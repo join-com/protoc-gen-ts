@@ -2,6 +2,7 @@ package generator
 
 import (
 	"fmt"
+	"log"
 	"strings"
 	"unicode"
 
@@ -33,7 +34,8 @@ func (g *generator) tsFileNameWithExt(protoName *string) string {
 func (g *generator) generateGenericImports() {
 	g.P(fmt.Sprint(`
 import * as grpc from 'grpc';
-import * as grpcTs from 'grpc-ts';
+import * as grpcTs from '@join-com/grpc-ts';
+import * as path from 'path';
 `))
 }
 
@@ -60,8 +62,8 @@ func (g *generator) generateImports(protoFile *google_protobuf.FileDescriptorPro
 }
 
 func (g *generator) validateParameters() {
-	if _, ok := g.Param["pb_pkg_path"]; !ok {
-		g.Fail("parameter `pb_pkg_path` is required (e.g. --ts_out=pb_pkg_path=<pb package path>:<output path>)")
+	if _, ok := g.Param["proto_relative"]; !ok {
+		g.Fail("parameter `proto_relative` is required (e.g. --ts_out=proto_relative=<proto relative to generated path>:<path to generated files>)")
 	}
 }
 
@@ -283,7 +285,27 @@ func (g *generator) methodDeprecated(method *google_protobuf.MethodDescriptorPro
 	}
 }
 
-func (g *generator) generateService(service *google_protobuf.ServiceDescriptorProto, packageName string) {
+func (g *generator) protoPath(protoFileName string) string {
+	splittedName := strings.Split(protoFileName, "/")
+	upPathArray := make([]string, len(splittedName)-1)
+	for i := 0; i < len(splittedName)-1; i++ {
+		upPathArray[i] = ".."
+	}
+	splittedRelative := strings.Split(g.Param["proto_relative"], "/")
+	relativePathArray := make([]string, len(splittedRelative))
+	for i := 0; i < len(splittedRelative); i++ {
+		relativePathArray[i] = splittedRelative[i]
+	}
+	protoPathArray := make([]string, len(splittedName))
+	for i := 0; i < len(splittedName); i++ {
+		protoPathArray[i] = splittedName[i]
+	}
+
+	fullPathArray := append(append(upPathArray, relativePathArray...), protoPathArray...)
+	return strings.Join(fullPathArray, `', '`)
+}
+
+func (g *generator) generateService(service *google_protobuf.ServiceDescriptorProto, packageName string, protoFileName string) {
 	g.P()
 	g.In()
 	if g.isServiceDeprecated(service) {
@@ -293,8 +315,10 @@ func (g *generator) generateService(service *google_protobuf.ServiceDescriptorPr
 	}
 	g.P(fmt.Sprintf("export class %sService extends grpcTs.Service<%sImplementation> {", gen.CamelCase(*service.Name), gen.CamelCase(*service.Name)))
 	g.In()
-	g.P(fmt.Sprintf("constructor(protoPath: string, implementations: %sImplementation) {", gen.CamelCase(*service.Name)))
+	g.P(fmt.Sprintf("constructor(implementations: %sImplementation) {", gen.CamelCase(*service.Name)))
 	g.In()
+	fullPath := g.protoPath(protoFileName)
+	g.P(fmt.Sprintf("const protoPath = path.join(__dirname, '%s');", fullPath))
 	g.P(fmt.Sprintf("super(protoPath, '%s', '%s', implementations);", packageName, *service.Name))
 	g.Out()
 	g.P(fmt.Sprint("}"))
@@ -335,7 +359,7 @@ func (g *generator) generateImplementation(service *google_protobuf.ServiceDescr
 	g.Out()
 }
 
-func (g *generator) generateClient(service *google_protobuf.ServiceDescriptorProto, packageName string) {
+func (g *generator) generateClient(service *google_protobuf.ServiceDescriptorProto, packageName string, protoFileName string) {
 	g.P()
 	g.In()
 	if g.isServiceDeprecated(service) {
@@ -346,9 +370,11 @@ func (g *generator) generateClient(service *google_protobuf.ServiceDescriptorPro
 
 	g.P(fmt.Sprintf("export class %sClient extends grpcTs.Client {", gen.CamelCase(*service.Name)))
 	g.In()
-	g.P("constructor(protoPath: string, host: string) {")
+	g.P("constructor(host: string, credentials: grpc.ChannelCredentials) {")
 	g.In()
-	g.P(fmt.Sprintf("super(protoPath, '%s', '%s', host);", packageName, *service.Name))
+	fullPath := g.protoPath(protoFileName)
+	g.P(fmt.Sprintf("const protoPath = path.join(__dirname, '%s');", fullPath))
+	g.P(fmt.Sprintf("super(protoPath, '%s', '%s', host, credentials);", packageName, *service.Name))
 	g.Out()
 	g.P("}")
 	for _, method := range service.Method {
@@ -391,11 +417,14 @@ func (g *generator) generateClient(service *google_protobuf.ServiceDescriptorPro
 
 func (g *generator) Make(protoFile *google_protobuf.FileDescriptorProto, protoFiles []*google_protobuf.FileDescriptorProto) (*plugin.CodeGeneratorResponse_File, error) {
 	g.validateParameters()
+	log.Print(*protoFile.Name)
+
+	g.P("// GENERATED CODE -- DO NOT EDIT!")
+
 	g.generateImports(protoFile, protoFiles)
 	if len(protoFile.Service) > 0 {
 		g.generateGenericImports()
 	}
-
 	packageName := protoFile.GetPackage()
 	g.generateNamespace(packageName)
 
@@ -409,11 +438,11 @@ func (g *generator) Make(protoFile *google_protobuf.FileDescriptorProto, protoFi
 
 	for _, service := range protoFile.Service {
 		g.generateImplementation(service)
-		g.generateService(service, *protoFile.Package)
+		g.generateService(service, *protoFile.Package, *protoFile.Name)
 	}
 
 	for _, service := range protoFile.Service {
-		g.generateClient(service, *protoFile.Package)
+		g.generateClient(service, *protoFile.Package, *protoFile.Name)
 	}
 
 	g.P("}")

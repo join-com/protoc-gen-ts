@@ -273,7 +273,12 @@ func (g *generator) methodOutputType(method *google_protobuf.MethodDescriptorPro
 		g.Fail(fmt.Sprintf("Response massage %s must have error field", *method.OutputType))
 	}
 
-	outputTypeName := g.getTsFieldType(resultField)
+	var outputTypeName string
+
+	outputTypeName = g.getTsFieldType(resultField)
+	if g.isFieldRepeated(resultField) {
+		outputTypeName = outputTypeName + "[]"
+	}
 	return outputTypeName
 }
 

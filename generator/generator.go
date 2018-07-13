@@ -290,7 +290,7 @@ func (g *generator) methodDeprecated(method *google_protobuf.MethodDescriptorPro
 	}
 }
 
-func (g *generator) protoPath(protoFileName string) string {
+func (g *generator) protoPathRelative(protoFileName string) string {
 	splittedName := strings.Split(protoFileName, "/")
 	upPathArray := make([]string, len(splittedName)-1)
 	for i := 0; i < len(splittedName)-1; i++ {
@@ -301,12 +301,7 @@ func (g *generator) protoPath(protoFileName string) string {
 	for i := 0; i < len(splittedRelative); i++ {
 		relativePathArray[i] = splittedRelative[i]
 	}
-	protoPathArray := make([]string, len(splittedName))
-	for i := 0; i < len(splittedName); i++ {
-		protoPathArray[i] = splittedName[i]
-	}
-
-	fullPathArray := append(append(upPathArray, relativePathArray...), protoPathArray...)
+	fullPathArray := append(upPathArray, relativePathArray...)
 	return strings.Join(fullPathArray, `', '`)
 }
 
@@ -320,11 +315,11 @@ func (g *generator) generateService(service *google_protobuf.ServiceDescriptorPr
 	}
 	g.P(fmt.Sprintf("export class %sService extends grpcTs.Service<%sImplementation> {", gen.CamelCase(*service.Name), gen.CamelCase(*service.Name)))
 	g.In()
-	g.P(fmt.Sprintf("constructor(implementations: %sImplementation) {", gen.CamelCase(*service.Name)))
+	g.P(fmt.Sprintf("constructor(implementations: %sImplementation, errorHandler?: grpcTs.ErrorHandler ) {", gen.CamelCase(*service.Name)))
 	g.In()
-	fullPath := g.protoPath(protoFileName)
-	g.P(fmt.Sprintf("const protoPath = path.join(__dirname, '%s');", fullPath))
-	g.P(fmt.Sprintf("super(protoPath, '%s', '%s', implementations);", packageName, *service.Name))
+	g.P(fmt.Sprintf("const protoPath = '%s';", protoFileName))
+	g.P(fmt.Sprintf("const includeDirs = [path.join(__dirname, '%s')];", g.protoPathRelative(protoFileName)))
+	g.P(fmt.Sprintf("super(protoPath, includeDirs, '%s', '%s', implementations, errorHandler);", packageName, *service.Name))
 	g.Out()
 	g.P(fmt.Sprint("}"))
 	g.Out()
@@ -377,9 +372,9 @@ func (g *generator) generateClient(service *google_protobuf.ServiceDescriptorPro
 	g.In()
 	g.P("constructor(host: string, credentials: grpc.ChannelCredentials) {")
 	g.In()
-	fullPath := g.protoPath(protoFileName)
-	g.P(fmt.Sprintf("const protoPath = path.join(__dirname, '%s');", fullPath))
-	g.P(fmt.Sprintf("super(protoPath, '%s', '%s', host, credentials);", packageName, *service.Name))
+	g.P(fmt.Sprintf("const protoPath = '%s';", protoFileName))
+	g.P(fmt.Sprintf("const includeDirs = [path.join(__dirname, '%s')];", g.protoPathRelative(protoFileName)))
+	g.P(fmt.Sprintf("super(protoPath, includeDirs, '%s', '%s', host, credentials);", packageName, *service.Name))
 	g.Out()
 	g.P("}")
 	for _, method := range service.Method {

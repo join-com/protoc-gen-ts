@@ -18,16 +18,22 @@ import (
 
 var camel = regexp.MustCompile("(^[^A-Z0-9]*|[A-Z0-9]*)([A-Z0-9][^A-Z]+|$)")
 
+type Dependency struct {
+	protoFileName string
+	depFileName   string
+}
+
 type fileMaker interface {
 	Make(*google_protobuf.FileDescriptorProto, []*google_protobuf.FileDescriptorProto) (*plugin.CodeGeneratorResponse_File, error)
 }
 
 type Generator struct {
 	*gen.Generator
-	indent           string
-	typeNameToObject map[string]*google_protobuf.DescriptorProto
-	reader           io.Reader
-	writer           io.Writer
+	indent                  string
+	typeNameToObject        map[string]*google_protobuf.DescriptorProto
+	reader                  io.Reader
+	writer                  io.Writer
+	dependencyNameImportMap map[Dependency]string
 }
 
 // New creates a new base generator
@@ -99,6 +105,7 @@ func (g *Generator) Fail(msgs ...string) {
 func (g *Generator) sideEffect() {
 	g.CommandLineParameters(g.Request.GetParameter())
 	g.BuildTypeNameMap(g.Request)
+	g.BuildImportsMap(g.Request)
 	g.Reset()
 }
 
@@ -112,9 +119,9 @@ func (g *Generator) ProtoFileBaseName(name string) string {
 func (g *Generator) generate(maker fileMaker, request *plugin.CodeGeneratorRequest) (*plugin.CodeGeneratorResponse, error) {
 	response := new(plugin.CodeGeneratorResponse)
 	for _, protoFile := range request.ProtoFile {
-		if strings.HasPrefix(*protoFile.Name, "google/protobuf") {
-			continue
-		}
+		// if strings.HasPrefix(*protoFile.Name, "google/protobuf") {
+		// 	continue
+		// }
 		file, err := maker.Make(protoFile, request.ProtoFile)
 		if err != nil {
 			return response, err
@@ -174,6 +181,53 @@ func (g *Generator) BuildTypeNameMap(request *plugin.CodeGeneratorRequest) {
 	}
 }
 
+func (g *Generator) BuildImportsMap(request *plugin.CodeGeneratorRequest) {
+	var exists = struct{}{}
+	g.dependencyNameImportMap = make(map[Dependency]string)
+	for _, protoFile := range request.ProtoFile {
+		usedImportNames := make(map[string]struct{})
+		for _, dependency := range protoFile.Dependency {
+			var depProtoFile *google_protobuf.FileDescriptorProto
+			for _, extProtoFile := range request.ProtoFile {
+				depProtoFileName := *extProtoFile.Name
+
+				if depProtoFileName == dependency {
+					depProtoFile = extProtoFile
+				}
+			}
+
+			packageName := depProtoFile.GetPackage()
+			namespaceName := g.namespaceName(packageName)
+			importName := namespaceName
+			if _, ok := usedImportNames[namespaceName]; ok {
+				splits := strings.Split(*depProtoFile.Name, "/")
+				fileNameWithExt := splits[len(splits)-1]
+				fileNameSplit := strings.Split(fileNameWithExt, ".")
+				importName = importName + gen.CamelCase(fileNameSplit[0])
+			}
+			usedImportNames[namespaceName] = exists
+			dep := Dependency{protoFileName: *protoFile.Name, depFileName: *depProtoFile.Name}
+			g.dependencyNameImportMap[dep] = importName
+		}
+	}
+}
+
+func (g *Generator) namespaceName(packageName string) string {
+	splits := strings.Split(packageName, ".")
+	camelCaseName := ""
+	for _, name := range splits {
+		a := []string{camelCaseName, gen.CamelCase(name)}
+		camelCaseName = strings.Join(a, "")
+	}
+
+	return camelCaseName
+}
+
 func (g *Generator) GetTypeByNamed(name string) *google_protobuf.DescriptorProto {
 	return g.typeNameToObject[name]
+}
+
+func (g *Generator) GetImportName(protoFileName string, depFileName string) string {
+	dep := Dependency{protoFileName: protoFileName, depFileName: depFileName}
+	return g.dependencyNameImportMap[dep]
 }

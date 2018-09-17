@@ -15,6 +15,7 @@ import (
 
 type generator struct {
 	*base.Generator
+	nameSpaceToImportName map[string]string
 }
 
 func New() *generator {
@@ -38,12 +39,18 @@ import * as grpcTs from '@join-com/grpc-ts';
 import * as path from 'path';
 `))
 }
+func (g *generator) packageNameFromFullName(fullName string) string {
+	parts := strings.Split(fullName, ".")
+	partsWithotTypeName := parts[:len(parts)-1]
+	return strings.Join(partsWithotTypeName, ".")
+}
 
 func (g *generator) generateImports(protoFile *google_protobuf.FileDescriptorProto, protoFiles []*google_protobuf.FileDescriptorProto) {
+	g.nameSpaceToImportName = make(map[string]string)
 	for _, dependency := range protoFile.Dependency {
-		if strings.HasPrefix(dependency, "google/protobuf") {
-			continue
-		}
+		// if strings.HasPrefix(dependency, "google/protobuf") {
+		// 	continue
+		// }
 		var depProtoFile *google_protobuf.FileDescriptorProto
 		for _, extProtoFile := range protoFiles {
 			depProtoFileName := *extProtoFile.Name
@@ -52,12 +59,21 @@ func (g *generator) generateImports(protoFile *google_protobuf.FileDescriptorPro
 				depProtoFile = extProtoFile
 			}
 		}
+
 		packageName := depProtoFile.GetPackage()
 		namespaceName := g.namespaceName(packageName)
-		fileNames := strings.Split(*depProtoFile.Name, "/")
+		fileNames := strings.Split(*protoFile.Name, "/")
 		path := strings.Repeat("../", len(fileNames)-1)
 		path += g.tsFileName(depProtoFile.Name)
-		g.P(fmt.Sprintf("import { %s } from '%s';", namespaceName, path))
+		importName := g.GetImportName(*protoFile.Name, *depProtoFile.Name)
+		g.nameSpaceToImportName["."+packageName] = importName
+		log.Printf("!!!! %s", packageName)
+		if importName == namespaceName {
+			g.P(fmt.Sprintf("import { %s } from '%s';", namespaceName, path))
+		} else {
+			g.P(fmt.Sprintf("import { %s as %s} from '%s';", namespaceName, importName, path))
+		}
+
 	}
 }
 
@@ -67,6 +83,7 @@ func (g *generator) validateParameters() {
 	}
 }
 
+// copy
 func (g *generator) namespaceName(packageName string) string {
 	splits := strings.Split(packageName, ".")
 	camelCaseName := ""
@@ -171,16 +188,14 @@ func (g *generator) isServiceDeprecated(field *google_protobuf.ServiceDescriptor
 }
 
 func (g *generator) getTsTypeFromMessage(typeName *string) string {
-	if !strings.HasPrefix(*typeName, ".google.protobuf.") {
-		names := strings.Split(*typeName, ".")
-		packageName := strings.Join(names[:len(names)-1], ".")
-		messageName := g.namespaceName(packageName) + "." + names[len(names)-1]
-		return messageName
-	}
-
+	log.Printf(">>>>>>>>> %s", g.packageNameFromFullName(*typeName))
 	names := strings.Split(*typeName, ".")
-	name := names[len(names)-1]
-	return wellKnownTypes[name]
+	// packageName := strings.Join(names[:len(names)-1], ".")
+	// namespace := g.namespaceName(packageName)
+	importName := g.nameSpaceToImportName[g.packageNameFromFullName(*typeName)]
+	messageName := importName + "." + names[len(names)-1]
+
+	return messageName
 }
 
 func (g *generator) getTsFieldType(field *google_protobuf.FieldDescriptorProto) string {
@@ -209,10 +224,7 @@ func (g *generator) generateField(field *google_protobuf.FieldDescriptorProto) {
 		g.P("/** @deprecated */")
 	}
 	s := *field.JsonName
-
-	if g.isFieldOptional(field) || g.isFieldDeprecated(field) || g.isFieldOneOf(field) {
-		s += "?"
-	}
+	s += "?"
 	s += fmt.Sprintf(": %s", g.getTsFieldType(field))
 	if g.isFieldRepeated(field) {
 		s += "[]"
@@ -235,6 +247,183 @@ func (g *generator) generateMessage(message *google_protobuf.DescriptorProto) {
 	for _, field := range message.Field {
 		g.generateField(field)
 	}
+	g.Out()
+	g.P("}")
+	g.Out()
+}
+
+func (g *generator) generatePrivateField(field *google_protobuf.FieldDescriptorProto) {
+	if g.isFieldDeprecated(field) {
+		g.P("/** @deprecated */")
+	}
+	s := "private _" + *field.JsonName
+	s += "?"
+	s += fmt.Sprintf(": %s", g.getTsFieldType(field))
+	if g.isFieldRepeated(field) {
+		s += "[]"
+	}
+	s += ";"
+	g.P(s)
+}
+
+func (g *generator) generateConstructor(message *google_protobuf.DescriptorProto) {
+	name := g.messageName(message)
+	g.P(fmt.Sprintf("constructor(attrs?: %s){", name))
+	g.In()
+	g.P("Object.assign(this, attrs)")
+	g.Out()
+	g.P("}")
+}
+
+func (g *generator) getFieldIndex(field *google_protobuf.FieldDescriptorProto) uint32 {
+	wireType := g.getWireType(field)
+	index := uint32(field.GetNumber())
+	return ((index << 3) | wireType) >> 0
+}
+
+func (g *generator) getWireType(field *google_protobuf.FieldDescriptorProto) uint32 {
+	switch *field.Type {
+	case google_protobuf.FieldDescriptorProto_TYPE_DOUBLE:
+		return proto.WireFixed64
+	case google_protobuf.FieldDescriptorProto_TYPE_FLOAT:
+		return proto.WireFixed32
+	case google_protobuf.FieldDescriptorProto_TYPE_INT64,
+		google_protobuf.FieldDescriptorProto_TYPE_UINT64:
+		return proto.WireVarint
+	case google_protobuf.FieldDescriptorProto_TYPE_INT32,
+		google_protobuf.FieldDescriptorProto_TYPE_UINT32,
+		google_protobuf.FieldDescriptorProto_TYPE_ENUM:
+		return proto.WireVarint
+	case google_protobuf.FieldDescriptorProto_TYPE_FIXED64,
+		google_protobuf.FieldDescriptorProto_TYPE_SFIXED64:
+		return proto.WireFixed64
+	case google_protobuf.FieldDescriptorProto_TYPE_FIXED32,
+		google_protobuf.FieldDescriptorProto_TYPE_SFIXED32:
+		return proto.WireFixed32
+	case google_protobuf.FieldDescriptorProto_TYPE_BOOL:
+		return proto.WireVarint
+	case google_protobuf.FieldDescriptorProto_TYPE_STRING:
+		return proto.WireBytes
+	case google_protobuf.FieldDescriptorProto_TYPE_GROUP:
+		return proto.WireStartGroup
+	case google_protobuf.FieldDescriptorProto_TYPE_MESSAGE:
+		return proto.WireBytes
+	case google_protobuf.FieldDescriptorProto_TYPE_BYTES:
+		return proto.WireBytes
+	case google_protobuf.FieldDescriptorProto_TYPE_SINT32:
+		return proto.WireVarint
+	case google_protobuf.FieldDescriptorProto_TYPE_SINT64:
+		return proto.WireVarint
+	default:
+		g.Fail("unhandled oneof field type ", field.Type.String())
+	}
+	return 2
+}
+
+func (g *generator) generateEncode(message *google_protobuf.DescriptorProto) {
+	g.P("public encode(writer: protobufjs.Writer = protobufjs.Writer.create()){")
+	g.In()
+	for _, field := range message.Field {
+		name := *field.JsonName
+		g.P(fmt.Sprintf("if (this._%s != null) {", name))
+		g.In()
+
+		// TODO check calculation
+		g.P(fmt.Sprintf("writer.uint32(%d).int32(this._%s)", g.getFieldIndex(field), name))
+		g.Out()
+		g.P("return writer")
+		g.P("}")
+	}
+	g.Out()
+	g.P("}")
+}
+
+func (g *generator) generateDecode(message *google_protobuf.DescriptorProto) {
+	g.P("public decode(inReader: Uint8Array | protobufjs.Reader, length?: number){")
+	g.In()
+	g.P("const reader = !(inReader instanceof protobufjs.Reader)")
+	g.In()
+	g.P("? protobufjs.Reader.create(inReader)")
+	g.P(": inReader")
+	g.Out()
+	g.P("const end = length === undefined ? reader.len : reader.pos + length")
+	g.P("const message = new Request()")
+	g.P("while (reader.pos < end) {")
+	g.In()
+	g.P("const tag = reader.uint32()")
+	g.P("switch (tag >>> 3) {")
+	g.In()
+
+	g.Out()
+	g.P("}")
+	g.Out()
+	g.P("}")
+	//
+	//
+	// : inReader
+	// g.In()
+	// for _, field := range message.Field {
+	// 	name := *field.JsonName
+	// 	g.P(fmt.Sprintf("if (this._%s != null) {", name))
+	// 	g.In()
+
+	// 	// TODO check calculation
+	// 	g.P(fmt.Sprintf("writer.uint32(%d).int32(this._%s)", g.getFieldIndex(field), name))
+	// 	g.Out()
+	// 	g.P("return writer")
+	// 	g.P("}")
+	// }
+	g.Out()
+	g.P("}")
+}
+
+func (g *generator) generateGettersSetters(message *google_protobuf.DescriptorProto) {
+	for _, field := range message.Field {
+		name := *field.JsonName
+		g.P(fmt.Sprintf("public get %s() {", name))
+		g.In()
+		if g.isFieldDeprecated(field) {
+			g.P(fmt.Sprintf("console.warn('%s is deprecated')", name))
+		}
+		g.P(fmt.Sprintf("return this._%s", name))
+		g.Out()
+		g.P("}")
+
+		g.P(fmt.Sprintf("public set %s(val) {", name))
+		g.In()
+		if g.isFieldDeprecated(field) {
+			g.P(fmt.Sprintf("console.warn('%s is deprecated')", name))
+		}
+
+		if *field.Type == google_protobuf.FieldDescriptorProto_TYPE_MESSAGE {
+			g.P(fmt.Sprintf("this._%s = new %sMsg(val)", name, g.getTsTypeFromMessage(field.TypeName)))
+		} else {
+			g.P(fmt.Sprintf("this._%s = val", name))
+		}
+
+		g.Out()
+		g.P("}")
+	}
+}
+
+func (g *generator) generateMessageClass(message *google_protobuf.DescriptorProto) {
+	g.P()
+	g.In()
+
+	if g.isMessageDeprecated(message) {
+		g.P("/**")
+		g.P("* @deprecated")
+		g.P("*/")
+	}
+	name := g.messageName(message)
+	g.P(fmt.Sprintf("export class %sMsg implements %s{", name, name))
+	g.In()
+	for _, field := range message.Field {
+		g.generatePrivateField(field)
+	}
+	g.generateConstructor(message)
+	g.generateGettersSetters(message)
+	g.generateEncode(message)
 	g.Out()
 	g.P("}")
 	g.Out()
@@ -434,6 +623,7 @@ func (g *generator) Make(protoFile *google_protobuf.FileDescriptorProto, protoFi
 
 	for _, message := range protoFile.MessageType {
 		g.generateMessage(message)
+		g.generateMessageClass(message)
 	}
 
 	for _, service := range protoFile.Service {

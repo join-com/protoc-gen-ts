@@ -39,6 +39,7 @@ import * as grpcTs from '@join-com/grpc-ts';
 import * as path from 'path';
 `))
 }
+
 func (g *generator) packageNameFromFullName(fullName string) string {
 	parts := strings.Split(fullName, ".")
 	partsWithotTypeName := parts[:len(parts)-1]
@@ -48,9 +49,6 @@ func (g *generator) packageNameFromFullName(fullName string) string {
 func (g *generator) generateImports(protoFile *google_protobuf.FileDescriptorProto, protoFiles []*google_protobuf.FileDescriptorProto) {
 	g.nameSpaceToImportName = make(map[string]string)
 	for _, dependency := range protoFile.Dependency {
-		// if strings.HasPrefix(dependency, "google/protobuf") {
-		// 	continue
-		// }
 		var depProtoFile *google_protobuf.FileDescriptorProto
 		for _, extProtoFile := range protoFiles {
 			depProtoFileName := *extProtoFile.Name
@@ -66,7 +64,7 @@ func (g *generator) generateImports(protoFile *google_protobuf.FileDescriptorPro
 		path := strings.Repeat("../", len(fileNames)-1)
 		path += g.tsFileName(depProtoFile.Name)
 		importName := g.GetImportName(*protoFile.Name, *depProtoFile.Name)
-		g.nameSpaceToImportName["."+packageName] = importName
+		g.nameSpaceToImportName[*depProtoFile.Name] = importName
 		log.Printf("!!!! %s", packageName)
 		if importName == namespaceName {
 			g.P(fmt.Sprintf("import { %s } from '%s';", namespaceName, path))

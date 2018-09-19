@@ -34,6 +34,7 @@ type Generator struct {
 	reader                  io.Reader
 	writer                  io.Writer
 	dependencyNameImportMap map[Dependency]string
+	messageToFileMap        map[string]string
 }
 
 // New creates a new base generator
@@ -106,6 +107,8 @@ func (g *Generator) sideEffect() {
 	g.CommandLineParameters(g.Request.GetParameter())
 	g.BuildTypeNameMap(g.Request)
 	g.BuildImportsMap(g.Request)
+	g.BuildMessageToFileMap(g.Request)
+	log.Printf("#%v", g.messageToFileMap)
 	g.Reset()
 }
 
@@ -212,6 +215,29 @@ func (g *Generator) BuildImportsMap(request *plugin.CodeGeneratorRequest) {
 	}
 }
 
+func (g *Generator) BuildMessageToFileMap(request *plugin.CodeGeneratorRequest) {
+	g.messageToFileMap = make(map[string]string)
+	for _, f := range request.ProtoFile {
+		// The names in this loop are defined by the proto world, not us, so the
+		// package name may be empty.  If so, the dotted package name of X will
+		// be ".X"; otherwise it will be ".pkg.X".
+		dottedPkg := "." + f.GetPackage()
+		if dottedPkg != "." {
+			dottedPkg += "."
+		}
+
+		for _, desc := range f.MessageType {
+			name := dottedPkg + *desc.Name
+			g.messageToFileMap[name] = f.GetName()
+		}
+
+		for _, desc := range f.EnumType {
+			name := dottedPkg + *desc.Name
+			g.messageToFileMap[name] = f.GetName()
+		}
+	}
+}
+
 func (g *Generator) namespaceName(packageName string) string {
 	splits := strings.Split(packageName, ".")
 	camelCaseName := ""
@@ -228,6 +254,12 @@ func (g *Generator) GetTypeByNamed(name string) *google_protobuf.DescriptorProto
 }
 
 func (g *Generator) GetImportName(protoFileName string, depFileName string) string {
+	dep := Dependency{protoFileName: protoFileName, depFileName: depFileName}
+	return g.dependencyNameImportMap[dep]
+}
+
+func (g *Generator) GetImportNameForMessage(protoFileName string, message string) string {
+	depFileName := g.messageToFileMap[message]
 	dep := Dependency{protoFileName: protoFileName, depFileName: depFileName}
 	return g.dependencyNameImportMap[dep]
 }

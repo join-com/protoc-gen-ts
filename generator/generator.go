@@ -15,7 +15,7 @@ import (
 
 type generator struct {
 	*base.Generator
-	nameSpaceToImportName map[string]string
+	protoFile *google_protobuf.FileDescriptorProto
 }
 
 func New() *generator {
@@ -34,6 +34,7 @@ func (g *generator) tsFileNameWithExt(protoName *string) string {
 
 func (g *generator) generateGenericImports() {
 	g.P(fmt.Sprint(`
+import * as protobufjs from 'protobufjs/minimal';
 import * as grpc from 'grpc';
 import * as grpcTs from '@join-com/grpc-ts';
 import * as path from 'path';
@@ -47,7 +48,6 @@ func (g *generator) packageNameFromFullName(fullName string) string {
 }
 
 func (g *generator) generateImports(protoFile *google_protobuf.FileDescriptorProto, protoFiles []*google_protobuf.FileDescriptorProto) {
-	g.nameSpaceToImportName = make(map[string]string)
 	for _, dependency := range protoFile.Dependency {
 		var depProtoFile *google_protobuf.FileDescriptorProto
 		for _, extProtoFile := range protoFiles {
@@ -64,8 +64,6 @@ func (g *generator) generateImports(protoFile *google_protobuf.FileDescriptorPro
 		path := strings.Repeat("../", len(fileNames)-1)
 		path += g.tsFileName(depProtoFile.Name)
 		importName := g.GetImportName(*protoFile.Name, *depProtoFile.Name)
-		g.nameSpaceToImportName[*depProtoFile.Name] = importName
-		log.Printf("!!!! %s", packageName)
 		if importName == namespaceName {
 			g.P(fmt.Sprintf("import { %s } from '%s';", namespaceName, path))
 		} else {
@@ -186,14 +184,12 @@ func (g *generator) isServiceDeprecated(field *google_protobuf.ServiceDescriptor
 }
 
 func (g *generator) getTsTypeFromMessage(typeName *string) string {
-	log.Printf(">>>>>>>>> %s", g.packageNameFromFullName(*typeName))
 	names := strings.Split(*typeName, ".")
-	// packageName := strings.Join(names[:len(names)-1], ".")
-	// namespace := g.namespaceName(packageName)
-	importName := g.nameSpaceToImportName[g.packageNameFromFullName(*typeName)]
-	messageName := importName + "." + names[len(names)-1]
-
-	return messageName
+	importName := g.GetImportNameForMessage(*g.protoFile.Name, *typeName)
+	if importName == "" {
+		return names[len(names)-1]
+	}
+	return importName + "." + names[len(names)-1]
 }
 
 func (g *generator) getTsFieldType(field *google_protobuf.FieldDescriptorProto) string {
@@ -313,9 +309,51 @@ func (g *generator) getWireType(field *google_protobuf.FieldDescriptorProto) uin
 	case google_protobuf.FieldDescriptorProto_TYPE_SINT64:
 		return proto.WireVarint
 	default:
-		g.Fail("unhandled oneof field type ", field.Type.String())
+		g.Fail("undefined field type", field.Type.String())
 	}
 	return 2
+}
+
+func (g *generator) getWriteFunction(field *google_protobuf.FieldDescriptorProto) string {
+	switch *field.Type {
+	case google_protobuf.FieldDescriptorProto_TYPE_DOUBLE:
+		return "double"
+	case google_protobuf.FieldDescriptorProto_TYPE_FLOAT:
+		return "float"
+	case google_protobuf.FieldDescriptorProto_TYPE_INT64:
+		return "int64"
+	case google_protobuf.FieldDescriptorProto_TYPE_UINT64:
+		return "uint64"
+	case google_protobuf.FieldDescriptorProto_TYPE_INT32:
+		return "int32"
+	case google_protobuf.FieldDescriptorProto_TYPE_UINT32:
+		return "uint32"
+	case google_protobuf.FieldDescriptorProto_TYPE_ENUM:
+		return "int32"
+	case google_protobuf.FieldDescriptorProto_TYPE_FIXED64:
+		return "fixed64"
+	case google_protobuf.FieldDescriptorProto_TYPE_SFIXED64:
+		return "sfixed64"
+	case google_protobuf.FieldDescriptorProto_TYPE_FIXED32:
+		return "fixed32"
+	case google_protobuf.FieldDescriptorProto_TYPE_SFIXED32:
+		return "sfixed32"
+	case google_protobuf.FieldDescriptorProto_TYPE_BOOL:
+		return "bool"
+	case google_protobuf.FieldDescriptorProto_TYPE_STRING:
+		return "string"
+	case google_protobuf.FieldDescriptorProto_TYPE_MESSAGE:
+		return "MESSAGE"
+	case google_protobuf.FieldDescriptorProto_TYPE_BYTES:
+		return "bytes"
+	case google_protobuf.FieldDescriptorProto_TYPE_SINT32:
+		return "sint32"
+	case google_protobuf.FieldDescriptorProto_TYPE_SINT64:
+		return "sint64"
+	default:
+		g.Fail("undefined field type", field.Type.String())
+	}
+	return "int32"
 }
 
 func (g *generator) generateEncode(message *google_protobuf.DescriptorProto) {
@@ -326,8 +364,30 @@ func (g *generator) generateEncode(message *google_protobuf.DescriptorProto) {
 		g.P(fmt.Sprintf("if (this._%s != null) {", name))
 		g.In()
 
-		// TODO check calculation
-		g.P(fmt.Sprintf("writer.uint32(%d).int32(this._%s)", g.getFieldIndex(field), name))
+		if *field.Type == google_protobuf.FieldDescriptorProto_TYPE_MESSAGE {
+			if g.isFieldRepeated(field) {
+				g.P(fmt.Sprintf("for (const value of this._%s) {", name))
+				g.In()
+				g.P(fmt.Sprintf("const msg = new %sMsg(value)", g.getTsTypeFromMessage(field.TypeName)))
+				g.P(fmt.Sprintf("msg.encode(writer.uint32(%d).fork()).ldelim();", g.getFieldIndex(field)))
+				g.Out()
+				g.P("}")
+			} else {
+				g.P(fmt.Sprintf("const msg = new %sMsg(this._%s)", g.getTsTypeFromMessage(field.TypeName), name))
+				g.P(fmt.Sprintf("msg.encode(writer.uint32(%d).fork()).ldelim();", g.getFieldIndex(field)))
+			}
+		} else {
+			if g.isFieldRepeated(field) {
+				g.P(fmt.Sprintf("for (const value of this._%s) {", name))
+				g.In()
+				g.P(fmt.Sprintf("writer.uint32(%d).%s(value);", g.getFieldIndex(field), g.getWriteFunction(field)))
+				g.Out()
+				g.P("}")
+			} else {
+				g.P(fmt.Sprintf("writer.uint32(%d).%s(this._%s);", g.getFieldIndex(field), g.getWriteFunction(field), name))
+			}
+
+		}
 		g.Out()
 		g.P("return writer")
 		g.P("}")
@@ -394,7 +454,11 @@ func (g *generator) generateGettersSetters(message *google_protobuf.DescriptorPr
 		}
 
 		if *field.Type == google_protobuf.FieldDescriptorProto_TYPE_MESSAGE {
-			g.P(fmt.Sprintf("this._%s = new %sMsg(val)", name, g.getTsTypeFromMessage(field.TypeName)))
+			if g.isFieldRepeated(field) {
+				g.P(fmt.Sprintf("this._%s = val && val.map(v => new %sMsg(v))", name, g.getTsTypeFromMessage(field.TypeName)))
+			} else {
+				g.P(fmt.Sprintf("this._%s = new %sMsg(val)", name, g.getTsTypeFromMessage(field.TypeName)))
+			}
 		} else {
 			g.P(fmt.Sprintf("this._%s = val", name))
 		}
@@ -603,6 +667,7 @@ func (g *generator) generateClient(service *google_protobuf.ServiceDescriptorPro
 }
 
 func (g *generator) Make(protoFile *google_protobuf.FileDescriptorProto, protoFiles []*google_protobuf.FileDescriptorProto) (*plugin.CodeGeneratorResponse_File, error) {
+	g.protoFile = protoFile
 	g.validateParameters()
 	log.Print(*protoFile.Name)
 

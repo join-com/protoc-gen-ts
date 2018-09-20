@@ -252,7 +252,11 @@ func (g *generator) generatePrivateField(field *google_protobuf.FieldDescriptorP
 	}
 	s := "private _" + *field.JsonName
 	s += "?"
-	s += fmt.Sprintf(": %s", g.getTsFieldType(field))
+	if *field.Type == google_protobuf.FieldDescriptorProto_TYPE_ENUM {
+		s += ": number"
+	} else {
+		s += fmt.Sprintf(": %s", g.getTsFieldType(field))
+	}
 	if g.isFieldRepeated(field) {
 		s += "[]"
 	}
@@ -389,9 +393,9 @@ func (g *generator) generateEncode(message *google_protobuf.DescriptorProto) {
 
 		}
 		g.Out()
-		g.P("return writer")
 		g.P("}")
 	}
+	g.P("return writer")
 	g.Out()
 	g.P("}")
 }
@@ -443,7 +447,50 @@ func (g *generator) generateGettersSetters(message *google_protobuf.DescriptorPr
 		if g.isFieldDeprecated(field) {
 			g.P(fmt.Sprintf("console.warn('%s is deprecated')", name))
 		}
-		g.P(fmt.Sprintf("return this._%s", name))
+		if *field.Type == google_protobuf.FieldDescriptorProto_TYPE_ENUM {
+			enum := g.GetEnumTypeByName(*field.TypeName)
+			g.P(fmt.Sprintf("if (!this._%s) {", name))
+			g.In()
+			g.P("return")
+			g.Out()
+			g.P("}")
+			if g.isFieldRepeated(field) {
+				g.P(fmt.Sprintf("return this._%s.map((val) => {", name))
+				g.In()
+				g.P("switch (val) {")
+				typeName := g.getTsFieldType(field)
+				for _, value := range enum.Value {
+					g.P(fmt.Sprintf("case %d:", *value.Number))
+					g.In()
+					g.P(fmt.Sprintf("return %s.%s", typeName, *value.Name))
+					g.Out()
+				}
+				g.P("default:")
+				g.In()
+				g.P(fmt.Sprintf("throw new Error('Undefined value of enum %s for field %s of message %s');", typeName, field.GetJsonName(), message.GetName()))
+				g.Out()
+				g.P("}")
+				g.Out()
+				g.P("})")
+			} else {
+				g.P(fmt.Sprintf("switch (this._%s) {", name))
+				typeName := g.getTsFieldType(field)
+				for _, value := range enum.Value {
+					g.P(fmt.Sprintf("case %d:", *value.Number))
+					g.In()
+					g.P(fmt.Sprintf("return %s.%s", typeName, *value.Name))
+					g.Out()
+				}
+				g.P("default:")
+				g.In()
+				g.P("return")
+				g.Out()
+				g.P("}")
+			}
+		} else {
+			g.P(fmt.Sprintf("return this._%s", name))
+		}
+
 		g.Out()
 		g.P("}")
 
@@ -458,6 +505,60 @@ func (g *generator) generateGettersSetters(message *google_protobuf.DescriptorPr
 				g.P(fmt.Sprintf("this._%s = val && val.map(v => new %sMsg(v))", name, g.getTsTypeFromMessage(field.TypeName)))
 			} else {
 				g.P(fmt.Sprintf("this._%s = new %sMsg(val)", name, g.getTsTypeFromMessage(field.TypeName)))
+			}
+		} else if *field.Type == google_protobuf.FieldDescriptorProto_TYPE_ENUM {
+			// 	switch (val) {
+			// 	case PricingType.FREE:
+			// 		this._pricingType = 0;
+			// 		break;
+			// 	case PricingType.FREE_BOOKING:
+			// 		this._pricingType = 1;
+			// 		break;
+			// 	case PricingType.PREMIUM:
+			// 		this._pricingType = 2;
+			// 		break;
+			// 	default:
+			// 		throw new Error('Undefined PricingType for message..');
+			// }
+			enum := g.GetEnumTypeByName(*field.TypeName)
+			if g.isFieldRepeated(field) {
+				g.P("if (!val) {")
+				g.In()
+				g.P("return")
+				g.Out()
+				g.P("}")
+				g.P(fmt.Sprintf("this._%s = val.map((value) => {", name))
+				g.In()
+				g.P("switch (value) {")
+				typeName := g.getTsFieldType(field)
+				for _, value := range enum.Value {
+					g.P(fmt.Sprintf("case %s.%s:", typeName, *value.Name))
+					g.In()
+					g.P(fmt.Sprintf("return %d", *value.Number))
+					g.Out()
+				}
+				g.P("default:")
+				g.In()
+				g.P(fmt.Sprintf("throw new Error('Undefined value of enum %s for field %s of message %s');", typeName, field.GetJsonName(), message.GetName()))
+				g.Out()
+				g.P("}")
+				g.Out()
+				g.P("})")
+			} else {
+				g.P("switch (val) {")
+				typeName := g.getTsFieldType(field)
+				for _, value := range enum.Value {
+					g.P(fmt.Sprintf("case %s.%s:", typeName, *value.Name))
+					g.In()
+					g.P(fmt.Sprintf("this._%s = %d", name, *value.Number))
+					g.P("break;")
+					g.Out()
+				}
+				g.P("default:")
+				g.In()
+				g.P(fmt.Sprintf("this._%s = undefined", name))
+				g.Out()
+				g.P("}")
 			}
 		} else {
 			g.P(fmt.Sprintf("this._%s = val", name))
@@ -505,7 +606,7 @@ func (g *generator) generateEnum(enum *google_protobuf.EnumDescriptorProto) {
 }
 
 func (g *generator) methodOutputType(method *google_protobuf.MethodDescriptorProto) string {
-	outputType := g.GetTypeByNamed(*method.OutputType)
+	outputType := g.GetMessageTypeByName(*method.OutputType)
 	var resultField *google_protobuf.FieldDescriptorProto
 	var errorField *google_protobuf.FieldDescriptorProto
 	for _, field := range outputType.Field {

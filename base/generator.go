@@ -31,6 +31,7 @@ type Generator struct {
 	*gen.Generator
 	indent                  string
 	typeNameToObject        map[string]*google_protobuf.DescriptorProto
+	enumNameToObject        map[string]*google_protobuf.EnumDescriptorProto
 	reader                  io.Reader
 	writer                  io.Writer
 	dependencyNameImportMap map[Dependency]string
@@ -106,6 +107,7 @@ func (g *Generator) Fail(msgs ...string) {
 func (g *Generator) sideEffect() {
 	g.CommandLineParameters(g.Request.GetParameter())
 	g.BuildTypeNameMap(g.Request)
+	g.BuildEnumNameMap(g.Request)
 	g.BuildImportsMap(g.Request)
 	g.BuildMessageToFileMap(g.Request)
 	log.Printf("#%v", g.messageToFileMap)
@@ -184,6 +186,24 @@ func (g *Generator) BuildTypeNameMap(request *plugin.CodeGeneratorRequest) {
 	}
 }
 
+func (g *Generator) BuildEnumNameMap(request *plugin.CodeGeneratorRequest) {
+	g.enumNameToObject = make(map[string]*google_protobuf.EnumDescriptorProto)
+	for _, f := range request.ProtoFile {
+		// The names in this loop are defined by the proto world, not us, so the
+		// package name may be empty.  If so, the dotted package name of X will
+		// be ".X"; otherwise it will be ".pkg.X".
+		dottedPkg := "." + f.GetPackage()
+		if dottedPkg != "." {
+			dottedPkg += "."
+		}
+
+		for _, desc := range f.EnumType {
+			name := dottedPkg + *desc.Name
+			g.enumNameToObject[name] = desc
+		}
+	}
+}
+
 func (g *Generator) BuildImportsMap(request *plugin.CodeGeneratorRequest) {
 	var exists = struct{}{}
 	g.dependencyNameImportMap = make(map[Dependency]string)
@@ -230,11 +250,6 @@ func (g *Generator) BuildMessageToFileMap(request *plugin.CodeGeneratorRequest) 
 			name := dottedPkg + *desc.Name
 			g.messageToFileMap[name] = f.GetName()
 		}
-
-		for _, desc := range f.EnumType {
-			name := dottedPkg + *desc.Name
-			g.messageToFileMap[name] = f.GetName()
-		}
 	}
 }
 
@@ -249,8 +264,12 @@ func (g *Generator) namespaceName(packageName string) string {
 	return camelCaseName
 }
 
-func (g *Generator) GetTypeByNamed(name string) *google_protobuf.DescriptorProto {
+func (g *Generator) GetMessageTypeByName(name string) *google_protobuf.DescriptorProto {
 	return g.typeNameToObject[name]
+}
+
+func (g *Generator) GetEnumTypeByName(name string) *google_protobuf.EnumDescriptorProto {
+	return g.enumNameToObject[name]
 }
 
 func (g *Generator) GetImportName(protoFileName string, depFileName string) string {

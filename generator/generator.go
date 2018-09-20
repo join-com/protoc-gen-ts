@@ -219,7 +219,12 @@ func (g *generator) generateField(field *google_protobuf.FieldDescriptorProto) {
 	}
 	s := *field.JsonName
 	s += "?"
-	s += fmt.Sprintf(": %s", g.getTsFieldType(field))
+	if field.GetTypeName() == ".google.protobuf.Timestamp" {
+		s += ": Date"
+	} else {
+		s += fmt.Sprintf(": %s", g.getTsFieldType(field))
+	}
+
 	if g.isFieldRepeated(field) {
 		s += "[]"
 	}
@@ -420,21 +425,6 @@ func (g *generator) generateDecode(message *google_protobuf.DescriptorProto) {
 	g.P("}")
 	g.Out()
 	g.P("}")
-	//
-	//
-	// : inReader
-	// g.In()
-	// for _, field := range message.Field {
-	// 	name := *field.JsonName
-	// 	g.P(fmt.Sprintf("if (this._%s != null) {", name))
-	// 	g.In()
-
-	// 	// TODO check calculation
-	// 	g.P(fmt.Sprintf("writer.uint32(%d).int32(this._%s)", g.getFieldIndex(field), name))
-	// 	g.Out()
-	// 	g.P("return writer")
-	// 	g.P("}")
-	// }
 	g.Out()
 	g.P("}")
 }
@@ -487,6 +477,12 @@ func (g *generator) generateGettersSetters(message *google_protobuf.DescriptorPr
 				g.Out()
 				g.P("}")
 			}
+		} else if field.GetTypeName() == ".google.protobuf.Timestamp" {
+			if g.isFieldRepeated(field) {
+				g.P(fmt.Sprintf("return this._%s && this._%s.map(v => new Date(((v.seconds || 0) * 1000) + ((v.nanos || 0) / 1000000)))", name, name))
+			} else {
+				g.P(fmt.Sprintf("return this._%s && new Date(((this._%s.seconds || 0) * 1000) + ((this._%s.nanos || 0) / 1000000))", name, name, name))
+			}
 		} else {
 			g.P(fmt.Sprintf("return this._%s", name))
 		}
@@ -501,25 +497,20 @@ func (g *generator) generateGettersSetters(message *google_protobuf.DescriptorPr
 		}
 
 		if *field.Type == google_protobuf.FieldDescriptorProto_TYPE_MESSAGE {
-			if g.isFieldRepeated(field) {
-				g.P(fmt.Sprintf("this._%s = val && val.map(v => new %sMsg(v))", name, g.getTsTypeFromMessage(field.TypeName)))
+			if field.GetTypeName() == ".google.protobuf.Timestamp" {
+				if g.isFieldRepeated(field) {
+					g.P(fmt.Sprintf("this._%s = val && val.map(v => ({ seconds: Math.floor(v.getTime() / 1000), nanos: v.getMilliseconds() * 1000000 }))", name))
+				} else {
+					g.P(fmt.Sprintf("this._%s = val && { seconds: Math.floor(val.getTime() / 1000), nanos: val.getMilliseconds() * 1000000 }", name))
+				}
 			} else {
-				g.P(fmt.Sprintf("this._%s = new %sMsg(val)", name, g.getTsTypeFromMessage(field.TypeName)))
+				if g.isFieldRepeated(field) {
+					g.P(fmt.Sprintf("this._%s = val && val.map(v => new %sMsg(v))", name, g.getTsTypeFromMessage(field.TypeName)))
+				} else {
+					g.P(fmt.Sprintf("this._%s = new %sMsg(val)", name, g.getTsTypeFromMessage(field.TypeName)))
+				}
 			}
 		} else if *field.Type == google_protobuf.FieldDescriptorProto_TYPE_ENUM {
-			// 	switch (val) {
-			// 	case PricingType.FREE:
-			// 		this._pricingType = 0;
-			// 		break;
-			// 	case PricingType.FREE_BOOKING:
-			// 		this._pricingType = 1;
-			// 		break;
-			// 	case PricingType.PREMIUM:
-			// 		this._pricingType = 2;
-			// 		break;
-			// 	default:
-			// 		throw new Error('Undefined PricingType for message..');
-			// }
 			enum := g.GetEnumTypeByName(*field.TypeName)
 			if g.isFieldRepeated(field) {
 				g.P("if (!val) {")

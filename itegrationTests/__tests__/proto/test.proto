@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package foo;
+
+service Users {
+  rpc Find(Request) returns (User) {}
+}
+
+enum Type {
+  UNKNOWN = 0;
+  ADMIN = 1;
+  USER = 2;
+}
+
+enum Role {
+  VIEW = 0;
+  EDIT = 1;
+}
+
+message Request {
+  int32 id = 1;
+}
+
+message Book {
+  string title = 1;
+  string isbn = 2;
+}
+
+message User {
+  int32 id = 1;
+  string name = 2;
+  Type type = 3;
+  repeated Role roles = 4;
+  Book favorite_book = 5;
+  repeated Book read_books = 6;
+}

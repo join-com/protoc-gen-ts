@@ -406,7 +406,7 @@ func (g *generator) generateEncode(message *google_protobuf.DescriptorProto) {
 }
 
 func (g *generator) generateDecode(message *google_protobuf.DescriptorProto) {
-	g.P("public decode(inReader: Uint8Array | protobufjs.Reader, length?: number){")
+	g.P("public static decode(inReader: Uint8Array | protobufjs.Reader, length?: number){")
 	g.In()
 	g.P("const reader = !(inReader instanceof protobufjs.Reader)")
 	g.In()
@@ -414,17 +414,50 @@ func (g *generator) generateDecode(message *google_protobuf.DescriptorProto) {
 	g.P(": inReader")
 	g.Out()
 	g.P("const end = length === undefined ? reader.len : reader.pos + length")
-	g.P("const message = new Request()")
+	g.P(fmt.Sprintf("const message = new %sMsg()", g.getTsTypeFromMessage(message.Name)))
 	g.P("while (reader.pos < end) {")
 	g.In()
 	g.P("const tag = reader.uint32()")
 	g.P("switch (tag >>> 3) {")
+	for _, field := range message.Field {
+		name := *field.JsonName
+		g.P(fmt.Sprintf("case %d:", field.GetNumber()))
+		g.In()
+		if *field.Type == google_protobuf.FieldDescriptorProto_TYPE_MESSAGE {
+			if g.isFieldRepeated(field) {
+				g.P(fmt.Sprintf("if (!(message._%s && message._%s.length)) {", name, name))
+				g.In()
+				g.P(fmt.Sprintf("message._%s = [];", name))
+				g.Out()
+				g.P("}")
+				g.P(fmt.Sprintf("message._%s.push(%sMsg.decode(reader, reader.uint32()));", name, g.getTsTypeFromMessage(field.TypeName)))
+			} else {
+				g.P(fmt.Sprintf("message._%s = %sMsg.decode(reader, reader.uint32());", name, g.getTsTypeFromMessage(field.TypeName)))
+			}
+		} else {
+			if g.isFieldRepeated(field) {
+				g.P(fmt.Sprintf("if (!(message._%s && message._%s.length)) {", name, name))
+				g.In()
+				g.P(fmt.Sprintf("message._%s = [];", name))
+				g.Out()
+				g.P("}")
+				g.P(fmt.Sprintf("message._%s.push(reader.%s());", name, g.getWriteFunction(field)))
+			} else {
+				g.P(fmt.Sprintf("message._%s = reader.%s();", name, g.getWriteFunction(field)))
+			}
+		}
+		g.P("break;")
+		g.Out()
+	}
+	g.P("default:")
 	g.In()
-
+	g.P("reader.skipType(tag & 7);")
+	g.P("break;")
 	g.Out()
 	g.P("}")
 	g.Out()
 	g.P("}")
+	g.P("return message;")
 	g.Out()
 	g.P("}")
 }
@@ -572,12 +605,13 @@ func (g *generator) generateMessageClass(message *google_protobuf.DescriptorProt
 	name := g.messageName(message)
 	g.P(fmt.Sprintf("export class %sMsg implements %s{", name, name))
 	g.In()
+	g.generateDecode(message)
 	for _, field := range message.Field {
 		g.generatePrivateField(field)
 	}
 	g.generateConstructor(message)
-	g.generateGettersSetters(message)
 	g.generateEncode(message)
+	g.generateGettersSetters(message)
 	g.Out()
 	g.P("}")
 	g.Out()

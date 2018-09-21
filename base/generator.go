@@ -109,7 +109,7 @@ func (g *Generator) sideEffect() {
 	g.BuildTypeNameMap(g.Request)
 	g.BuildEnumNameMap(g.Request)
 	g.BuildImportsMap(g.Request)
-	g.BuildMessageToFileMap(g.Request)
+	g.BuildMessageOrEnumToFileMap(g.Request)
 	log.Printf("#%v", g.messageToFileMap)
 	g.Reset()
 }
@@ -235,7 +235,7 @@ func (g *Generator) BuildImportsMap(request *plugin.CodeGeneratorRequest) {
 	}
 }
 
-func (g *Generator) BuildMessageToFileMap(request *plugin.CodeGeneratorRequest) {
+func (g *Generator) BuildMessageOrEnumToFileMap(request *plugin.CodeGeneratorRequest) {
 	g.messageToFileMap = make(map[string]string)
 	for _, f := range request.ProtoFile {
 		// The names in this loop are defined by the proto world, not us, so the
@@ -247,6 +247,11 @@ func (g *Generator) BuildMessageToFileMap(request *plugin.CodeGeneratorRequest) 
 		}
 
 		for _, desc := range f.MessageType {
+			name := dottedPkg + *desc.Name
+			g.messageToFileMap[name] = f.GetName()
+		}
+
+		for _, desc := range f.EnumType {
 			name := dottedPkg + *desc.Name
 			g.messageToFileMap[name] = f.GetName()
 		}

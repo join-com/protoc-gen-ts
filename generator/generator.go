@@ -3,6 +3,7 @@ package generator
 import (
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 	"unicode"
 
@@ -33,12 +34,11 @@ func (g *generator) tsFileNameWithExt(protoName *string) string {
 }
 
 func (g *generator) generateGenericImports() {
-	g.P(fmt.Sprint(`
-import * as protobufjs from 'protobufjs/minimal';
+	g.P(`
 import * as grpc from 'grpc';
 import * as grpcTs from '@join-com/grpc-ts';
 import * as path from 'path';
-`))
+`)
 }
 
 func (g *generator) packageNameFromFullName(fullName string) string {
@@ -704,6 +704,45 @@ func (g *generator) generateService(service *google_protobuf.ServiceDescriptorPr
 	g.Out()
 }
 
+func (g *generator) generateDefinition(service *google_protobuf.ServiceDescriptorProto) {
+	g.P()
+	g.In()
+	g.P(fmt.Sprintf("export const %sServiceDefinition = {", g.toLowerFirst(*service.Name)))
+	g.In()
+	for _, method := range service.Method {
+		g.P(fmt.Sprintf("%s: {", g.toLowerFirst(*method.Name)))
+		g.In()
+		g.P(fmt.Sprintf("path: '/%s/%s',", *service.Name, *method.Name))
+		var clientStreaming bool
+		if method.ClientStreaming == nil {
+			clientStreaming = false
+		} else {
+			clientStreaming = *method.ClientStreaming
+		}
+		g.P(fmt.Sprintf("requestStream: %s,", strconv.FormatBool(clientStreaming)))
+		var serverStreaming bool
+		if method.ServerStreaming == nil {
+			serverStreaming = false
+		} else {
+			serverStreaming = *method.ServerStreaming
+		}
+		g.P(fmt.Sprintf("responseStream: %s,", strconv.FormatBool(serverStreaming)))
+		requestType := g.getTsTypeFromMessage(method.InputType)
+		g.P(fmt.Sprintf("requestType: %sMsg,", requestType))
+		responseType := g.getTsTypeFromMessage(method.OutputType)
+		g.P(fmt.Sprintf("responseType: %sMsg,", responseType))
+		g.P(fmt.Sprintf("requestSerialize: (args: %s) => new %sMsg(args).encode().finish(),", requestType, requestType))
+		g.P(fmt.Sprintf("requestDeserialize: (argBuf: Buffer) => %sMsg.decode(argBuf),", requestType))
+		g.P(fmt.Sprintf("responseSerialize: (args: %s) => new %sMsg(args).encode().finish(),", responseType, responseType))
+		g.P(fmt.Sprintf("responseDeserialize: (argBuf: Buffer) => %sMsg.decode(argBuf),", responseType))
+		g.Out()
+		g.P("},")
+	}
+	g.Out()
+	g.P("}")
+	g.Out()
+}
+
 func (g *generator) generateImplementation(service *google_protobuf.ServiceDescriptorProto) {
 	g.P()
 	g.In()
@@ -800,9 +839,10 @@ func (g *generator) Make(protoFile *google_protobuf.FileDescriptorProto, protoFi
 	g.P("// GENERATED CODE -- DO NOT EDIT!")
 
 	g.generateImports(protoFile, protoFiles)
-	if len(protoFile.Service) > 0 {
-		g.generateGenericImports()
-	}
+	g.P("import * as protobufjs from 'protobufjs/minimal';")
+	// if len(protoFile.Service) > 0 {
+	// 	g.generateGenericImports()
+	// }
 	packageName := protoFile.GetPackage()
 	g.generateNamespace(packageName)
 
@@ -816,13 +856,18 @@ func (g *generator) Make(protoFile *google_protobuf.FileDescriptorProto, protoFi
 	}
 
 	for _, service := range protoFile.Service {
-		g.generateImplementation(service)
-		g.generateService(service, *protoFile.Package, *protoFile.Name)
+		g.generateDefinition(service)
+		// g.generateService(service, *protoFile.Package, *protoFile.Name)
 	}
 
-	for _, service := range protoFile.Service {
-		g.generateClient(service, *protoFile.Package, *protoFile.Name)
-	}
+	// for _, service := range protoFile.Service {
+	// 	g.generateImplementation(service)
+	// 	g.generateService(service, *protoFile.Package, *protoFile.Name)
+	// }
+
+	// for _, service := range protoFile.Service {
+	// 	g.generateClient(service, *protoFile.Package, *protoFile.Name)
+	// }
 
 	g.P("}")
 

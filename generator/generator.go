@@ -415,7 +415,28 @@ func (g *generator) generateDecode(message *google_protobuf.DescriptorProto) {
 				g.P(fmt.Sprintf("if (!(message._%s && message._%s.length)) {", name, name))
 				g.P(fmt.Sprintf("message._%s = [];", name))
 				g.P("}")
-				g.P(fmt.Sprintf("message._%s.push(reader.%s());", name, g.getWriteFunction(field)))
+				if *field.Type == google_protobuf.FieldDescriptorProto_TYPE_ENUM {
+					g.P("if ((tag & 7) === 2) {")
+					g.P("const end2 = reader.uint32() + reader.pos;")
+					g.P("while (reader.pos < end2) {")
+					g.P(fmt.Sprintf("message._%s.push(reader.int32());", name))
+					g.P("}")
+					g.P("} else {")
+					g.P(fmt.Sprintf("message._%s.push(reader.%s());", name, g.getWriteFunction(field)))
+					g.P("}")
+				} else {
+					g.P(fmt.Sprintf("message._%s.push(reader.%s());", name, g.getWriteFunction(field)))
+				}
+				// if (!(message.roles && message.roles.length))
+				//                 message.roles = [];
+				//             if ((tag & 7) === 2) {
+				//                 var end2 = reader.uint32() + reader.pos;
+				//                 while (reader.pos < end2)
+				//                     message.roles.push(reader.int32());
+				//             } else
+				//                 message.roles.push(reader.int32());
+				//             break;
+
 			} else {
 				g.P(fmt.Sprintf("message._%s = reader.%s();", name, g.getWriteFunction(field)))
 			}
@@ -700,9 +721,9 @@ func (g *generator) generateDefinition(service *google_protobuf.ServiceDescripto
 		g.P(fmt.Sprintf("requestType: %sMsg,", requestType))
 		responseType := g.getTsTypeFromMessage(method.OutputType)
 		g.P(fmt.Sprintf("responseType: %sMsg,", responseType))
-		g.P(fmt.Sprintf("requestSerialize: (args: %s) => new %sMsg(args).encode().finish(),", requestType, requestType))
+		g.P(fmt.Sprintf("requestSerialize: (args: %s) => new %sMsg(args).encode().finish() as Buffer,", requestType, requestType))
 		g.P(fmt.Sprintf("requestDeserialize: (argBuf: Buffer) => %sMsg.decode(argBuf),", requestType))
-		g.P(fmt.Sprintf("responseSerialize: (args: %s) => new %sMsg(args).encode().finish(),", responseType, responseType))
+		g.P(fmt.Sprintf("responseSerialize: (args: %s) => new %sMsg(args).encode().finish() as Buffer,", responseType, responseType))
 		g.P(fmt.Sprintf("responseDeserialize: (argBuf: Buffer) => %sMsg.decode(argBuf),", responseType))
 
 		g.P("},")

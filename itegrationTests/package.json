@@ -10,11 +10,11 @@
     "proto:build": "yarn proto:clean && protoc __tests__/proto/*.proto -I __tests__/proto --ts_out=proto_relative=../../proto:/$PWD/__tests__/generated && yarn proto:prettier"
   },
   "dependencies": {
-    "@types/jest": "^23.3.2",
     "grpc": "^1.15.1",
     "protobufjs": "^6.8.8"
   },
   "devDependencies": {
+    "@types/jest": "^23.3.2",
     "@types/node": "^10.10.1",
     "jest": "^23.6.0",
     "jest-extended": "^0.9.0",

@@ -1,5 +1,23 @@
 // GENERATED CODE -- DO NOT EDIT!
+
 import * as protobufjs from 'protobufjs/minimal';
+
+interface MethodDefinition<Request, Response> {
+  path: string;
+  requestStream: boolean;
+  responseStream: boolean;
+  requestType: new () => Request;
+  responseType: new () => Response;
+  requestSerialize: (args: Request) => Buffer;
+  requestDeserialize: (argBuf: Buffer) => Request;
+  responseSerialize: (args: Response) => Buffer;
+  responseDeserialize: (argBuf: Buffer) => Response;
+}
+
+interface ServiceDefinition<MD1> {
+  find: MD1;
+}
+
 export namespace Foo {
   export enum Type {
     UNKNOWN = 'UNKNOWN',
@@ -123,6 +141,8 @@ export namespace Foo {
     roles?: Role[];
     favoriteBook?: Book;
     readBooks?: Book[];
+    nicks?: string[];
+    types?: Type[];
   }
 
   export class UserMsg implements User {
@@ -151,7 +171,14 @@ export namespace Foo {
             if (!(message._roles && message._roles.length)) {
               message._roles = [];
             }
-            message._roles.push(reader.int32());
+            if ((tag & 7) === 2) {
+              const end2 = reader.uint32() + reader.pos;
+              while (reader.pos < end2) {
+                message._roles.push(reader.int32());
+              }
+            } else {
+              message._roles.push(reader.int32());
+            }
             break;
           case 5:
             message._favoriteBook = BookMsg.decode(reader, reader.uint32());
@@ -161,6 +188,25 @@ export namespace Foo {
               message._readBooks = [];
             }
             message._readBooks.push(BookMsg.decode(reader, reader.uint32()));
+            break;
+          case 7:
+            if (!(message._nicks && message._nicks.length)) {
+              message._nicks = [];
+            }
+            message._nicks.push(reader.string());
+            break;
+          case 8:
+            if (!(message._types && message._types.length)) {
+              message._types = [];
+            }
+            if ((tag & 7) === 2) {
+              const end2 = reader.uint32() + reader.pos;
+              while (reader.pos < end2) {
+                message._types.push(reader.int32());
+              }
+            } else {
+              message._types.push(reader.int32());
+            }
             break;
           default:
             reader.skipType(tag & 7);
@@ -175,6 +221,8 @@ export namespace Foo {
     private _roles?: number[];
     private _favoriteBook?: Book;
     private _readBooks?: Book[];
+    private _nicks?: string[];
+    private _types?: number[];
     constructor(attrs?: User) {
       Object.assign(this, attrs);
     }
@@ -201,6 +249,16 @@ export namespace Foo {
         for (const value of this._readBooks) {
           const msg = new BookMsg(value);
           msg.encode(writer.uint32(50).fork()).ldelim();
+        }
+      }
+      if (this._nicks != null) {
+        for (const value of this._nicks) {
+          writer.uint32(58).string(value);
+        }
+      }
+      if (this._types != null) {
+        for (const value of this._types) {
+          writer.uint32(64).int32(value);
         }
       }
       return writer;
@@ -293,20 +351,83 @@ export namespace Foo {
     public set readBooks(val) {
       this._readBooks = val && val.map(v => new BookMsg(v));
     }
+    public get nicks() {
+      return this._nicks;
+    }
+    public set nicks(val) {
+      this._nicks = val;
+    }
+    public get types() {
+      if (!this._types) {
+        return;
+      }
+      return this._types.map(val => {
+        switch (val) {
+          case 0:
+            return Type.UNKNOWN;
+          case 1:
+            return Type.ADMIN;
+          case 2:
+            return Type.USER;
+          default:
+            throw new Error(
+              'Undefined value of enum Type for field types of message User'
+            );
+        }
+      });
+    }
+    public set types(val) {
+      if (!val) {
+        return;
+      }
+      this._types = val.map(value => {
+        switch (value) {
+          case Type.UNKNOWN:
+            return 0;
+          case Type.ADMIN:
+            return 1;
+          case Type.USER:
+            return 2;
+          default:
+            throw new Error(
+              'Undefined value of enum Type for field types of message User'
+            );
+        }
+      });
+    }
   }
 
-  export const usersServiceDefinition = {
-    find: {
-      path: '/Users/Find',
-      requestStream: false,
-      responseStream: false,
-      requestType: RequestMsg,
-      responseType: UserMsg,
-      requestSerialize: (args: Request) =>
-        new RequestMsg(args).encode().finish(),
-      requestDeserialize: (argBuf: Buffer) => RequestMsg.decode(argBuf),
-      responseSerialize: (args: User) => new UserMsg(args).encode().finish(),
-      responseDeserialize: (argBuf: Buffer) => UserMsg.decode(argBuf)
-    }
+  export const a = UserMsg;
+
+  const find: MethodDefinition<RequestMsg, UserMsg> = {
+    path: '/Users/Find',
+    requestStream: false,
+    responseStream: false,
+    requestType: RequestMsg,
+    responseType: UserMsg,
+    requestSerialize: (args: Request) =>
+      new RequestMsg(args).encode().finish() as Buffer,
+    requestDeserialize: (argBuf: Buffer) => RequestMsg.decode(argBuf),
+    responseSerialize: (args: User) =>
+      new UserMsg(args).encode().finish() as Buffer,
+    responseDeserialize: (argBuf: Buffer) => UserMsg.decode(argBuf)
+  };
+
+  export const usersServiceDefinition: ServiceDefinition<
+    MethodDefinition<RequestMsg, UserMsg>
+  > = {
+    find
   };
 }
+
+// interface ServiceDefinition {
+//   [key: string]: MethodDefinition
+// }
+
+export class Service<T> {
+  constructor(implementations: { [K in keyof T]: T[K] }) {}
+}
+
+const ser = new Service<
+  ServiceDefinition<MethodDefinition<Foo.RequestMsg, Foo.UserMsg>>
+>(Foo.usersServiceDefinition);

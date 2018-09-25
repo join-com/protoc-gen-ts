@@ -33,4 +33,6 @@ message User {
   repeated Role roles = 4;
   Book favorite_book = 5;
   repeated Book read_books = 6;
+  repeated string nicks = 7;
+  repeated Type types = 8;
 }

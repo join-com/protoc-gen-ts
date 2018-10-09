@@ -36,8 +36,7 @@ func (g *generator) tsFileNameWithExt(protoName *string) string {
 func (g *generator) generateGenericImports() {
 	g.P(`
 import * as grpc from 'grpc';
-import * as grpcTs from '@join-com/grpc-ts';
-import * as path from 'path';
+import * as grpcts from '@join-com/grpc-ts';
 `)
 }
 
@@ -620,35 +619,6 @@ func (g *generator) generateEnum(enum *google_protobuf.EnumDescriptorProto) {
 
 }
 
-func (g *generator) methodOutputType(method *google_protobuf.MethodDescriptorProto) string {
-	outputType := g.GetMessageTypeByName(*method.OutputType)
-	var resultField *google_protobuf.FieldDescriptorProto
-	var errorField *google_protobuf.FieldDescriptorProto
-	for _, field := range outputType.Field {
-		if *field.Name == "result" {
-			resultField = field
-		}
-		if *field.Name == "error" {
-			errorField = field
-		}
-	}
-	if resultField == nil {
-		g.Fail(fmt.Sprintf("Response massage %s must have result field", *method.OutputType))
-	}
-
-	if errorField == nil {
-		g.Fail(fmt.Sprintf("Response massage %s must have error field", *method.OutputType))
-	}
-
-	var outputTypeName string
-
-	outputTypeName = g.getTsFieldType(resultField)
-	if g.isFieldRepeated(resultField) {
-		outputTypeName = outputTypeName + "[]"
-	}
-	return outputTypeName
-}
-
 func (g *generator) methodDeprecated(method *google_protobuf.MethodDescriptorProto) {
 	if g.isMethodDeprecated(method) {
 		g.P("/**")
@@ -670,28 +640,6 @@ func (g *generator) protoPathRelative(protoFileName string) string {
 	}
 	fullPathArray := append(upPathArray, relativePathArray...)
 	return strings.Join(fullPathArray, `', '`)
-}
-
-func (g *generator) generateService(service *google_protobuf.ServiceDescriptorProto, packageName string, protoFileName string) {
-	g.P()
-
-	if g.isServiceDeprecated(service) {
-		g.P("/**")
-		g.P("* @deprecated")
-		g.P("*/")
-	}
-	g.P(fmt.Sprintf("export class %sService extends grpcTs.Service<%sImplementation> {", gen.CamelCase(*service.Name), gen.CamelCase(*service.Name)))
-
-	g.P(fmt.Sprintf("constructor(implementations: %sImplementation, errorHandler?: grpcTs.ErrorHandler ) {", gen.CamelCase(*service.Name)))
-
-	g.P(fmt.Sprintf("const protoPath = '%s';", protoFileName))
-	g.P(fmt.Sprintf("const includeDirs = [path.join(__dirname, '%s')];", g.protoPathRelative(protoFileName)))
-	g.P(fmt.Sprintf("super(protoPath, includeDirs, '%s', '%s', implementations, errorHandler);", packageName, *service.Name))
-
-	g.P(fmt.Sprint("}"))
-
-	g.P(fmt.Sprint("}"))
-
 }
 
 func (g *generator) generateDefinition(service *google_protobuf.ServiceDescriptorProto) {
@@ -741,23 +689,23 @@ func (g *generator) generateImplementation(service *google_protobuf.ServiceDescr
 		g.P("* @deprecated")
 		g.P("*/")
 	}
-	g.P(fmt.Sprintf("export interface %sImplementation {", gen.CamelCase(*service.Name)))
+	g.P(fmt.Sprintf("export interface %sImplementation extends grpcts.Implementations {", gen.CamelCase(*service.Name)))
 
 	for _, method := range service.Method {
 		g.methodDeprecated(method)
 		inputTypeName := g.getTsTypeFromMessage(method.InputType)
+		outputTypeName := g.getTsTypeFromMessage(method.OutputType)
 		if method.ServerStreaming != nil && *method.ServerStreaming && method.ClientStreaming != nil && *method.ClientStreaming {
-			outputTypeName := g.getTsTypeFromMessage(method.OutputType)
-			g.P(fmt.Sprintf("%s(duplexStream: grpc.ServerDuplexStream<%s, %s>): void;", g.toLowerFirst(*method.Name), inputTypeName, outputTypeName))
+			g.P(fmt.Sprintf("%s(call: grpc.ServerDuplexStream<%s, %s>): void;", g.toLowerFirst(*method.Name), inputTypeName, outputTypeName))
 		} else if method.ServerStreaming != nil && *method.ServerStreaming {
-			outputTypeName := g.getTsTypeFromMessage(method.OutputType)
-			g.P(fmt.Sprintf("%s(req: %s, stream: grpc.ServerWriteableStream<%s>): void;", g.toLowerFirst(*method.Name), inputTypeName, outputTypeName))
+			// TODO why there is no type for write stream?
+			g.P(fmt.Sprintf("%s(call: grpc.ServerWriteableStream<%s>): void;", g.toLowerFirst(*method.Name), inputTypeName))
 		} else if method.ClientStreaming != nil && *method.ClientStreaming {
-			outputTypeName := g.methodOutputType(method)
-			g.P(fmt.Sprintf("%s(stream: grpc.ServerReadableStream<%s>): Promise<%s>;", g.toLowerFirst(*method.Name), inputTypeName, outputTypeName))
+			g.P(fmt.Sprintf("%s(call: grpc.ServerReadableStream<%s>): Promise<%s>;", g.toLowerFirst(*method.Name), inputTypeName, outputTypeName))
+			g.P(fmt.Sprintf("%s(call: grpc.ServerReadableStream<%s>, callback: grpc.sendUnaryData<%s>): void;", g.toLowerFirst(*method.Name), inputTypeName, outputTypeName))
 		} else {
-			outputTypeName := g.methodOutputType(method)
-			g.P(fmt.Sprintf("%s(req: %s): Promise<%s>;", g.toLowerFirst(*method.Name), inputTypeName, outputTypeName))
+			g.P(fmt.Sprintf("%s(call: grpc.ServerUnaryCall<%s>): Promise<%s>;", g.toLowerFirst(*method.Name), inputTypeName, outputTypeName))
+			g.P(fmt.Sprintf("%s(call: grpc.ServerUnaryCall<%s>, callback: grpc.sendUnaryData<%s>): void;", g.toLowerFirst(*method.Name), inputTypeName, outputTypeName))
 		}
 	}
 
@@ -772,41 +720,34 @@ func (g *generator) generateClient(service *google_protobuf.ServiceDescriptorPro
 		g.P("* @deprecated")
 		g.P("*/")
 	}
-	g.P(fmt.Sprintf("export class %sClient extends grpcTs.Client {", gen.CamelCase(*service.Name)))
-	g.P("constructor(host: string, credentials: grpc.ChannelCredentials) {")
-	g.P(fmt.Sprintf("const protoPath = '%s';", protoFileName))
-	g.P(fmt.Sprintf("const includeDirs = [path.join(__dirname, '%s')];", g.protoPathRelative(protoFileName)))
-	g.P(fmt.Sprintf("super(protoPath, includeDirs, '%s', '%s', host, credentials);", packageName, *service.Name))
-	g.P("}")
+	g.P(fmt.Sprintf("export class %sClient extends grpcts.Client {", gen.CamelCase(*service.Name)))
 	for _, method := range service.Method {
 		inputTypeName := g.getTsTypeFromMessage(method.InputType)
 		g.methodDeprecated(method)
 		if method.ServerStreaming != nil && *method.ServerStreaming && method.ClientStreaming != nil && *method.ClientStreaming {
 			outputTypeName := g.getTsTypeFromMessage(method.OutputType)
-			g.P(fmt.Sprintf("public %s(): grpc.ClientDuplexStream<%s, %s> {", g.toLowerFirst(*method.Name), inputTypeName, outputTypeName))
-			g.P(fmt.Sprintf("return super.makeBidiStreamRequest('%s');", g.toLowerFirst(*method.Name)))
+			g.P(fmt.Sprintf("public %s(metadata?: grpcts.Metadata) {", g.toLowerFirst(*method.Name)))
+			g.P(fmt.Sprintf("return super.makeBidiStreamRequest<%s, %s>('%s', metadata);", inputTypeName, outputTypeName, g.toLowerFirst(*method.Name)))
 			g.P(fmt.Sprint("}"))
 		} else if method.ServerStreaming != nil && *method.ServerStreaming {
 			outputTypeName := g.getTsTypeFromMessage(method.OutputType)
-			g.P(fmt.Sprintf("public %s(req: %s): grpc.ClientReadableStream<%s> {", g.toLowerFirst(*method.Name), inputTypeName, outputTypeName))
+			g.P(fmt.Sprintf("public %s(req: %s, metadata?: grpcts.Metadata) {", g.toLowerFirst(*method.Name), inputTypeName))
 
-			g.P(fmt.Sprintf("return super.makeServerStreamRequest('%s', req);", g.toLowerFirst(*method.Name)))
+			g.P(fmt.Sprintf("return super.makeServerStreamRequest<%s, %s>('%s', req, metadata);", inputTypeName, outputTypeName, g.toLowerFirst(*method.Name)))
 
 			g.P(fmt.Sprint("}"))
 		} else if method.ClientStreaming != nil && *method.ClientStreaming {
 			outputTypeName := g.getTsTypeFromMessage(method.OutputType)
-			g.P(fmt.Sprintf("public %s(callback: grpcTs.Callback<%s>): grpc.ClientWritableStream<%s> {", g.toLowerFirst(*method.Name), outputTypeName, inputTypeName))
+			g.P(fmt.Sprintf("public %s(metadata?: grpcts.Metadata) {", g.toLowerFirst(*method.Name)))
 
-			g.P(fmt.Sprintf("return super.makeClientStreamRequest('%s', callback);", g.toLowerFirst(*method.Name)))
+			g.P(fmt.Sprintf("return super.makeClientStreamRequest<%s, %s>('%s', metadata);", inputTypeName, outputTypeName, g.toLowerFirst(*method.Name)))
 
-			g.P(fmt.Sprint("}"))
+			g.P(fmt.Sprint("};"))
 		} else {
-			outputTypeName := g.methodOutputType(method)
-			g.P(fmt.Sprintf("public %s(req: %s): Promise<%s> {", g.toLowerFirst(*method.Name), inputTypeName, outputTypeName))
-
-			g.P(fmt.Sprintf("return super.makeUnaryRequest('%s', req);", g.toLowerFirst(*method.Name)))
-
-			g.P(fmt.Sprint("}"))
+			outputTypeName := g.getTsTypeFromMessage(method.OutputType)
+			g.P(fmt.Sprintf("public %s(req: %s, metadata?: grpcts.Metadata) {", g.toLowerFirst(*method.Name), inputTypeName))
+			g.P(fmt.Sprintf("return super.makeUnaryRequest<%s, %s>('%s', req, metadata);", inputTypeName, outputTypeName, g.toLowerFirst(*method.Name)))
+			g.P(fmt.Sprint("};"))
 		}
 	}
 
@@ -823,9 +764,9 @@ func (g *generator) Make(protoFile *google_protobuf.FileDescriptorProto, protoFi
 
 	g.generateImports(protoFile, protoFiles)
 	g.P("import * as protobufjs from 'protobufjs/minimal';")
-	// if len(protoFile.Service) > 0 {
-	// 	g.generateGenericImports()
-	// }
+	if len(protoFile.Service) > 0 {
+		g.generateGenericImports()
+	}
 	packageName := protoFile.GetPackage()
 	g.generateNamespace(packageName)
 
@@ -840,17 +781,9 @@ func (g *generator) Make(protoFile *google_protobuf.FileDescriptorProto, protoFi
 
 	for _, service := range protoFile.Service {
 		g.generateDefinition(service)
-		// g.generateService(service, *protoFile.Package, *protoFile.Name)
+		g.generateImplementation(service)
+		g.generateClient(service, *protoFile.Package, *protoFile.Name)
 	}
-
-	// for _, service := range protoFile.Service {
-	// 	g.generateImplementation(service)
-	// 	g.generateService(service, *protoFile.Package, *protoFile.Name)
-	// }
-
-	// for _, service := range protoFile.Service {
-	// 	g.generateClient(service, *protoFile.Package, *protoFile.Name)
-	// }
 
 	g.P("}")
 

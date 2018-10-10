@@ -266,7 +266,7 @@ export namespace Foo {
             );
             message.dates.push(
               new Date(
-                (dates.seconds || 0) * 1000 + (dates.nanos || 0) / 1000000
+                (®.seconds || 0) * 1000 + (dates.nanos || 0) / 1000000
               )
             );
             break;

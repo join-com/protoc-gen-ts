@@ -348,19 +348,60 @@ func (g *generator) getWriteFunction(field *google_protobuf.FieldDescriptorProto
 	return "int32"
 }
 
+func (g *generator) encodeEnumSwitch(field *google_protobuf.FieldDescriptorProto, name string, message *google_protobuf.DescriptorProto) {
+	enum := g.GetEnumTypeByName(*field.TypeName)
+	g.P(fmt.Sprintf("switch (val) {"))
+	typeName := g.getTsFieldType(field)
+	for _, value := range enum.Value {
+		g.P(fmt.Sprintf("case %s.%s:", typeName, *value.Name))
+		g.P(fmt.Sprintf("return %d;", *value.Number))
+	}
+	g.P("default:")
+	// TODO: raise error? g.P(fmt.Sprintf("throw new Error('Undefined value of enum %s for field %s of message %s');", typeName, field.GetJsonName(), message.GetName()))
+	g.P("return")
+	g.P("};")
+}
+
 func (g *generator) generateEncode(message *google_protobuf.DescriptorProto) {
 	g.P("public encode(writer: protobufjs.Writer = protobufjs.Writer.create()){")
 	for _, field := range message.Field {
 		name := *field.JsonName
 		g.P(fmt.Sprintf("if (this.%s != null) {", name))
-		if *field.Type == google_protobuf.FieldDescriptorProto_TYPE_MESSAGE {
+		if *field.Type == google_protobuf.FieldDescriptorProto_TYPE_ENUM {
 			if g.isFieldRepeated(field) {
 				g.P(fmt.Sprintf("for (const value of this.%s) {", name))
-				g.P(fmt.Sprintf("const msg = new %sMsg(value);", g.getTsTypeFromMessage(field.TypeName)))
+				g.P(fmt.Sprintf("const %s = (val => {", name))
+				g.encodeEnumSwitch(field, name, message)
+				g.P("})(value);")
+				g.P(fmt.Sprintf("if (%s) {", name))
+				g.P(fmt.Sprintf("writer.uint32(%d).int32(%s);", g.getFieldIndex(field), name))
+				g.P("}")
+				g.P("}")
+			} else {
+				g.P(fmt.Sprintf("const %s = (val => {", name))
+				g.encodeEnumSwitch(field, name, message)
+				g.P(fmt.Sprintf("})(this.%s);", name))
+				g.P(fmt.Sprintf("if (%s) {", name))
+				g.P(fmt.Sprintf("writer.uint32(%d).int32(%s);", g.getFieldIndex(field), name))
+				g.P("}")
+			}
+		} else if *field.Type == google_protobuf.FieldDescriptorProto_TYPE_MESSAGE {
+			if g.isFieldRepeated(field) {
+				g.P(fmt.Sprintf("for (const value of this.%s) {", name))
+				g.P("if (!value) { continue; }")
+				if field.GetTypeName() == ".google.protobuf.Timestamp" {
+					g.P(fmt.Sprintf("const msg = new %sMsg({seconds: Math.floor(value.getTime() / 1000) , nanos: value.getMilliseconds() * 1000000});", g.getTsTypeFromMessage(field.TypeName)))
+				} else {
+					g.P(fmt.Sprintf("const msg = new %sMsg(value);", g.getTsTypeFromMessage(field.TypeName)))
+				}
 				g.P(fmt.Sprintf("msg.encode(writer.uint32(%d).fork()).ldelim();", g.getFieldIndex(field)))
 				g.P("}")
 			} else {
-				g.P(fmt.Sprintf("const msg = new %sMsg(this.%s);", g.getTsTypeFromMessage(field.TypeName), name))
+				if field.GetTypeName() == ".google.protobuf.Timestamp" {
+					g.P(fmt.Sprintf("const msg = new %sMsg({seconds: Math.floor(this.%s.getTime() / 1000) , nanos: this.%s.getMilliseconds() * 1000000});", g.getTsTypeFromMessage(field.TypeName), name, name))
+				} else {
+					g.P(fmt.Sprintf("const msg = new %sMsg(this.%s);", g.getTsTypeFromMessage(field.TypeName), name))
+				}
 				g.P(fmt.Sprintf("msg.encode(writer.uint32(%d).fork()).ldelim();", g.getFieldIndex(field)))
 			}
 		} else {
@@ -378,7 +419,7 @@ func (g *generator) generateEncode(message *google_protobuf.DescriptorProto) {
 	g.P("}")
 }
 
-func (g *generator) enumSwitch(field *google_protobuf.FieldDescriptorProto, name string, message *google_protobuf.DescriptorProto) {
+func (g *generator) decodeEnumSwitch(field *google_protobuf.FieldDescriptorProto, name string, message *google_protobuf.DescriptorProto) {
 	enum := g.GetEnumTypeByName(*field.TypeName)
 	g.P(fmt.Sprintf("switch (val) {"))
 	typeName := g.getTsFieldType(field)
@@ -412,7 +453,7 @@ func (g *generator) generateDecode(message *google_protobuf.DescriptorProto) {
 			if g.isFieldRepeated(field) {
 				assign := func() {
 					g.P(fmt.Sprintf("const %s = (((val) => {", name))
-					g.enumSwitch(field, name, message)
+					g.decodeEnumSwitch(field, name, message)
 					g.P("})(reader.int32()));")
 					g.P(fmt.Sprintf("if (%s) {", name))
 					g.P(fmt.Sprintf("message.%s.push(%s);", name, name))
@@ -429,7 +470,7 @@ func (g *generator) generateDecode(message *google_protobuf.DescriptorProto) {
 				g.P("}")
 			} else {
 				g.P(fmt.Sprintf("message.%s = ((val) => {", name))
-				g.enumSwitch(field, name, message)
+				g.decodeEnumSwitch(field, name, message)
 				g.P("})(reader.int32());")
 			}
 		} else if *field.Type == google_protobuf.FieldDescriptorProto_TYPE_MESSAGE {

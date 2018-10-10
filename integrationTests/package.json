@@ -10,6 +10,7 @@
     "proto:build": "yarn proto:clean && protoc __tests__/proto/*.proto -I __tests__/proto --ts_out=proto_relative=../../proto:/$PWD/__tests__/generated && yarn proto:prettier"
   },
   "dependencies": {
+    "@join-com/grpc-ts": "1.0.0-2",
     "grpc": "^1.15.1",
     "protobufjs": "^6.8.8"
   },

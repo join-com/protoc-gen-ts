@@ -1,12 +1,12 @@
 // GENERATED CODE -- DO NOT EDIT!
 import * as protobufjs from 'protobufjs/minimal';
 export namespace Common {
-  export interface Name {
+  export interface OtherPkgMessage {
     firstName?: string;
     latsName?: string;
   }
 
-  export class NameMsg implements Name {
+  export class OtherPkgMessageMsg implements OtherPkgMessage {
     public static decode(
       inReader: Uint8Array | protobufjs.Reader,
       length?: number
@@ -15,7 +15,7 @@ export namespace Common {
         ? protobufjs.Reader.create(inReader)
         : inReader;
       const end = length === undefined ? reader.len : reader.pos + length;
-      const message = new NameMsg();
+      const message = new OtherPkgMessageMsg();
       while (reader.pos < end) {
         const tag = reader.uint32();
         switch (tag >>> 3) {
@@ -34,7 +34,7 @@ export namespace Common {
     }
     public firstName?: string;
     public latsName?: string;
-    constructor(attrs?: Name) {
+    constructor(attrs?: OtherPkgMessage) {
       Object.assign(this, attrs);
     }
     public encode(writer: protobufjs.Writer = protobufjs.Writer.create()) {

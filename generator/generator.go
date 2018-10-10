@@ -60,7 +60,12 @@ func (g *generator) generateImports(protoFile *google_protobuf.FileDescriptorPro
 		packageName := depProtoFile.GetPackage()
 		namespaceName := g.namespaceName(packageName)
 		fileNames := strings.Split(*protoFile.Name, "/")
-		path := strings.Repeat("../", len(fileNames)-1)
+		var path string
+		if len(fileNames) > 0 {
+			path = "./"
+		} else {
+			path = strings.Repeat("../", len(fileNames)-1)
+		}
 		path += g.tsFileName(depProtoFile.Name)
 		importName := g.GetImportName(*protoFile.Name, *depProtoFile.Name)
 		if importName == namespaceName {
@@ -212,11 +217,15 @@ func (g *generator) isFieldRepeated(field *google_protobuf.FieldDescriptorProto)
 	return field.Label != nil && *field.Label == google_protobuf.FieldDescriptorProto_LABEL_REPEATED
 }
 
-func (g *generator) generateField(field *google_protobuf.FieldDescriptorProto) {
+func (g *generator) generateField(field *google_protobuf.FieldDescriptorProto, setPublic bool) {
 	if g.isFieldDeprecated(field) {
 		g.P("/** @deprecated */")
 	}
-	s := *field.JsonName
+	s := ""
+	if setPublic {
+		s += "public "
+	}
+	s += *field.JsonName
 	s += "?"
 	if field.GetTypeName() == ".google.protobuf.Timestamp" {
 		s += ": Date"
@@ -240,27 +249,9 @@ func (g *generator) generateMessage(message *google_protobuf.DescriptorProto) {
 	}
 	g.P(fmt.Sprintf("export interface %s {", g.messageName(message)))
 	for _, field := range message.Field {
-		g.generateField(field)
+		g.generateField(field, false)
 	}
 	g.P("}")
-}
-
-func (g *generator) generatePrivateField(field *google_protobuf.FieldDescriptorProto) {
-	if g.isFieldDeprecated(field) {
-		g.P("/** @deprecated */")
-	}
-	s := "private _" + *field.JsonName
-	s += "?"
-	if *field.Type == google_protobuf.FieldDescriptorProto_TYPE_ENUM {
-		s += ": number"
-	} else {
-		s += fmt.Sprintf(": %s", g.getTsFieldType(field))
-	}
-	if g.isFieldRepeated(field) {
-		s += "[]"
-	}
-	s += ";"
-	g.P(s)
 }
 
 func (g *generator) generateConstructor(message *google_protobuf.DescriptorProto) {
@@ -361,30 +352,44 @@ func (g *generator) generateEncode(message *google_protobuf.DescriptorProto) {
 	g.P("public encode(writer: protobufjs.Writer = protobufjs.Writer.create()){")
 	for _, field := range message.Field {
 		name := *field.JsonName
-		g.P(fmt.Sprintf("if (this._%s != null) {", name))
+		g.P(fmt.Sprintf("if (this.%s != null) {", name))
 		if *field.Type == google_protobuf.FieldDescriptorProto_TYPE_MESSAGE {
 			if g.isFieldRepeated(field) {
-				g.P(fmt.Sprintf("for (const value of this._%s) {", name))
+				g.P(fmt.Sprintf("for (const value of this.%s) {", name))
 				g.P(fmt.Sprintf("const msg = new %sMsg(value);", g.getTsTypeFromMessage(field.TypeName)))
 				g.P(fmt.Sprintf("msg.encode(writer.uint32(%d).fork()).ldelim();", g.getFieldIndex(field)))
 				g.P("}")
 			} else {
-				g.P(fmt.Sprintf("const msg = new %sMsg(this._%s);", g.getTsTypeFromMessage(field.TypeName), name))
+				g.P(fmt.Sprintf("const msg = new %sMsg(this.%s);", g.getTsTypeFromMessage(field.TypeName), name))
 				g.P(fmt.Sprintf("msg.encode(writer.uint32(%d).fork()).ldelim();", g.getFieldIndex(field)))
 			}
 		} else {
 			if g.isFieldRepeated(field) {
-				g.P(fmt.Sprintf("for (const value of this._%s) {", name))
+				g.P(fmt.Sprintf("for (const value of this.%s) {", name))
 				g.P(fmt.Sprintf("writer.uint32(%d).%s(value);", g.getFieldIndex(field), g.getWriteFunction(field)))
 				g.P("}")
 			} else {
-				g.P(fmt.Sprintf("writer.uint32(%d).%s(this._%s);", g.getFieldIndex(field), g.getWriteFunction(field), name))
+				g.P(fmt.Sprintf("writer.uint32(%d).%s(this.%s);", g.getFieldIndex(field), g.getWriteFunction(field), name))
 			}
 		}
 		g.P("}")
 	}
 	g.P("return writer")
 	g.P("}")
+}
+
+func (g *generator) enumSwitch(field *google_protobuf.FieldDescriptorProto, name string, message *google_protobuf.DescriptorProto) {
+	enum := g.GetEnumTypeByName(*field.TypeName)
+	g.P(fmt.Sprintf("switch (val) {"))
+	typeName := g.getTsFieldType(field)
+	for _, value := range enum.Value {
+		g.P(fmt.Sprintf("case %d:", *value.Number))
+		g.P(fmt.Sprintf("return %s.%s;", typeName, *value.Name))
+	}
+	g.P("default:")
+	// TODO: raise error? g.P(fmt.Sprintf("throw new Error('Undefined value of enum %s for field %s of message %s');", typeName, field.GetJsonName(), message.GetName()))
+	g.P("return")
+	g.P("};")
 }
 
 func (g *generator) generateDecode(message *google_protobuf.DescriptorProto) {
@@ -399,45 +404,61 @@ func (g *generator) generateDecode(message *google_protobuf.DescriptorProto) {
 	g.P("switch (tag >>> 3) {")
 	for _, field := range message.Field {
 		name := *field.JsonName
+		if g.isFieldDeprecated(field) {
+			g.P(fmt.Sprintf("console.warn('%s is deprecated');", name))
+		}
 		g.P(fmt.Sprintf("case %d:", field.GetNumber()))
-		if *field.Type == google_protobuf.FieldDescriptorProto_TYPE_MESSAGE {
+		if *field.Type == google_protobuf.FieldDescriptorProto_TYPE_ENUM {
 			if g.isFieldRepeated(field) {
-				g.P(fmt.Sprintf("if (!(message._%s && message._%s.length)) {", name, name))
-				g.P(fmt.Sprintf("message._%s = [];", name))
+				assign := func() {
+					g.P(fmt.Sprintf("const %s = (((val) => {", name))
+					g.enumSwitch(field, name, message)
+					g.P("})(reader.int32()));")
+					g.P(fmt.Sprintf("if (%s) {", name))
+					g.P(fmt.Sprintf("message.%s.push(%s);", name, name))
+					g.P("}")
+				}
+				g.P(fmt.Sprintf("if (!(message.%s && message.%s.length)) { message.%s = []; }", name, name, name))
+				g.P("if ((tag & 7) === 2) {")
+				g.P("const end2 = reader.uint32() + reader.pos;")
+				g.P("while (reader.pos < end2) {")
+				assign()
 				g.P("}")
-				g.P(fmt.Sprintf("message._%s.push(%sMsg.decode(reader, reader.uint32()));", name, g.getTsTypeFromMessage(field.TypeName)))
+				g.P("} else {")
+				assign()
+				g.P("}")
 			} else {
-				g.P(fmt.Sprintf("message._%s = %sMsg.decode(reader, reader.uint32());", name, g.getTsTypeFromMessage(field.TypeName)))
+				g.P(fmt.Sprintf("message.%s = ((val) => {", name))
+				g.enumSwitch(field, name, message)
+				g.P("})(reader.int32());")
+			}
+		} else if *field.Type == google_protobuf.FieldDescriptorProto_TYPE_MESSAGE {
+			if g.isFieldRepeated(field) {
+				g.P(fmt.Sprintf("if (!(message.%s && message.%s.length)) {", name, name))
+				g.P(fmt.Sprintf("message.%s = [];", name))
+				g.P("}")
+				if field.GetTypeName() == ".google.protobuf.Timestamp" {
+					g.P(fmt.Sprintf("const %s = %sMsg.decode(reader, reader.uint32());", name, g.getTsTypeFromMessage(field.TypeName)))
+					g.P(fmt.Sprintf("message.%s.push(new Date(((%s.seconds || 0) * 1000) + ((%s.nanos || 0) / 1000000)));", name, name, name))
+				} else {
+					g.P(fmt.Sprintf("message.%s.push(%sMsg.decode(reader, reader.uint32()));", name, g.getTsTypeFromMessage(field.TypeName)))
+				}
+			} else {
+				if field.GetTypeName() == ".google.protobuf.Timestamp" {
+					g.P(fmt.Sprintf("const %s = %sMsg.decode(reader, reader.uint32());", name, g.getTsTypeFromMessage(field.TypeName)))
+					g.P(fmt.Sprintf("message.%s = new Date(((%s.seconds || 0) * 1000) + ((%s.nanos || 0) / 1000000));", name, name, name))
+				} else {
+					g.P(fmt.Sprintf("message.%s = %sMsg.decode(reader, reader.uint32());", name, g.getTsTypeFromMessage(field.TypeName)))
+				}
 			}
 		} else {
 			if g.isFieldRepeated(field) {
-				g.P(fmt.Sprintf("if (!(message._%s && message._%s.length)) {", name, name))
-				g.P(fmt.Sprintf("message._%s = [];", name))
+				g.P(fmt.Sprintf("if (!(message.%s && message.%s.length)) {", name, name))
+				g.P(fmt.Sprintf("message.%s = [];", name))
 				g.P("}")
-				if *field.Type == google_protobuf.FieldDescriptorProto_TYPE_ENUM {
-					g.P("if ((tag & 7) === 2) {")
-					g.P("const end2 = reader.uint32() + reader.pos;")
-					g.P("while (reader.pos < end2) {")
-					g.P(fmt.Sprintf("message._%s.push(reader.int32());", name))
-					g.P("}")
-					g.P("} else {")
-					g.P(fmt.Sprintf("message._%s.push(reader.%s());", name, g.getWriteFunction(field)))
-					g.P("}")
-				} else {
-					g.P(fmt.Sprintf("message._%s.push(reader.%s());", name, g.getWriteFunction(field)))
-				}
-				// if (!(message.roles && message.roles.length))
-				//                 message.roles = [];
-				//             if ((tag & 7) === 2) {
-				//                 var end2 = reader.uint32() + reader.pos;
-				//                 while (reader.pos < end2)
-				//                     message.roles.push(reader.int32());
-				//             } else
-				//                 message.roles.push(reader.int32());
-				//             break;
-
+				g.P(fmt.Sprintf("message.%s.push(reader.%s());", name, g.getWriteFunction(field)))
 			} else {
-				g.P(fmt.Sprintf("message._%s = reader.%s();", name, g.getWriteFunction(field)))
+				g.P(fmt.Sprintf("message.%s = reader.%s();", name, g.getWriteFunction(field)))
 			}
 		}
 		g.P("break;")
@@ -459,18 +480,18 @@ func (g *generator) generateGettersSetters(message *google_protobuf.DescriptorPr
 		name := *field.JsonName
 		g.P(fmt.Sprintf("public get %s() {", name))
 
-		if g.isFieldDeprecated(field) {
-			g.P(fmt.Sprintf("console.warn('%s is deprecated');", name))
-		}
+		// if g.isFieldDeprecated(field) {
+		// 	g.P(fmt.Sprintf("console.warn('%s is deprecated');", name))
+		// }
 		if *field.Type == google_protobuf.FieldDescriptorProto_TYPE_ENUM {
 			enum := g.GetEnumTypeByName(*field.TypeName)
-			g.P(fmt.Sprintf("if (!this._%s) {", name))
+			g.P(fmt.Sprintf("if (!this.%s) {", name))
 
 			g.P("return")
 
 			g.P("}")
 			if g.isFieldRepeated(field) {
-				g.P(fmt.Sprintf("return this._%s.map((val) => {", name))
+				g.P(fmt.Sprintf("return this.%s.map((val) => {", name))
 
 				g.P("switch (val) {")
 				typeName := g.getTsFieldType(field)
@@ -488,7 +509,7 @@ func (g *generator) generateGettersSetters(message *google_protobuf.DescriptorPr
 
 				g.P("})")
 			} else {
-				g.P(fmt.Sprintf("switch (this._%s) {", name))
+				g.P(fmt.Sprintf("switch (this.%s) {", name))
 				typeName := g.getTsFieldType(field)
 				for _, value := range enum.Value {
 					g.P(fmt.Sprintf("case %d:", *value.Number))
@@ -504,12 +525,12 @@ func (g *generator) generateGettersSetters(message *google_protobuf.DescriptorPr
 			}
 		} else if field.GetTypeName() == ".google.protobuf.Timestamp" {
 			if g.isFieldRepeated(field) {
-				g.P(fmt.Sprintf("return this._%s && this._%s.map(v => new Date(((v.seconds || 0) * 1000) + ((v.nanos || 0) / 1000000)));", name, name))
+				g.P(fmt.Sprintf("return this.%s && this.%s.map(v => new Date(((v.seconds || 0) * 1000) + ((v.nanos || 0) / 1000000)));", name, name))
 			} else {
-				g.P(fmt.Sprintf("return this._%s && new Date(((this._%s.seconds || 0) * 1000) + ((this._%s.nanos || 0) / 1000000));", name, name, name))
+				g.P(fmt.Sprintf("return this.%s && new Date(((this.%s.seconds || 0) * 1000) + ((this.%s.nanos || 0) / 1000000));", name, name, name))
 			}
 		} else {
-			g.P(fmt.Sprintf("return this._%s;", name))
+			g.P(fmt.Sprintf("return this.%s;", name))
 		}
 
 		g.P("}")
@@ -523,15 +544,15 @@ func (g *generator) generateGettersSetters(message *google_protobuf.DescriptorPr
 		if *field.Type == google_protobuf.FieldDescriptorProto_TYPE_MESSAGE {
 			if field.GetTypeName() == ".google.protobuf.Timestamp" {
 				if g.isFieldRepeated(field) {
-					g.P(fmt.Sprintf("this._%s = val && val.map(v => ({ seconds: Math.floor(v.getTime() / 1000), nanos: v.getMilliseconds() * 1000000 }));", name))
+					g.P(fmt.Sprintf("this.%s = val && val.map(v => ({ seconds: Math.floor(v.getTime() / 1000), nanos: v.getMilliseconds() * 1000000 }));", name))
 				} else {
-					g.P(fmt.Sprintf("this._%s = val && { seconds: Math.floor(val.getTime() / 1000), nanos: val.getMilliseconds() * 1000000 };", name))
+					g.P(fmt.Sprintf("this.%s = val && { seconds: Math.floor(val.getTime() / 1000), nanos: val.getMilliseconds() * 1000000 };", name))
 				}
 			} else {
 				if g.isFieldRepeated(field) {
-					g.P(fmt.Sprintf("this._%s = val && val.map(v => new %sMsg(v));", name, g.getTsTypeFromMessage(field.TypeName)))
+					g.P(fmt.Sprintf("this.%s = val && val.map(v => new %sMsg(v));", name, g.getTsTypeFromMessage(field.TypeName)))
 				} else {
-					g.P(fmt.Sprintf("this._%s = new %sMsg(val);", name, g.getTsTypeFromMessage(field.TypeName)))
+					g.P(fmt.Sprintf("this.%s = new %sMsg(val);", name, g.getTsTypeFromMessage(field.TypeName)))
 				}
 			}
 		} else if *field.Type == google_protobuf.FieldDescriptorProto_TYPE_ENUM {
@@ -542,7 +563,7 @@ func (g *generator) generateGettersSetters(message *google_protobuf.DescriptorPr
 				g.P("return;")
 
 				g.P("}")
-				g.P(fmt.Sprintf("this._%s = val.map((value) => {", name))
+				g.P(fmt.Sprintf("this.%s = val.map((value) => {", name))
 
 				g.P("switch (value) {")
 				typeName := g.getTsFieldType(field)
@@ -565,18 +586,18 @@ func (g *generator) generateGettersSetters(message *google_protobuf.DescriptorPr
 				for _, value := range enum.Value {
 					g.P(fmt.Sprintf("case %s.%s:", typeName, *value.Name))
 
-					g.P(fmt.Sprintf("this._%s = %d;", name, *value.Number))
+					g.P(fmt.Sprintf("this.%s = %d;", name, *value.Number))
 					g.P("break;")
 
 				}
 				g.P("default:")
 
-				g.P(fmt.Sprintf("this._%s = undefined;", name))
+				g.P(fmt.Sprintf("this.%s = undefined;", name))
 
 				g.P("}")
 			}
 		} else {
-			g.P(fmt.Sprintf("this._%s = val;", name))
+			g.P(fmt.Sprintf("this.%s = val;", name))
 		}
 
 		g.P("}")
@@ -596,11 +617,11 @@ func (g *generator) generateMessageClass(message *google_protobuf.DescriptorProt
 
 	g.generateDecode(message)
 	for _, field := range message.Field {
-		g.generatePrivateField(field)
+		g.generateField(field, true)
 	}
 	g.generateConstructor(message)
 	g.generateEncode(message)
-	g.generateGettersSetters(message)
+	// g.generateGettersSetters(message)
 
 	g.P("}")
 

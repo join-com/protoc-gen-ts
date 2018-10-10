@@ -2,8 +2,15 @@ syntax = "proto3";
 
 package foo;
 
+import "google/protobuf/timestamp.proto";
+
+import "common/common.proto";
+
 service Users {
   rpc Find(Request) returns (User) {}
+  rpc FindClientStream(stream Request) returns (User) {}
+  rpc FindServerStream(Request) returns (stream User) {}
+  rpc FindBidiStream(stream Request) returns (stream User) {}
 }
 
 enum Type {
@@ -35,4 +42,7 @@ message User {
   repeated Book read_books = 6;
   repeated string nicks = 7;
   repeated Type types = 8;
+  google.protobuf.Timestamp date = 9;
+  common.Name full_name = 10;
+  repeated google.protobuf.Timestamp dates = 11;
 }

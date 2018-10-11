@@ -306,6 +306,23 @@ func (g *generator) getWireType(field *google_protobuf.FieldDescriptorProto) uin
 	return 2
 }
 
+func (g *generator) isType64Bit(field *google_protobuf.FieldDescriptorProto) bool {
+	switch *field.Type {
+	case google_protobuf.FieldDescriptorProto_TYPE_INT64:
+		return true
+	case google_protobuf.FieldDescriptorProto_TYPE_UINT64:
+		return true
+	case google_protobuf.FieldDescriptorProto_TYPE_FIXED64:
+		return true
+	case google_protobuf.FieldDescriptorProto_TYPE_SFIXED64:
+		return true
+	case google_protobuf.FieldDescriptorProto_TYPE_SINT64:
+		return true
+	default:
+		return false
+	}
+}
+
 func (g *generator) getWriteFunction(field *google_protobuf.FieldDescriptorProto) string {
 	switch *field.Type {
 	case google_protobuf.FieldDescriptorProto_TYPE_DOUBLE:
@@ -373,7 +390,7 @@ func (g *generator) generateEncode(message *google_protobuf.DescriptorProto) {
 				g.P(fmt.Sprintf("const %s = (val => {", name))
 				g.encodeEnumSwitch(field, name, message)
 				g.P("})(value);")
-				g.P(fmt.Sprintf("if (%s) {", name))
+				g.P(fmt.Sprintf("if (%s != null) {", name))
 				g.P(fmt.Sprintf("writer.uint32(%d).int32(%s);", g.getFieldIndex(field), name))
 				g.P("}")
 				g.P("}")
@@ -381,7 +398,7 @@ func (g *generator) generateEncode(message *google_protobuf.DescriptorProto) {
 				g.P(fmt.Sprintf("const %s = (val => {", name))
 				g.encodeEnumSwitch(field, name, message)
 				g.P(fmt.Sprintf("})(this.%s);", name))
-				g.P(fmt.Sprintf("if (%s) {", name))
+				g.P(fmt.Sprintf("if (%s != null) {", name))
 				g.P(fmt.Sprintf("writer.uint32(%d).int32(%s);", g.getFieldIndex(field), name))
 				g.P("}")
 			}
@@ -494,12 +511,41 @@ func (g *generator) generateDecode(message *google_protobuf.DescriptorProto) {
 			}
 		} else {
 			if g.isFieldRepeated(field) {
+				assign := func() {
+					if g.isType64Bit(field) {
+						g.P(fmt.Sprintf("const %s = reader.%s();", name, g.getWriteFunction(field)))
+						g.P(fmt.Sprintf("message.%s.push(new protobufjs.util.LongBits(%s.low >>> 0, %s.high >>> 0).toNumber());", name, name, name))
+					} else if *field.Type == google_protobuf.FieldDescriptorProto_TYPE_BYTES {
+						g.P(fmt.Sprintf("message.%s.push(new Uint8Array(reader.%s()));", name, g.getWriteFunction(field)))
+					} else {
+						g.P(fmt.Sprintf("message.%s.push(reader.%s());", name, g.getWriteFunction(field)))
+					}
+				}
 				g.P(fmt.Sprintf("if (!(message.%s && message.%s.length)) {", name, name))
 				g.P(fmt.Sprintf("message.%s = [];", name))
 				g.P("}")
-				g.P(fmt.Sprintf("message.%s.push(reader.%s());", name, g.getWriteFunction(field)))
+
+				if (*field.Type != google_protobuf.FieldDescriptorProto_TYPE_STRING) && (*field.Type != google_protobuf.FieldDescriptorProto_TYPE_BYTES) {
+					g.P("if ((tag & 7) === 2) {")
+					g.P("const end2 = reader.uint32() + reader.pos;")
+					g.P("while (reader.pos < end2) {")
+					assign()
+					g.P("}")
+					g.P("} else {")
+				}
+				assign()
+				if (*field.Type != google_protobuf.FieldDescriptorProto_TYPE_STRING) && (*field.Type != google_protobuf.FieldDescriptorProto_TYPE_BYTES) {
+					g.P("}")
+				}
 			} else {
-				g.P(fmt.Sprintf("message.%s = reader.%s();", name, g.getWriteFunction(field)))
+				if g.isType64Bit(field) {
+					g.P(fmt.Sprintf("const %s = reader.%s();", name, g.getWriteFunction(field)))
+					g.P(fmt.Sprintf("message.%s = new protobufjs.util.LongBits(%s.low >>> 0, %s.high >>> 0).toNumber();", name, name, name))
+				} else if *field.Type == google_protobuf.FieldDescriptorProto_TYPE_BYTES {
+					g.P(fmt.Sprintf("message.%s = new Uint8Array(reader.%s());", name, g.getWriteFunction(field)))
+				} else {
+					g.P(fmt.Sprintf("message.%s = reader.%s();", name, g.getWriteFunction(field)))
+				}
 			}
 		}
 		g.P("break;")

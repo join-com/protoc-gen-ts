@@ -59,7 +59,6 @@ export namespace Foo {
 
   export interface Nested {
     title?: string;
-    isbn?: string;
   }
 
   export class NestedMsg implements Nested {
@@ -78,9 +77,6 @@ export namespace Foo {
           case 1:
             message.title = reader.string();
             break;
-          case 2:
-            message.isbn = reader.string();
-            break;
           default:
             reader.skipType(tag & 7);
             break;
@@ -89,16 +85,12 @@ export namespace Foo {
       return message;
     }
     public title?: string;
-    public isbn?: string;
     constructor(attrs?: Nested) {
       Object.assign(this, attrs);
     }
     public encode(writer: protobufjs.Writer = protobufjs.Writer.create()) {
       if (this.title != null) {
         writer.uint32(10).string(this.title);
-      }
-      if (this.isbn != null) {
-        writer.uint32(18).string(this.isbn);
       }
       return writer;
     }
@@ -133,8 +125,8 @@ export namespace Foo {
     fieldStringRepeated?: string[];
     fieldBytes?: Uint8Array;
     fieldBytesRepeated?: Uint8Array[];
-    enumTest?: EnumType;
-    enumTestRepeated?: EnumType[];
+    fieldEnum?: EnumType;
+    fieldEnumRepeated?: EnumType[];
     message?: Nested;
     messageRepeated?: Nested[];
     timestamp?: Date;
@@ -167,7 +159,14 @@ export namespace Foo {
             ) {
               message.fieldInt32Repeated = [];
             }
-            message.fieldInt32Repeated.push(reader.int32());
+            if ((tag & 7) === 2) {
+              const end2 = reader.uint32() + reader.pos;
+              while (reader.pos < end2) {
+                message.fieldInt32Repeated.push(reader.int32());
+              }
+            } else {
+              message.fieldInt32Repeated.push(reader.int32());
+            }
             break;
           case 3:
             message.fieldDouble = reader.double();
@@ -181,7 +180,14 @@ export namespace Foo {
             ) {
               message.fieldDoubleRepeated = [];
             }
-            message.fieldDoubleRepeated.push(reader.double());
+            if ((tag & 7) === 2) {
+              const end2 = reader.uint32() + reader.pos;
+              while (reader.pos < end2) {
+                message.fieldDoubleRepeated.push(reader.double());
+              }
+            } else {
+              message.fieldDoubleRepeated.push(reader.double());
+            }
             break;
           case 5:
             message.fieldFloat = reader.float();
@@ -192,7 +198,14 @@ export namespace Foo {
             ) {
               message.fieldFloatRepeated = [];
             }
-            message.fieldFloatRepeated.push(reader.float());
+            if ((tag & 7) === 2) {
+              const end2 = reader.uint32() + reader.pos;
+              while (reader.pos < end2) {
+                message.fieldFloatRepeated.push(reader.float());
+              }
+            } else {
+              message.fieldFloatRepeated.push(reader.float());
+            }
             break;
           case 7:
             message.fieldUint32 = reader.uint32();
@@ -206,10 +219,21 @@ export namespace Foo {
             ) {
               message.fieldUint32Repeated = [];
             }
-            message.fieldUint32Repeated.push(reader.uint32());
+            if ((tag & 7) === 2) {
+              const end2 = reader.uint32() + reader.pos;
+              while (reader.pos < end2) {
+                message.fieldUint32Repeated.push(reader.uint32());
+              }
+            } else {
+              message.fieldUint32Repeated.push(reader.uint32());
+            }
             break;
           case 9:
-            message.fieldUint64 = reader.uint64();
+            const fieldUint64 = reader.uint64();
+            message.fieldUint64 = new protobufjs.util.LongBits(
+              fieldUint64.low >>> 0,
+              fieldUint64.high >>> 0
+            ).toNumber();
             break;
           case 10:
             if (
@@ -220,7 +244,26 @@ export namespace Foo {
             ) {
               message.fieldUint64Repeated = [];
             }
-            message.fieldUint64Repeated.push(reader.uint64());
+            if ((tag & 7) === 2) {
+              const end2 = reader.uint32() + reader.pos;
+              while (reader.pos < end2) {
+                const fieldUint64Repeated = reader.uint64();
+                message.fieldUint64Repeated.push(
+                  new protobufjs.util.LongBits(
+                    fieldUint64Repeated.low >>> 0,
+                    fieldUint64Repeated.high >>> 0
+                  ).toNumber()
+                );
+              }
+            } else {
+              const fieldUint64Repeated = reader.uint64();
+              message.fieldUint64Repeated.push(
+                new protobufjs.util.LongBits(
+                  fieldUint64Repeated.low >>> 0,
+                  fieldUint64Repeated.high >>> 0
+                ).toNumber()
+              );
+            }
             break;
           case 11:
             message.fieldSint32 = reader.sint32();
@@ -234,10 +277,21 @@ export namespace Foo {
             ) {
               message.fieldSint32Repeated = [];
             }
-            message.fieldSint32Repeated.push(reader.sint32());
+            if ((tag & 7) === 2) {
+              const end2 = reader.uint32() + reader.pos;
+              while (reader.pos < end2) {
+                message.fieldSint32Repeated.push(reader.sint32());
+              }
+            } else {
+              message.fieldSint32Repeated.push(reader.sint32());
+            }
             break;
           case 13:
-            message.fieldSint64 = reader.sint64();
+            const fieldSint64 = reader.sint64();
+            message.fieldSint64 = new protobufjs.util.LongBits(
+              fieldSint64.low >>> 0,
+              fieldSint64.high >>> 0
+            ).toNumber();
             break;
           case 14:
             if (
@@ -248,7 +302,26 @@ export namespace Foo {
             ) {
               message.fieldSint64Repeated = [];
             }
-            message.fieldSint64Repeated.push(reader.sint64());
+            if ((tag & 7) === 2) {
+              const end2 = reader.uint32() + reader.pos;
+              while (reader.pos < end2) {
+                const fieldSint64Repeated = reader.sint64();
+                message.fieldSint64Repeated.push(
+                  new protobufjs.util.LongBits(
+                    fieldSint64Repeated.low >>> 0,
+                    fieldSint64Repeated.high >>> 0
+                  ).toNumber()
+                );
+              }
+            } else {
+              const fieldSint64Repeated = reader.sint64();
+              message.fieldSint64Repeated.push(
+                new protobufjs.util.LongBits(
+                  fieldSint64Repeated.low >>> 0,
+                  fieldSint64Repeated.high >>> 0
+                ).toNumber()
+              );
+            }
             break;
           case 15:
             message.fieldFixed32 = reader.fixed32();
@@ -262,10 +335,21 @@ export namespace Foo {
             ) {
               message.fieldFixed32Repeated = [];
             }
-            message.fieldFixed32Repeated.push(reader.fixed32());
+            if ((tag & 7) === 2) {
+              const end2 = reader.uint32() + reader.pos;
+              while (reader.pos < end2) {
+                message.fieldFixed32Repeated.push(reader.fixed32());
+              }
+            } else {
+              message.fieldFixed32Repeated.push(reader.fixed32());
+            }
             break;
           case 17:
-            message.fieldFixed64 = reader.fixed64();
+            const fieldFixed64 = reader.fixed64();
+            message.fieldFixed64 = new protobufjs.util.LongBits(
+              fieldFixed64.low >>> 0,
+              fieldFixed64.high >>> 0
+            ).toNumber();
             break;
           case 18:
             if (
@@ -276,7 +360,26 @@ export namespace Foo {
             ) {
               message.fieldFixed64Repeated = [];
             }
-            message.fieldFixed64Repeated.push(reader.fixed64());
+            if ((tag & 7) === 2) {
+              const end2 = reader.uint32() + reader.pos;
+              while (reader.pos < end2) {
+                const fieldFixed64Repeated = reader.fixed64();
+                message.fieldFixed64Repeated.push(
+                  new protobufjs.util.LongBits(
+                    fieldFixed64Repeated.low >>> 0,
+                    fieldFixed64Repeated.high >>> 0
+                  ).toNumber()
+                );
+              }
+            } else {
+              const fieldFixed64Repeated = reader.fixed64();
+              message.fieldFixed64Repeated.push(
+                new protobufjs.util.LongBits(
+                  fieldFixed64Repeated.low >>> 0,
+                  fieldFixed64Repeated.high >>> 0
+                ).toNumber()
+              );
+            }
             break;
           case 19:
             message.fieldSfixed32 = reader.sfixed32();
@@ -290,10 +393,21 @@ export namespace Foo {
             ) {
               message.fieldSfixed32Repeated = [];
             }
-            message.fieldSfixed32Repeated.push(reader.sfixed32());
+            if ((tag & 7) === 2) {
+              const end2 = reader.uint32() + reader.pos;
+              while (reader.pos < end2) {
+                message.fieldSfixed32Repeated.push(reader.sfixed32());
+              }
+            } else {
+              message.fieldSfixed32Repeated.push(reader.sfixed32());
+            }
             break;
           case 21:
-            message.fieldSfixed64 = reader.sfixed64();
+            const fieldSfixed64 = reader.sfixed64();
+            message.fieldSfixed64 = new protobufjs.util.LongBits(
+              fieldSfixed64.low >>> 0,
+              fieldSfixed64.high >>> 0
+            ).toNumber();
             break;
           case 22:
             if (
@@ -304,7 +418,26 @@ export namespace Foo {
             ) {
               message.fieldSfixed64Repeated = [];
             }
-            message.fieldSfixed64Repeated.push(reader.sfixed64());
+            if ((tag & 7) === 2) {
+              const end2 = reader.uint32() + reader.pos;
+              while (reader.pos < end2) {
+                const fieldSfixed64Repeated = reader.sfixed64();
+                message.fieldSfixed64Repeated.push(
+                  new protobufjs.util.LongBits(
+                    fieldSfixed64Repeated.low >>> 0,
+                    fieldSfixed64Repeated.high >>> 0
+                  ).toNumber()
+                );
+              }
+            } else {
+              const fieldSfixed64Repeated = reader.sfixed64();
+              message.fieldSfixed64Repeated.push(
+                new protobufjs.util.LongBits(
+                  fieldSfixed64Repeated.low >>> 0,
+                  fieldSfixed64Repeated.high >>> 0
+                ).toNumber()
+              );
+            }
             break;
           case 23:
             message.fieldBool = reader.bool();
@@ -315,7 +448,14 @@ export namespace Foo {
             ) {
               message.fieldBoolRepeated = [];
             }
-            message.fieldBoolRepeated.push(reader.bool());
+            if ((tag & 7) === 2) {
+              const end2 = reader.uint32() + reader.pos;
+              while (reader.pos < end2) {
+                message.fieldBoolRepeated.push(reader.bool());
+              }
+            } else {
+              message.fieldBoolRepeated.push(reader.bool());
+            }
             break;
           case 25:
             message.fieldString = reader.string();
@@ -332,7 +472,7 @@ export namespace Foo {
             message.fieldStringRepeated.push(reader.string());
             break;
           case 27:
-            message.fieldBytes = reader.bytes();
+            message.fieldBytes = new Uint8Array(reader.bytes());
             break;
           case 28:
             if (
@@ -340,10 +480,10 @@ export namespace Foo {
             ) {
               message.fieldBytesRepeated = [];
             }
-            message.fieldBytesRepeated.push(reader.bytes());
+            message.fieldBytesRepeated.push(new Uint8Array(reader.bytes()));
             break;
           case 29:
-            message.enumTest = (val => {
+            message.fieldEnum = (val => {
               switch (val) {
                 case 0:
                   return EnumType.UNKNOWN;
@@ -358,14 +498,14 @@ export namespace Foo {
             break;
           case 30:
             if (
-              !(message.enumTestRepeated && message.enumTestRepeated.length)
+              !(message.fieldEnumRepeated && message.fieldEnumRepeated.length)
             ) {
-              message.enumTestRepeated = [];
+              message.fieldEnumRepeated = [];
             }
             if ((tag & 7) === 2) {
               const end2 = reader.uint32() + reader.pos;
               while (reader.pos < end2) {
-                const enumTestRepeated = (val => {
+                const fieldEnumRepeated = (val => {
                   switch (val) {
                     case 0:
                       return EnumType.UNKNOWN;
@@ -377,12 +517,12 @@ export namespace Foo {
                       return;
                   }
                 })(reader.int32());
-                if (enumTestRepeated) {
-                  message.enumTestRepeated.push(enumTestRepeated);
+                if (fieldEnumRepeated) {
+                  message.fieldEnumRepeated.push(fieldEnumRepeated);
                 }
               }
             } else {
-              const enumTestRepeated = (val => {
+              const fieldEnumRepeated = (val => {
                 switch (val) {
                   case 0:
                     return EnumType.UNKNOWN;
@@ -394,8 +534,8 @@ export namespace Foo {
                     return;
                 }
               })(reader.int32());
-              if (enumTestRepeated) {
-                message.enumTestRepeated.push(enumTestRepeated);
+              if (fieldEnumRepeated) {
+                message.fieldEnumRepeated.push(fieldEnumRepeated);
               }
             }
             break;
@@ -456,7 +596,11 @@ export namespace Foo {
             );
             break;
           case 37:
-            message.fieldInt64 = reader.int64();
+            const fieldInt64 = reader.int64();
+            message.fieldInt64 = new protobufjs.util.LongBits(
+              fieldInt64.low >>> 0,
+              fieldInt64.high >>> 0
+            ).toNumber();
             break;
           case 38:
             if (
@@ -464,7 +608,26 @@ export namespace Foo {
             ) {
               message.fieldInt64Repeated = [];
             }
-            message.fieldInt64Repeated.push(reader.int64());
+            if ((tag & 7) === 2) {
+              const end2 = reader.uint32() + reader.pos;
+              while (reader.pos < end2) {
+                const fieldInt64Repeated = reader.int64();
+                message.fieldInt64Repeated.push(
+                  new protobufjs.util.LongBits(
+                    fieldInt64Repeated.low >>> 0,
+                    fieldInt64Repeated.high >>> 0
+                  ).toNumber()
+                );
+              }
+            } else {
+              const fieldInt64Repeated = reader.int64();
+              message.fieldInt64Repeated.push(
+                new protobufjs.util.LongBits(
+                  fieldInt64Repeated.low >>> 0,
+                  fieldInt64Repeated.high >>> 0
+                ).toNumber()
+              );
+            }
             break;
           default:
             reader.skipType(tag & 7);
@@ -501,8 +664,8 @@ export namespace Foo {
     public fieldStringRepeated?: string[];
     public fieldBytes?: Uint8Array;
     public fieldBytesRepeated?: Uint8Array[];
-    public enumTest?: EnumType;
-    public enumTestRepeated?: EnumType[];
+    public fieldEnum?: EnumType;
+    public fieldEnumRepeated?: EnumType[];
     public message?: Nested;
     public messageRepeated?: Nested[];
     public timestamp?: Date;
@@ -627,8 +790,8 @@ export namespace Foo {
           writer.uint32(226).bytes(value);
         }
       }
-      if (this.enumTest != null) {
-        const enumTest = (val => {
+      if (this.fieldEnum != null) {
+        const fieldEnum = (val => {
           switch (val) {
             case EnumType.UNKNOWN:
               return 0;
@@ -639,14 +802,14 @@ export namespace Foo {
             default:
               return;
           }
-        })(this.enumTest);
-        if (enumTest) {
-          writer.uint32(232).int32(enumTest);
+        })(this.fieldEnum);
+        if (fieldEnum != null) {
+          writer.uint32(232).int32(fieldEnum);
         }
       }
-      if (this.enumTestRepeated != null) {
-        for (const value of this.enumTestRepeated) {
-          const enumTestRepeated = (val => {
+      if (this.fieldEnumRepeated != null) {
+        for (const value of this.fieldEnumRepeated) {
+          const fieldEnumRepeated = (val => {
             switch (val) {
               case EnumType.UNKNOWN:
                 return 0;
@@ -658,8 +821,8 @@ export namespace Foo {
                 return;
             }
           })(value);
-          if (enumTestRepeated) {
-            writer.uint32(240).int32(enumTestRepeated);
+          if (fieldEnumRepeated != null) {
+            writer.uint32(240).int32(fieldEnumRepeated);
           }
         }
       }

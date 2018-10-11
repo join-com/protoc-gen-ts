@@ -30,7 +30,6 @@ message Request {
 
 message Nested {
   string title = 1;
-  string isbn = 2;
 }
 
 message Test {
@@ -76,8 +75,8 @@ message Test {
   bytes field_bytes = 27;
   repeated bytes field_bytes_repeated = 28;
 
-  EnumType enum_test = 29;
-  repeated EnumType enum_test_repeated = 30;
+  EnumType field_enum = 29;
+  repeated EnumType field_enum_repeated = 30;
 
   Nested message = 31;
   repeated Nested message_repeated = 32;

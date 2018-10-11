@@ -20,7 +20,11 @@ export namespace GoogleProtobuf {
         const tag = reader.uint32();
         switch (tag >>> 3) {
           case 1:
-            message.seconds = reader.int64();
+            const seconds = reader.int64();
+            message.seconds = new protobufjs.util.LongBits(
+              seconds.low >>> 0,
+              seconds.high >>> 0
+            ).toNumber();
             break;
           case 2:
             message.nanos = reader.int32();

@@ -30,7 +30,6 @@ type fileMaker interface {
 type Generator struct {
 	*gen.Generator
 	indent                  string
-	typeNameToObject        map[string]*google_protobuf.DescriptorProto
 	enumNameToObject        map[string]*google_protobuf.EnumDescriptorProto
 	reader                  io.Reader
 	writer                  io.Writer
@@ -106,7 +105,6 @@ func (g *Generator) Fail(msgs ...string) {
 // to make it possible to get object name by type name (via TypeName).
 func (g *Generator) sideEffect() {
 	g.CommandLineParameters(g.Request.GetParameter())
-	g.BuildTypeNameMap(g.Request)
 	g.BuildEnumNameMap(g.Request)
 	g.BuildImportsMap(g.Request)
 	g.BuildMessageOrEnumToFileMap(g.Request)
@@ -124,9 +122,6 @@ func (g *Generator) ProtoFileBaseName(name string) string {
 func (g *Generator) generate(maker fileMaker, request *plugin.CodeGeneratorRequest) (*plugin.CodeGeneratorResponse, error) {
 	response := new(plugin.CodeGeneratorResponse)
 	for _, protoFile := range request.ProtoFile {
-		// if strings.HasPrefix(*protoFile.Name, "google/protobuf") {
-		// 	continue
-		// }
 		file, err := maker.Make(protoFile, request.ProtoFile)
 		if err != nil {
 			return response, err
@@ -165,24 +160,6 @@ func (g *Generator) Generate(maker fileMaker) {
 	_, err = g.writer.Write(output)
 	if err != nil {
 		g.Error(err, "failed to write output proto")
-	}
-}
-
-func (g *Generator) BuildTypeNameMap(request *plugin.CodeGeneratorRequest) {
-	g.typeNameToObject = make(map[string]*google_protobuf.DescriptorProto)
-	for _, f := range request.ProtoFile {
-		// The names in this loop are defined by the proto world, not us, so the
-		// package name may be empty.  If so, the dotted package name of X will
-		// be ".X"; otherwise it will be ".pkg.X".
-		dottedPkg := "." + f.GetPackage()
-		if dottedPkg != "." {
-			dottedPkg += "."
-		}
-
-		for _, desc := range f.MessageType {
-			name := dottedPkg + *desc.Name
-			g.typeNameToObject[name] = desc
-		}
 	}
 }
 
@@ -267,10 +244,6 @@ func (g *Generator) namespaceName(packageName string) string {
 	}
 
 	return camelCaseName
-}
-
-func (g *Generator) GetMessageTypeByName(name string) *google_protobuf.DescriptorProto {
-	return g.typeNameToObject[name]
 }
 
 func (g *Generator) GetEnumTypeByName(name string) *google_protobuf.EnumDescriptorProto {

@@ -2,6 +2,7 @@
 import { GoogleProtobuf } from './google/protobuf/Timestamp';
 import { Common } from './common/Common';
 import * as protobufjs from 'protobufjs/minimal';
+import { logger } from '@join-com/gcloud-logger-trace';
 
 import * as grpc from 'grpc';
 import * as grpcts from '@join-com/grpc-ts';
@@ -57,15 +58,22 @@ export namespace Foo {
     }
   }
 
+  /**
+   * @deprecated
+   */
   export interface Nested {
     title?: string;
   }
 
+  /**
+   * @deprecated
+   */
   export class NestedMsg implements Nested {
     public static decode(
       inReader: Uint8Array | protobufjs.Reader,
       length?: number
     ) {
+      logger.warn('message Nested is deprecated');
       const reader = !(inReader instanceof protobufjs.Reader)
         ? protobufjs.Reader.create(inReader)
         : inReader;
@@ -89,6 +97,7 @@ export namespace Foo {
       Object.assign(this, attrs);
     }
     public encode(writer: protobufjs.Writer = protobufjs.Writer.create()) {
+      logger.warn('message Nested is deprecated');
       if (this.title != null) {
         writer.uint32(10).string(this.title);
       }
@@ -109,6 +118,7 @@ export namespace Foo {
     fieldUint64Repeated?: number[];
     fieldSint32?: number;
     fieldSint32Repeated?: number[];
+    /** @deprecated */
     fieldSint64?: number;
     fieldSint64Repeated?: number[];
     fieldFixed32?: number;
@@ -126,7 +136,7 @@ export namespace Foo {
     fieldBytes?: Uint8Array;
     fieldBytesRepeated?: Uint8Array[];
     fieldEnum?: EnumType;
-    fieldEnumRepeated?: EnumType[];
+    fieldEnumRepeated?: Role[];
     message?: Nested;
     messageRepeated?: Nested[];
     timestamp?: Date;
@@ -287,6 +297,7 @@ export namespace Foo {
             }
             break;
           case 13:
+            logger.warn('field fieldSint64 is deprecated in Test');
             const fieldSint64 = reader.sint64();
             message.fieldSint64 = new protobufjs.util.LongBits(
               fieldSint64.low >>> 0,
@@ -508,11 +519,9 @@ export namespace Foo {
                 const fieldEnumRepeated = (val => {
                   switch (val) {
                     case 0:
-                      return EnumType.UNKNOWN;
+                      return Role.VIEW;
                     case 1:
-                      return EnumType.ADMIN;
-                    case 2:
-                      return EnumType.USER;
+                      return Role.EDIT;
                     default:
                       return;
                   }
@@ -525,11 +534,9 @@ export namespace Foo {
               const fieldEnumRepeated = (val => {
                 switch (val) {
                   case 0:
-                    return EnumType.UNKNOWN;
+                    return Role.VIEW;
                   case 1:
-                    return EnumType.ADMIN;
-                  case 2:
-                    return EnumType.USER;
+                    return Role.EDIT;
                   default:
                     return;
                 }
@@ -539,10 +546,10 @@ export namespace Foo {
               }
             }
             break;
-          case 31:
+          case 33:
             message.message = NestedMsg.decode(reader, reader.uint32());
             break;
-          case 32:
+          case 34:
             if (!(message.messageRepeated && message.messageRepeated.length)) {
               message.messageRepeated = [];
             }
@@ -550,7 +557,7 @@ export namespace Foo {
               NestedMsg.decode(reader, reader.uint32())
             );
             break;
-          case 33:
+          case 35:
             const timestamp = GoogleProtobuf.TimestampMsg.decode(
               reader,
               reader.uint32()
@@ -559,7 +566,7 @@ export namespace Foo {
               (timestamp.seconds || 0) * 1000 + (timestamp.nanos || 0) / 1000000
             );
             break;
-          case 34:
+          case 36:
             if (
               !(message.timestampRepeated && message.timestampRepeated.length)
             ) {
@@ -576,13 +583,13 @@ export namespace Foo {
               )
             );
             break;
-          case 35:
+          case 37:
             message.otherPkgMessage = Common.OtherPkgMessageMsg.decode(
               reader,
               reader.uint32()
             );
             break;
-          case 36:
+          case 38:
             if (
               !(
                 message.otherPkgMessageRepeated &&
@@ -595,14 +602,14 @@ export namespace Foo {
               Common.OtherPkgMessageMsg.decode(reader, reader.uint32())
             );
             break;
-          case 37:
+          case 39:
             const fieldInt64 = reader.int64();
             message.fieldInt64 = new protobufjs.util.LongBits(
               fieldInt64.low >>> 0,
               fieldInt64.high >>> 0
             ).toNumber();
             break;
-          case 38:
+          case 40:
             if (
               !(message.fieldInt64Repeated && message.fieldInt64Repeated.length)
             ) {
@@ -648,6 +655,7 @@ export namespace Foo {
     public fieldUint64Repeated?: number[];
     public fieldSint32?: number;
     public fieldSint32Repeated?: number[];
+    /** @deprecated */
     public fieldSint64?: number;
     public fieldSint64Repeated?: number[];
     public fieldFixed32?: number;
@@ -665,7 +673,7 @@ export namespace Foo {
     public fieldBytes?: Uint8Array;
     public fieldBytesRepeated?: Uint8Array[];
     public fieldEnum?: EnumType;
-    public fieldEnumRepeated?: EnumType[];
+    public fieldEnumRepeated?: Role[];
     public message?: Nested;
     public messageRepeated?: Nested[];
     public timestamp?: Date;
@@ -811,12 +819,10 @@ export namespace Foo {
         for (const value of this.fieldEnumRepeated) {
           const fieldEnumRepeated = (val => {
             switch (val) {
-              case EnumType.UNKNOWN:
+              case Role.VIEW:
                 return 0;
-              case EnumType.ADMIN:
+              case Role.EDIT:
                 return 1;
-              case EnumType.USER:
-                return 2;
               default:
                 return;
             }
@@ -828,7 +834,7 @@ export namespace Foo {
       }
       if (this.message != null) {
         const msg = new NestedMsg(this.message);
-        msg.encode(writer.uint32(250).fork()).ldelim();
+        msg.encode(writer.uint32(266).fork()).ldelim();
       }
       if (this.messageRepeated != null) {
         for (const value of this.messageRepeated) {
@@ -836,7 +842,7 @@ export namespace Foo {
             continue;
           }
           const msg = new NestedMsg(value);
-          msg.encode(writer.uint32(258).fork()).ldelim();
+          msg.encode(writer.uint32(274).fork()).ldelim();
         }
       }
       if (this.timestamp != null) {
@@ -844,7 +850,7 @@ export namespace Foo {
           seconds: Math.floor(this.timestamp.getTime() / 1000),
           nanos: this.timestamp.getMilliseconds() * 1000000
         });
-        msg.encode(writer.uint32(266).fork()).ldelim();
+        msg.encode(writer.uint32(282).fork()).ldelim();
       }
       if (this.timestampRepeated != null) {
         for (const value of this.timestampRepeated) {
@@ -855,12 +861,12 @@ export namespace Foo {
             seconds: Math.floor(value.getTime() / 1000),
             nanos: value.getMilliseconds() * 1000000
           });
-          msg.encode(writer.uint32(274).fork()).ldelim();
+          msg.encode(writer.uint32(290).fork()).ldelim();
         }
       }
       if (this.otherPkgMessage != null) {
         const msg = new Common.OtherPkgMessageMsg(this.otherPkgMessage);
-        msg.encode(writer.uint32(282).fork()).ldelim();
+        msg.encode(writer.uint32(298).fork()).ldelim();
       }
       if (this.otherPkgMessageRepeated != null) {
         for (const value of this.otherPkgMessageRepeated) {
@@ -868,15 +874,15 @@ export namespace Foo {
             continue;
           }
           const msg = new Common.OtherPkgMessageMsg(value);
-          msg.encode(writer.uint32(290).fork()).ldelim();
+          msg.encode(writer.uint32(306).fork()).ldelim();
         }
       }
       if (this.fieldInt64 != null) {
-        writer.uint32(296).int64(this.fieldInt64);
+        writer.uint32(312).int64(this.fieldInt64);
       }
       if (this.fieldInt64Repeated != null) {
         for (const value of this.fieldInt64Repeated) {
-          writer.uint32(304).int64(value);
+          writer.uint32(320).int64(value);
         }
       }
       return writer;
@@ -943,6 +949,9 @@ export namespace Foo {
   };
 
   export interface UsersImplementation extends grpcts.Implementations {
+    /**
+     * @deprecated
+     */
     find(call: grpc.ServerUnaryCall<Request>): Promise<Common.OtherPkgMessage>;
     find(
       call: grpc.ServerUnaryCall<Request>,
@@ -962,7 +971,11 @@ export namespace Foo {
   }
 
   export class UsersClient extends grpcts.Client {
+    /**
+     * @deprecated
+     */
     public find(req: Request, metadata?: grpcts.Metadata) {
+      logger.warn('method Find is deprecated');
       return super.makeUnaryRequest<Request, Common.OtherPkgMessage>(
         'find',
         req,

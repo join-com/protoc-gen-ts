@@ -1,3 +1,9 @@
+// TODO:
+// 1. deprecated log
+// 2. test changes in messages adding fields, removing
+// 3. test enums changes
+// 4. test if not sent
+
 import { Foo } from './generated/Test'
 import { loadSync } from 'protobufjs'
 import * as path from 'path'
@@ -39,7 +45,7 @@ describe('encode', () => {
     fieldBytes: new Uint8Array([21, 31]),
     fieldBytesRepeated: [new Uint8Array([21, 31]), new Uint8Array([2, 31])],
     fieldEnum: Foo.EnumType.UNKNOWN,
-    fieldEnumRepeated: [Foo.EnumType.ADMIN, Foo.EnumType.UNKNOWN],
+    fieldEnumRepeated: [Foo.Role.EDIT, Foo.Role.VIEW],
     message: {
       title: 'msg'
     },

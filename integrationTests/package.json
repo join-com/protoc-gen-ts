@@ -7,9 +7,10 @@
   "scripts": {
     "proto:prettier": "prettier --write '__tests__/generated/**/*.ts'",
     "proto:clean": "find __tests__/generated ! -name 'tslint.json' ! -name '.prettierrc' -type f -exec rm -f {} +",
-    "proto:build": "yarn proto:clean && protoc __tests__/proto/*.proto -I __tests__/proto --ts_out=proto_relative=../../proto:/$PWD/__tests__/generated && yarn proto:prettier"
+    "proto:build": "yarn proto:clean && protoc __tests__/proto/*.proto -I __tests__/proto --ts_out=/$PWD/__tests__/generated && yarn proto:prettier"
   },
   "dependencies": {
+    "@join-com/gcloud-logger-trace": "^0.1.5",
     "@join-com/grpc-ts": "1.0.0-2",
     "grpc": "^1.15.1",
     "protobufjs": "^6.8.8"

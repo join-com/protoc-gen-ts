@@ -1,7 +1,9 @@
 // GENERATED CODE -- DO NOT EDIT!
 import * as protobufjs from 'protobufjs/minimal';
+import { logger } from '@join-com/gcloud-logger-trace';
 export namespace Common {
   export interface OtherPkgMessage {
+    /** @deprecated */
     firstName?: string;
     latsName?: string;
   }
@@ -20,6 +22,7 @@ export namespace Common {
         const tag = reader.uint32();
         switch (tag >>> 3) {
           case 1:
+            logger.warn('field firstName is deprecated in OtherPkgMessage');
             message.firstName = reader.string();
             break;
           case 2:
@@ -32,6 +35,7 @@ export namespace Common {
       }
       return message;
     }
+    /** @deprecated */
     public firstName?: string;
     public latsName?: string;
     constructor(attrs?: OtherPkgMessage) {

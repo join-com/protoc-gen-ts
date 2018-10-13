@@ -1,5 +1,6 @@
 // GENERATED CODE -- DO NOT EDIT!
 import * as protobufjs from 'protobufjs/minimal';
+import { logger } from '@join-com/gcloud-logger-trace';
 export namespace GoogleProtobuf {
   export interface Timestamp {
     seconds?: number;

@@ -3,6 +3,6 @@ syntax = "proto3";
 package common;
 
 message OtherPkgMessage {
-  string first_name = 1[deprecated=true];
+  string first_name = 1;
   string lats_name = 2;
 }

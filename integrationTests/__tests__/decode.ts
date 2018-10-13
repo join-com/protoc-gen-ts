@@ -2,63 +2,62 @@ import { Foo } from './generated/Test'
 import { loadSync } from 'protobufjs'
 import * as path from 'path'
 
-let PbTest: any
-beforeAll(() => {
-  const root = loadSync(path.join(__dirname, 'proto', 'test.proto'))
-  PbTest = root.lookupType('foo.Test')
-})
+const baseValues = {
+  fieldInt32: 123,
+  fieldInt32Repeated: [123, 12312],
+  fieldInt64: 12321313,
+  fieldInt64Repeated: [1333023, 12000312],
+  fieldDouble: 1234.1221231323,
+  fieldDoubleRepeated: [1234.1221231323],
+  fieldFloat: 9999.1,
+  fieldFloatRepeated: [9999.1],
+  fieldUint32: 11119,
+  fieldUint32Repeated: [11119],
+  fieldUint64: 114119,
+  fieldUint64Repeated: [161119],
+  fieldSint32: 13123,
+  fieldSint32Repeated: [13123, 1312312],
+  fieldFixed32: 123123,
+  fieldFixed32Repeated: [3223, 12312],
+  fieldFixed64: 123123,
+  fieldFixed64Repeated: [3223, 12312],
+  fieldSfixed32: 123123,
+  fieldSfixed32Repeated: [3223, 12312],
+  fieldSfixed64: 123123,
+  fieldSfixed64Repeated: [3223, 12312],
+  fieldBool: true,
+  fieldBoolRepeated: [true, false, true],
+  fieldString: 'foo',
+  fieldStringRepeated: ['foo', 'bar'],
+  fieldBytes: new Uint8Array([21, 31]),
+  fieldBytesRepeated: [new Uint8Array([21, 31]), new Uint8Array([2, 31])],
+  fieldEnum: Foo.EnumType.UNKNOWN,
+  fieldEnumRepeated: [Foo.Role.EDIT, Foo.Role.VIEW],
+  message: {
+    title: 'msg'
+  },
+  messageRepeated: [
+    {
+      title: 'msg1'
+    },
+    {
+      title: 'msg2'
+    }
+  ],
+  timestamp: { seconds: 1414841073, nanos: 123000000 },
+  timestampRepeated: [
+    { seconds: 1393412400, nanos: 234000000 },
+    { seconds: 1369562410, nanos: 221000000 }
+  ]
+}
 
 describe('decode', () => {
+  const values = baseValues
+
+  const root = loadSync(path.join(__dirname, 'proto', 'test.proto'))
+  const PbTest = root.lookupType('foo.Test')
   let buffer: Uint8Array
   let decoded: any
-  const values = {
-    fieldInt32: 123,
-    fieldInt32Repeated: [123, 12312],
-    fieldInt64: 12321313,
-    fieldInt64Repeated: [1333023, 12000312],
-    fieldDouble: 1234.1221231323,
-    fieldDoubleRepeated: [1234.1221231323],
-    fieldFloat: 9999.1,
-    fieldFloatRepeated: [9999.1],
-    fieldUint32: 11119,
-    fieldUint32Repeated: [11119],
-    fieldUint64: 114119,
-    fieldUint64Repeated: [161119],
-    fieldSint32: 13123,
-    fieldSint32Repeated: [13123, 1312312],
-    fieldFixed32: 123123,
-    fieldFixed32Repeated: [3223, 12312],
-    fieldFixed64: 123123,
-    fieldFixed64Repeated: [3223, 12312],
-    fieldSfixed32: 123123,
-    fieldSfixed32Repeated: [3223, 12312],
-    fieldSfixed64: 123123,
-    fieldSfixed64Repeated: [3223, 12312],
-    fieldBool: true,
-    fieldBoolRepeated: [true, false, true],
-    fieldString: 'foo',
-    fieldStringRepeated: ['foo', 'bar'],
-    fieldBytes: new Uint8Array([21, 31]),
-    fieldBytesRepeated: [new Uint8Array([21, 31]), new Uint8Array([2, 31])],
-    fieldEnum: Foo.EnumType.UNKNOWN,
-    fieldEnumRepeated: [Foo.EnumType.ADMIN, Foo.EnumType.UNKNOWN],
-    message: {
-      title: 'msg'
-    },
-    messageRepeated: [
-      {
-        title: 'msg1'
-      },
-      {
-        title: 'msg2'
-      }
-    ],
-    timestamp: { seconds: 1414841073, nanos: 123000000 },
-    timestampRepeated: [
-      { seconds: 1393412400, nanos: 234000000 },
-      { seconds: 1369562410, nanos: 221000000 }
-    ]
-  }
 
   beforeEach(() => {
     const message = PbTest.fromObject(values)
@@ -124,5 +123,30 @@ describe('decode', () => {
         values.fieldFloatRepeated.map(Math.fround)
       )
     })
+  })
+})
+
+describe('decode changed protos', () => {
+  const root = loadSync(path.join(__dirname, 'protoBefore', 'test.proto'))
+  const PbTest = root.lookupType('foo.Test')
+  let buffer: Uint8Array
+  let decoded: any
+  const values = {
+    ...baseValues,
+    fieldEnumRepeated: ['EXECUTE', 'VIEW'],
+    fieldString2: 'test2',
+    fieldString3: 'test3'
+  }
+
+  beforeEach(() => {
+    const message = PbTest.fromObject(values)
+    buffer = PbTest.encode(message).finish()
+    decoded = Foo.TestMsg.decode(buffer)
+  })
+
+  it('ignores missing field', () => {
+    expect(decoded.fieldEnumRepeated).toEqual([Foo.Role.VIEW])
+    expect(decoded.fieldString2).not.toBeDefined()
+    expect(decoded.fieldString3).not.toBeDefined()
   })
 })

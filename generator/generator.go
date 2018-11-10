@@ -2,7 +2,6 @@ package generator
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 	"unicode"
@@ -26,7 +25,11 @@ func New() *generator {
 func (g *generator) tsFileName(protoName *string) string {
 	fileNames := strings.Split(*protoName, "/")
 	fileBaseName := fileNames[len(fileNames)-1]
-	return strings.Join(fileNames[:len(fileNames)-1], "/") + "/" + gen.CamelCase(g.ProtoFileBaseName(fileBaseName))
+	baseName := gen.CamelCase(g.ProtoFileBaseName(fileBaseName))
+	if len(fileNames) > 1 {
+		return strings.Join(fileNames[:len(fileNames)-1], "/") + "/" + baseName
+	}
+	return baseName
 }
 
 func (g *generator) tsFileNameWithExt(protoName *string) string {
@@ -37,6 +40,7 @@ func (g *generator) generateGenericImports() {
 	g.P(`
 import * as grpc from 'grpc';
 import * as grpcts from '@join-com/grpc-ts';
+import * as nodeTrace from '@join-com/node-trace';
 `)
 }
 
@@ -54,11 +58,12 @@ func (g *generator) generateImports(protoFile *google_protobuf.FileDescriptorPro
 		namespaceName := g.namespaceName(packageName)
 		fileNames := strings.Split(*protoFile.Name, "/")
 		var path string
-		if len(fileNames) > 0 {
+		if len(fileNames) <= 1 {
 			path = "./"
 		} else {
 			path = strings.Repeat("../", len(fileNames)-1)
 		}
+
 		path += g.tsFileName(depProtoFile.Name)
 		importName := g.GetImportName(*protoFile.Name, *depProtoFile.Name)
 		if importName == namespaceName {
@@ -200,7 +205,7 @@ func (g *generator) generateField(field *google_protobuf.FieldDescriptorProto, s
 	g.P(s)
 }
 
-func (g *generator) generateMessage(message *google_protobuf.DescriptorProto) {
+func (g *generator) generateMessageInterface(message *google_protobuf.DescriptorProto) {
 	g.P()
 	if g.isMessageDeprecated(message) {
 		g.P("/**")
@@ -340,6 +345,7 @@ func (g *generator) encodeEnumSwitch(field *google_protobuf.FieldDescriptorProto
 
 func (g *generator) generateEncode(message *google_protobuf.DescriptorProto) {
 	g.P("public encode(writer: protobufjs.Writer = protobufjs.Writer.create()){")
+
 	if g.isMessageDeprecated(message) {
 		g.P(fmt.Sprintf("logger.warn('message %s is deprecated');", *message.Name))
 	}
@@ -400,6 +406,7 @@ func (g *generator) generateEncode(message *google_protobuf.DescriptorProto) {
 
 func (g *generator) decodeEnumSwitch(field *google_protobuf.FieldDescriptorProto, name string, message *google_protobuf.DescriptorProto) {
 	enum := g.GetEnumTypeByName(*field.TypeName)
+
 	g.P(fmt.Sprintf("switch (val) {"))
 	typeName := g.getTsFieldType(field)
 	for _, value := range enum.Value {
@@ -642,6 +649,9 @@ func (g *generator) generateClient(service *google_protobuf.ServiceDescriptorPro
 		g.P("*/")
 	}
 	g.P(fmt.Sprintf("export class %sClient extends grpcts.Client {", gen.CamelCase(*service.Name)))
+	g.P("constructor(address: string, credentials: grpc.ChannelCredentials, trace: grpcts.ClientTrace = nodeTrace, options?: object){")
+	g.P(fmt.Sprintf("super(%sServiceDefinition, address, credentials, trace, options);", g.toLowerFirst(*service.Name)))
+	g.P("}")
 	for _, method := range service.Method {
 		inputTypeName := g.getTsTypeFromMessage(method.InputType)
 		g.methodDeprecated(method)
@@ -678,12 +688,12 @@ func (g *generator) generateClient(service *google_protobuf.ServiceDescriptorPro
 
 func (g *generator) Make(protoFile *google_protobuf.FileDescriptorProto, protoFiles []*google_protobuf.FileDescriptorProto) (*plugin.CodeGeneratorResponse_File, error) {
 	g.protoFile = protoFile
-	log.Print(*protoFile.Name)
 
 	g.P("// GENERATED CODE -- DO NOT EDIT!")
 
 	g.generateImports(protoFile, protoFiles)
 	g.P("import * as protobufjs from 'protobufjs/minimal';")
+	g.P("// @ts-ignore ignored as it's generated and it's difficult to predict if logger is needed")
 	g.P("import { logger } from '@join-com/gcloud-logger-trace';")
 	if len(protoFile.Service) > 0 {
 		g.generateGenericImports()
@@ -696,7 +706,7 @@ func (g *generator) Make(protoFile *google_protobuf.FileDescriptorProto, protoFi
 	}
 
 	for _, message := range protoFile.MessageType {
-		g.generateMessage(message)
+		g.generateMessageInterface(message)
 		g.generateMessageClass(message)
 	}
 

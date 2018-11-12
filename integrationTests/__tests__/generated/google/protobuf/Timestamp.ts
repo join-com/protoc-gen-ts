@@ -1,13 +1,14 @@
 // GENERATED CODE -- DO NOT EDIT!
 import * as protobufjs from 'protobufjs/minimal';
+// @ts-ignore ignored as it's generated and it's difficult to predict if logger is needed
 import { logger } from '@join-com/gcloud-logger-trace';
 export namespace GoogleProtobuf {
-  export interface Timestamp {
+  export interface ITimestamp {
     seconds?: number;
     nanos?: number;
   }
 
-  export class TimestampMsg implements Timestamp {
+  export class Timestamp implements ITimestamp {
     public static decode(
       inReader: Uint8Array | protobufjs.Reader,
       length?: number
@@ -16,7 +17,7 @@ export namespace GoogleProtobuf {
         ? protobufjs.Reader.create(inReader)
         : inReader;
       const end = length === undefined ? reader.len : reader.pos + length;
-      const message = new TimestampMsg();
+      const message = new Timestamp();
       while (reader.pos < end) {
         const tag = reader.uint32();
         switch (tag >>> 3) {
@@ -39,7 +40,7 @@ export namespace GoogleProtobuf {
     }
     public seconds?: number;
     public nanos?: number;
-    constructor(attrs?: Timestamp) {
+    constructor(attrs?: ITimestamp) {
       Object.assign(this, attrs);
     }
     public encode(writer: protobufjs.Writer = protobufjs.Writer.create()) {

@@ -65,7 +65,7 @@ describe('encode', () => {
   }
 
   beforeEach(() => {
-    const user = new Foo.TestMsg(values)
+    const user = new Foo.Test(values)
     buffer = user.encode().finish()
     decoded = PbTest.toObject(PbTest.decode(buffer), {
       enums: String,

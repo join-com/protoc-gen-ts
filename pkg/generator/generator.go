@@ -6,7 +6,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/antonversal/protoc-gen-ts/base"
+	"github.com/antonversal/protoc-gen-ts/pkg/base"
 	"github.com/golang/protobuf/proto"
 	google_protobuf "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	gen "github.com/golang/protobuf/protoc-gen-go/generator"
@@ -55,7 +55,7 @@ func (g *generator) generateImports(protoFile *google_protobuf.FileDescriptorPro
 		}
 
 		packageName := depProtoFile.GetPackage()
-		namespaceName := g.namespaceName(packageName)
+		namespaceName := g.NamespaceName(packageName)
 		fileNames := strings.Split(*protoFile.Name, "/")
 		var path string
 		if len(fileNames) <= 1 {
@@ -74,23 +74,8 @@ func (g *generator) generateImports(protoFile *google_protobuf.FileDescriptorPro
 	}
 }
 
-func (g *generator) namespaceName(packageName string) string {
-	splits := strings.Split(packageName, ".")
-	camelCaseName := ""
-	for _, name := range splits {
-		a := []string{camelCaseName, gen.CamelCase(name)}
-		camelCaseName = strings.Join(a, "")
-	}
-
-	return camelCaseName
-}
-
 func (g *generator) generateNamespace(packageName string) {
-	g.P(fmt.Sprintf("export namespace %s {", g.namespaceName(packageName)))
-}
-
-func (g *generator) messageName(message *google_protobuf.DescriptorProto) string {
-	return gen.CamelCase(*message.Name)
+	g.P(fmt.Sprintf("export namespace %s {", g.NamespaceName(packageName)))
 }
 
 func (g *generator) enumName(enum *google_protobuf.EnumDescriptorProto) string {
@@ -131,13 +116,6 @@ func (g *generator) isFieldDeprecated(field *google_protobuf.FieldDescriptorProt
 	return *field.Options.Deprecated
 }
 
-func (g *generator) isMessageDeprecated(field *google_protobuf.DescriptorProto) bool {
-	if field.Options == nil || field.Options.Deprecated == nil {
-		return false
-	}
-	return *field.Options.Deprecated
-}
-
 func (g *generator) isMethodDeprecated(field *google_protobuf.MethodDescriptorProto) bool {
 	if field.Options == nil || field.Options.Deprecated == nil {
 		return false
@@ -152,17 +130,13 @@ func (g *generator) isServiceDeprecated(field *google_protobuf.ServiceDescriptor
 	return *field.Options.Deprecated
 }
 
-func (g *generator) getTsTypeFromMessage(typeName *string, isInterface bool) string {
+func (g *generator) getTsTypeFromMessage(typeName *string) string {
 	names := strings.Split(*typeName, ".")
 	importName := g.GetImportNameForMessage(*g.protoFile.Name, *typeName)
-	interfaceName := names[len(names)-1]
-	if isInterface {
-		interfaceName = "I" + interfaceName
-	}
 	if importName == "" {
-		return interfaceName
+		return names[len(names)-1]
 	}
-	return importName + "." + interfaceName
+	return importName + "." + names[len(names)-1]
 }
 
 func (g *generator) getTsFieldType(field *google_protobuf.FieldDescriptorProto) string {
@@ -176,7 +150,7 @@ func (g *generator) getTsFieldType(field *google_protobuf.FieldDescriptorProto) 
 
 	if *field.Type == google_protobuf.FieldDescriptorProto_TYPE_MESSAGE ||
 		*field.Type == google_protobuf.FieldDescriptorProto_TYPE_ENUM {
-		return g.getTsTypeFromMessage(field.TypeName, *field.Type == google_protobuf.FieldDescriptorProto_TYPE_MESSAGE)
+		return g.getTsTypeFromMessage(field.TypeName)
 	}
 
 	return g.getTsFieldTypeForScalar(*field.Type)
@@ -209,14 +183,15 @@ func (g *generator) generateField(field *google_protobuf.FieldDescriptorProto, s
 	g.P(s)
 }
 
-func (g *generator) generateMessageInterface(message *google_protobuf.DescriptorProto) {
+func (g *generator) generateMessageInterface(message *google_protobuf.DescriptorProto, messageMeta base.MessageMeta) {
 	g.P()
-	if g.isMessageDeprecated(message) {
+	if messageMeta.IsDeprecated {
 		g.P("/**")
 		g.P("* @deprecated")
 		g.P("*/")
 	}
-	g.P(fmt.Sprintf("export interface I%s {", g.messageName(message)))
+
+	g.P(fmt.Sprintf("export interface %s {", messageMeta.TsInterfaceName))
 	for _, field := range message.Field {
 		g.generateField(field, false)
 	}
@@ -224,8 +199,7 @@ func (g *generator) generateMessageInterface(message *google_protobuf.Descriptor
 }
 
 func (g *generator) generateConstructor(message *google_protobuf.DescriptorProto) {
-	name := g.messageName(message)
-	g.P(fmt.Sprintf("constructor(attrs?: I%s){", name))
+	g.P(fmt.Sprintf("constructor(attrs?: %s){", g.MessageMap[message].MessageName))
 	g.P("Object.assign(this, attrs)")
 	g.P("}")
 }
@@ -348,9 +322,10 @@ func (g *generator) encodeEnumSwitch(field *google_protobuf.FieldDescriptorProto
 }
 
 func (g *generator) generateEncode(message *google_protobuf.DescriptorProto) {
+	messageMeta := g.MessageMap[message]
 	g.P("public encode(writer: protobufjs.Writer = protobufjs.Writer.create()){")
 
-	if g.isMessageDeprecated(message) {
+	if messageMeta.IsDeprecated {
 		g.P(fmt.Sprintf("logger.warn('message %s is deprecated');", *message.Name))
 	}
 	for _, field := range message.Field {
@@ -379,17 +354,17 @@ func (g *generator) generateEncode(message *google_protobuf.DescriptorProto) {
 				g.P(fmt.Sprintf("for (const value of this.%s) {", name))
 				g.P("if (!value) { continue; }")
 				if field.GetTypeName() == ".google.protobuf.Timestamp" {
-					g.P(fmt.Sprintf("const msg = new %s({seconds: Math.floor(value.getTime() / 1000) , nanos: value.getMilliseconds() * 1000000});", g.getTsTypeFromMessage(field.TypeName, false)))
+					g.P(fmt.Sprintf("const msg = new %sMsg({seconds: Math.floor(value.getTime() / 1000) , nanos: value.getMilliseconds() * 1000000});", g.getTsTypeFromMessage(field.TypeName)))
 				} else {
-					g.P(fmt.Sprintf("const msg = new %s(value);", g.getTsTypeFromMessage(field.TypeName, false)))
+					g.P(fmt.Sprintf("const msg = new %sMsg(value);", g.getTsTypeFromMessage(field.TypeName)))
 				}
 				g.P(fmt.Sprintf("msg.encode(writer.uint32(%d).fork()).ldelim();", g.getFieldIndex(field)))
 				g.P("}")
 			} else {
 				if field.GetTypeName() == ".google.protobuf.Timestamp" {
-					g.P(fmt.Sprintf("const msg = new %s({seconds: Math.floor(this.%s.getTime() / 1000) , nanos: this.%s.getMilliseconds() * 1000000});", g.getTsTypeFromMessage(field.TypeName, false), name, name))
+					g.P(fmt.Sprintf("const msg = new %sMsg({seconds: Math.floor(this.%s.getTime() / 1000) , nanos: this.%s.getMilliseconds() * 1000000});", g.getTsTypeFromMessage(field.TypeName), name, name))
 				} else {
-					g.P(fmt.Sprintf("const msg = new %s(this.%s);", g.getTsTypeFromMessage(field.TypeName, false), name))
+					g.P(fmt.Sprintf("const msg = new %sMsg(this.%s);", g.getTsTypeFromMessage(field.TypeName), name))
 				}
 				g.P(fmt.Sprintf("msg.encode(writer.uint32(%d).fork()).ldelim();", g.getFieldIndex(field)))
 			}
@@ -423,15 +398,16 @@ func (g *generator) decodeEnumSwitch(field *google_protobuf.FieldDescriptorProto
 }
 
 func (g *generator) generateDecode(message *google_protobuf.DescriptorProto) {
+	messageMeta := g.MessageMap[message]
 	g.P("public static decode(inReader: Uint8Array | protobufjs.Reader, length?: number){")
-	if g.isMessageDeprecated(message) {
+	if messageMeta.IsDeprecated {
 		g.P(fmt.Sprintf("logger.warn('message %s is deprecated');", *message.Name))
 	}
 	g.P("const reader = !(inReader instanceof protobufjs.Reader)")
 	g.P("? protobufjs.Reader.create(inReader)")
 	g.P(": inReader")
 	g.P("const end = length === undefined ? reader.len : reader.pos + length;")
-	g.P(fmt.Sprintf("const message = new %s();", g.getTsTypeFromMessage(message.Name, false)))
+	g.P(fmt.Sprintf("const message = new %sMsg();", g.getTsTypeFromMessage(message.Name)))
 	g.P("while (reader.pos < end) {")
 	g.P("const tag = reader.uint32()")
 	g.P("switch (tag >>> 3) {")
@@ -471,17 +447,17 @@ func (g *generator) generateDecode(message *google_protobuf.DescriptorProto) {
 				g.P(fmt.Sprintf("message.%s = [];", name))
 				g.P("}")
 				if field.GetTypeName() == ".google.protobuf.Timestamp" {
-					g.P(fmt.Sprintf("const %s = %s.decode(reader, reader.uint32());", name, g.getTsTypeFromMessage(field.TypeName, false)))
+					g.P(fmt.Sprintf("const %s = %sMsg.decode(reader, reader.uint32());", name, g.getTsTypeFromMessage(field.TypeName)))
 					g.P(fmt.Sprintf("message.%s.push(new Date(((%s.seconds || 0) * 1000) + ((%s.nanos || 0) / 1000000)));", name, name, name))
 				} else {
-					g.P(fmt.Sprintf("message.%s.push(%s.decode(reader, reader.uint32()));", name, g.getTsTypeFromMessage(field.TypeName, false)))
+					g.P(fmt.Sprintf("message.%s.push(%sMsg.decode(reader, reader.uint32()));", name, g.getTsTypeFromMessage(field.TypeName)))
 				}
 			} else {
 				if field.GetTypeName() == ".google.protobuf.Timestamp" {
-					g.P(fmt.Sprintf("const %s = %s.decode(reader, reader.uint32());", name, g.getTsTypeFromMessage(field.TypeName, false)))
+					g.P(fmt.Sprintf("const %s = %sMsg.decode(reader, reader.uint32());", name, g.getTsTypeFromMessage(field.TypeName)))
 					g.P(fmt.Sprintf("message.%s = new Date(((%s.seconds || 0) * 1000) + ((%s.nanos || 0) / 1000000));", name, name, name))
 				} else {
-					g.P(fmt.Sprintf("message.%s = %s.decode(reader, reader.uint32());", name, g.getTsTypeFromMessage(field.TypeName, false)))
+					g.P(fmt.Sprintf("message.%s = %sMsg.decode(reader, reader.uint32());", name, g.getTsTypeFromMessage(field.TypeName)))
 				}
 			}
 		} else {
@@ -534,15 +510,14 @@ func (g *generator) generateDecode(message *google_protobuf.DescriptorProto) {
 	g.P("}")
 }
 
-func (g *generator) generateMessageClass(message *google_protobuf.DescriptorProto) {
+func (g *generator) generateMessageClass(message *google_protobuf.DescriptorProto, messageMeta base.MessageMeta) {
 	g.P()
-	if g.isMessageDeprecated(message) {
+	if messageMeta.IsDeprecated {
 		g.P("/**")
 		g.P("* @deprecated")
 		g.P("*/")
 	}
-	name := g.messageName(message)
-	g.P(fmt.Sprintf("export class %s implements I%s{", name, name))
+	g.P(fmt.Sprintf("export class %s implements I%s{", messageMeta.MessageName, messageMeta.TsInterfaceName))
 	g.generateDecode(message)
 	for _, field := range message.Field {
 		g.generateField(field, true)
@@ -600,16 +575,14 @@ func (g *generator) generateDefinition(service *google_protobuf.ServiceDescripto
 			serverStreaming = *method.ServerStreaming
 		}
 		g.P(fmt.Sprintf("responseStream: %s,", strconv.FormatBool(serverStreaming)))
-		requestType := g.getTsTypeFromMessage(method.InputType, false)
-		iRequestType := g.getTsTypeFromMessage(method.InputType, true)
-		g.P(fmt.Sprintf("requestType: %s,", requestType))
-		responseType := g.getTsTypeFromMessage(method.OutputType, false)
-		iResponseType := g.getTsTypeFromMessage(method.OutputType, true)
-		g.P(fmt.Sprintf("responseType: %s,", responseType))
-		g.P(fmt.Sprintf("requestSerialize: (args: %s) => new %s(args).encode().finish() as Buffer,", iRequestType, requestType))
-		g.P(fmt.Sprintf("requestDeserialize: (argBuf: Buffer) => %s.decode(argBuf),", requestType))
-		g.P(fmt.Sprintf("responseSerialize: (args: %s) => new %s(args).encode().finish() as Buffer,", iResponseType, responseType))
-		g.P(fmt.Sprintf("responseDeserialize: (argBuf: Buffer) => %s.decode(argBuf),", responseType))
+		requestType := g.getTsTypeFromMessage(method.InputType)
+		g.P(fmt.Sprintf("requestType: %sMsg,", requestType))
+		responseType := g.getTsTypeFromMessage(method.OutputType)
+		g.P(fmt.Sprintf("responseType: %sMsg,", responseType))
+		g.P(fmt.Sprintf("requestSerialize: (args: %s) => new %sMsg(args).encode().finish() as Buffer,", requestType, requestType))
+		g.P(fmt.Sprintf("requestDeserialize: (argBuf: Buffer) => %sMsg.decode(argBuf),", requestType))
+		g.P(fmt.Sprintf("responseSerialize: (args: %s) => new %sMsg(args).encode().finish() as Buffer,", responseType, responseType))
+		g.P(fmt.Sprintf("responseDeserialize: (argBuf: Buffer) => %sMsg.decode(argBuf),", responseType))
 		g.P("},")
 	}
 	g.P("}")
@@ -627,8 +600,8 @@ func (g *generator) generateImplementation(service *google_protobuf.ServiceDescr
 
 	for _, method := range service.Method {
 		g.methodDeprecated(method)
-		inputTypeName := g.getTsTypeFromMessage(method.InputType, true)
-		outputTypeName := g.getTsTypeFromMessage(method.OutputType, true)
+		inputTypeName := g.getTsTypeFromMessage(method.InputType)
+		outputTypeName := g.getTsTypeFromMessage(method.OutputType)
 		if method.ServerStreaming != nil && *method.ServerStreaming && method.ClientStreaming != nil && *method.ClientStreaming {
 			g.P(fmt.Sprintf("%s(call: grpc.ServerDuplexStream<%s, %s>): void;", g.toLowerFirst(*method.Name), inputTypeName, outputTypeName))
 		} else if method.ServerStreaming != nil && *method.ServerStreaming {
@@ -659,28 +632,28 @@ func (g *generator) generateClient(service *google_protobuf.ServiceDescriptorPro
 	g.P(fmt.Sprintf("super(%sServiceDefinition, address, credentials, trace, options);", g.toLowerFirst(*service.Name)))
 	g.P("}")
 	for _, method := range service.Method {
-		inputTypeName := g.getTsTypeFromMessage(method.InputType, true)
+		inputTypeName := g.getTsTypeFromMessage(method.InputType)
 		g.methodDeprecated(method)
 		if method.ServerStreaming != nil && *method.ServerStreaming && method.ClientStreaming != nil && *method.ClientStreaming {
-			outputTypeName := g.getTsTypeFromMessage(method.OutputType, true)
+			outputTypeName := g.getTsTypeFromMessage(method.OutputType)
 			g.P(fmt.Sprintf("public %s(metadata?: grpcts.Metadata) {", g.toLowerFirst(*method.Name)))
 			g.methodDeprecatedLog(method)
 			g.P(fmt.Sprintf("return super.makeBidiStreamRequest<%s, %s>('%s', metadata);", inputTypeName, outputTypeName, g.toLowerFirst(*method.Name)))
 			g.P(fmt.Sprint("}"))
 		} else if method.ServerStreaming != nil && *method.ServerStreaming {
-			outputTypeName := g.getTsTypeFromMessage(method.OutputType, true)
+			outputTypeName := g.getTsTypeFromMessage(method.OutputType)
 			g.P(fmt.Sprintf("public %s(req: %s, metadata?: grpcts.Metadata) {", g.toLowerFirst(*method.Name), inputTypeName))
 			g.methodDeprecatedLog(method)
 			g.P(fmt.Sprintf("return super.makeServerStreamRequest<%s, %s>('%s', req, metadata);", inputTypeName, outputTypeName, g.toLowerFirst(*method.Name)))
 			g.P(fmt.Sprint("}"))
 		} else if method.ClientStreaming != nil && *method.ClientStreaming {
-			outputTypeName := g.getTsTypeFromMessage(method.OutputType, true)
+			outputTypeName := g.getTsTypeFromMessage(method.OutputType)
 			g.P(fmt.Sprintf("public %s(metadata?: grpcts.Metadata) {", g.toLowerFirst(*method.Name)))
 			g.methodDeprecatedLog(method)
 			g.P(fmt.Sprintf("return super.makeClientStreamRequest<%s, %s>('%s', metadata);", inputTypeName, outputTypeName, g.toLowerFirst(*method.Name)))
 			g.P(fmt.Sprint("};"))
 		} else {
-			outputTypeName := g.getTsTypeFromMessage(method.OutputType, true)
+			outputTypeName := g.getTsTypeFromMessage(method.OutputType)
 			g.P(fmt.Sprintf("public %s(req: %s, metadata?: grpcts.Metadata) {", g.toLowerFirst(*method.Name), inputTypeName))
 			g.methodDeprecatedLog(method)
 			g.P(fmt.Sprintf("return super.makeUnaryRequest<%s, %s>('%s', req, metadata);", inputTypeName, outputTypeName, g.toLowerFirst(*method.Name)))
@@ -711,9 +684,9 @@ func (g *generator) Make(protoFile *google_protobuf.FileDescriptorProto, protoFi
 		g.generateEnum(enum)
 	}
 
-	for _, message := range protoFile.MessageType {
-		g.generateMessageInterface(message)
-		g.generateMessageClass(message)
+	for _, messageMeta := range g.FilterMessageMeta(protoFile) {
+		g.generateMessageInterface(messageMeta.DescriptorProto, messageMeta)
+		g.generateMessageClass(messageMeta.DescriptorProto, messageMeta)
 	}
 
 	for _, service := range protoFile.Service {

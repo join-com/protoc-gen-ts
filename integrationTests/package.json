@@ -11,20 +11,20 @@
   },
   "dependencies": {
     "@join-com/gcloud-logger-trace": "^0.1.5",
-    "@join-com/grpc-ts": "1.0.0-2",
-    "grpc": "^1.15.1",
+    "@join-com/grpc-ts": "1.0.0-3",
+    "grpc": "^1.16.0",
     "protobufjs": "^6.8.8"
   },
   "devDependencies": {
-    "@types/jest": "^23.3.3",
-    "@types/node": "^10.11.4",
+    "@types/jest": "^23.3.9",
+    "@types/node": "^10.12.5",
     "jest": "^23.6.0",
     "jest-extended": "^0.11.0",
     "jest-watch-typeahead": "^0.2.0",
-    "prettier": "^1.14.3",
-    "ts-jest": "^23.10.3",
+    "prettier": "^1.15.2",
+    "ts-jest": "^23.10.4",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.15.0",
-    "typescript": "^3.1.1"
+    "typescript": "^3.1.6"
   }
 }

@@ -2,10 +2,12 @@
 import { GoogleProtobuf } from './google/protobuf/Timestamp';
 import { Common } from './common/Common';
 import * as protobufjs from 'protobufjs/minimal';
+// @ts-ignore ignored as it's generated and it's difficult to predict if logger is needed
 import { logger } from '@join-com/gcloud-logger-trace';
 
 import * as grpc from 'grpc';
 import * as grpcts from '@join-com/grpc-ts';
+import * as nodeTrace from '@join-com/node-trace';
 
 export namespace Foo {
   export enum EnumType {
@@ -19,11 +21,11 @@ export namespace Foo {
     EDIT = 'EDIT'
   }
 
-  export interface Request {
+  export interface IRequest {
     id?: number;
   }
 
-  export class RequestMsg implements Request {
+  export class Request implements IRequest {
     public static decode(
       inReader: Uint8Array | protobufjs.Reader,
       length?: number
@@ -32,7 +34,7 @@ export namespace Foo {
         ? protobufjs.Reader.create(inReader)
         : inReader;
       const end = length === undefined ? reader.len : reader.pos + length;
-      const message = new RequestMsg();
+      const message = new Request();
       while (reader.pos < end) {
         const tag = reader.uint32();
         switch (tag >>> 3) {
@@ -47,7 +49,7 @@ export namespace Foo {
       return message;
     }
     public id?: number;
-    constructor(attrs?: Request) {
+    constructor(attrs?: IRequest) {
       Object.assign(this, attrs);
     }
     public encode(writer: protobufjs.Writer = protobufjs.Writer.create()) {
@@ -61,14 +63,14 @@ export namespace Foo {
   /**
    * @deprecated
    */
-  export interface Nested {
+  export interface INested {
     title?: string;
   }
 
   /**
    * @deprecated
    */
-  export class NestedMsg implements Nested {
+  export class Nested implements INested {
     public static decode(
       inReader: Uint8Array | protobufjs.Reader,
       length?: number
@@ -78,7 +80,7 @@ export namespace Foo {
         ? protobufjs.Reader.create(inReader)
         : inReader;
       const end = length === undefined ? reader.len : reader.pos + length;
-      const message = new NestedMsg();
+      const message = new Nested();
       while (reader.pos < end) {
         const tag = reader.uint32();
         switch (tag >>> 3) {
@@ -93,7 +95,7 @@ export namespace Foo {
       return message;
     }
     public title?: string;
-    constructor(attrs?: Nested) {
+    constructor(attrs?: INested) {
       Object.assign(this, attrs);
     }
     public encode(writer: protobufjs.Writer = protobufjs.Writer.create()) {
@@ -105,7 +107,7 @@ export namespace Foo {
     }
   }
 
-  export interface Test {
+  export interface ITest {
     fieldInt32?: number;
     fieldInt32Repeated?: number[];
     fieldDouble?: number;
@@ -137,17 +139,17 @@ export namespace Foo {
     fieldBytesRepeated?: Uint8Array[];
     fieldEnum?: EnumType;
     fieldEnumRepeated?: Role[];
-    message?: Nested;
-    messageRepeated?: Nested[];
+    message?: INested;
+    messageRepeated?: INested[];
     timestamp?: Date;
     timestampRepeated?: Date[];
-    otherPkgMessage?: Common.OtherPkgMessage;
-    otherPkgMessageRepeated?: Common.OtherPkgMessage[];
+    otherPkgMessage?: Common.IOtherPkgMessage;
+    otherPkgMessageRepeated?: Common.IOtherPkgMessage[];
     fieldInt64?: number;
     fieldInt64Repeated?: number[];
   }
 
-  export class TestMsg implements Test {
+  export class Test implements ITest {
     public static decode(
       inReader: Uint8Array | protobufjs.Reader,
       length?: number
@@ -156,7 +158,7 @@ export namespace Foo {
         ? protobufjs.Reader.create(inReader)
         : inReader;
       const end = length === undefined ? reader.len : reader.pos + length;
-      const message = new TestMsg();
+      const message = new Test();
       while (reader.pos < end) {
         const tag = reader.uint32();
         switch (tag >>> 3) {
@@ -547,18 +549,18 @@ export namespace Foo {
             }
             break;
           case 33:
-            message.message = NestedMsg.decode(reader, reader.uint32());
+            message.message = Nested.decode(reader, reader.uint32());
             break;
           case 34:
             if (!(message.messageRepeated && message.messageRepeated.length)) {
               message.messageRepeated = [];
             }
             message.messageRepeated.push(
-              NestedMsg.decode(reader, reader.uint32())
+              Nested.decode(reader, reader.uint32())
             );
             break;
           case 35:
-            const timestamp = GoogleProtobuf.TimestampMsg.decode(
+            const timestamp = GoogleProtobuf.Timestamp.decode(
               reader,
               reader.uint32()
             );
@@ -572,7 +574,7 @@ export namespace Foo {
             ) {
               message.timestampRepeated = [];
             }
-            const timestampRepeated = GoogleProtobuf.TimestampMsg.decode(
+            const timestampRepeated = GoogleProtobuf.Timestamp.decode(
               reader,
               reader.uint32()
             );
@@ -584,7 +586,7 @@ export namespace Foo {
             );
             break;
           case 37:
-            message.otherPkgMessage = Common.OtherPkgMessageMsg.decode(
+            message.otherPkgMessage = Common.OtherPkgMessage.decode(
               reader,
               reader.uint32()
             );
@@ -599,7 +601,7 @@ export namespace Foo {
               message.otherPkgMessageRepeated = [];
             }
             message.otherPkgMessageRepeated.push(
-              Common.OtherPkgMessageMsg.decode(reader, reader.uint32())
+              Common.OtherPkgMessage.decode(reader, reader.uint32())
             );
             break;
           case 39:
@@ -674,15 +676,15 @@ export namespace Foo {
     public fieldBytesRepeated?: Uint8Array[];
     public fieldEnum?: EnumType;
     public fieldEnumRepeated?: Role[];
-    public message?: Nested;
-    public messageRepeated?: Nested[];
+    public message?: INested;
+    public messageRepeated?: INested[];
     public timestamp?: Date;
     public timestampRepeated?: Date[];
-    public otherPkgMessage?: Common.OtherPkgMessage;
-    public otherPkgMessageRepeated?: Common.OtherPkgMessage[];
+    public otherPkgMessage?: Common.IOtherPkgMessage;
+    public otherPkgMessageRepeated?: Common.IOtherPkgMessage[];
     public fieldInt64?: number;
     public fieldInt64Repeated?: number[];
-    constructor(attrs?: Test) {
+    constructor(attrs?: ITest) {
       Object.assign(this, attrs);
     }
     public encode(writer: protobufjs.Writer = protobufjs.Writer.create()) {
@@ -833,7 +835,7 @@ export namespace Foo {
         }
       }
       if (this.message != null) {
-        const msg = new NestedMsg(this.message);
+        const msg = new Nested(this.message);
         msg.encode(writer.uint32(266).fork()).ldelim();
       }
       if (this.messageRepeated != null) {
@@ -841,12 +843,12 @@ export namespace Foo {
           if (!value) {
             continue;
           }
-          const msg = new NestedMsg(value);
+          const msg = new Nested(value);
           msg.encode(writer.uint32(274).fork()).ldelim();
         }
       }
       if (this.timestamp != null) {
-        const msg = new GoogleProtobuf.TimestampMsg({
+        const msg = new GoogleProtobuf.Timestamp({
           seconds: Math.floor(this.timestamp.getTime() / 1000),
           nanos: this.timestamp.getMilliseconds() * 1000000
         });
@@ -857,7 +859,7 @@ export namespace Foo {
           if (!value) {
             continue;
           }
-          const msg = new GoogleProtobuf.TimestampMsg({
+          const msg = new GoogleProtobuf.Timestamp({
             seconds: Math.floor(value.getTime() / 1000),
             nanos: value.getMilliseconds() * 1000000
           });
@@ -865,7 +867,7 @@ export namespace Foo {
         }
       }
       if (this.otherPkgMessage != null) {
-        const msg = new Common.OtherPkgMessageMsg(this.otherPkgMessage);
+        const msg = new Common.OtherPkgMessage(this.otherPkgMessage);
         msg.encode(writer.uint32(298).fork()).ldelim();
       }
       if (this.otherPkgMessageRepeated != null) {
@@ -873,7 +875,7 @@ export namespace Foo {
           if (!value) {
             continue;
           }
-          const msg = new Common.OtherPkgMessageMsg(value);
+          const msg = new Common.OtherPkgMessage(value);
           msg.encode(writer.uint32(306).fork()).ldelim();
         }
       }
@@ -894,57 +896,57 @@ export namespace Foo {
       path: '/Users/Find',
       requestStream: false,
       responseStream: false,
-      requestType: RequestMsg,
-      responseType: Common.OtherPkgMessageMsg,
-      requestSerialize: (args: Request) =>
-        new RequestMsg(args).encode().finish() as Buffer,
-      requestDeserialize: (argBuf: Buffer) => RequestMsg.decode(argBuf),
-      responseSerialize: (args: Common.OtherPkgMessage) =>
-        new Common.OtherPkgMessageMsg(args).encode().finish() as Buffer,
+      requestType: Request,
+      responseType: Common.OtherPkgMessage,
+      requestSerialize: (args: IRequest) =>
+        new Request(args).encode().finish() as Buffer,
+      requestDeserialize: (argBuf: Buffer) => Request.decode(argBuf),
+      responseSerialize: (args: Common.IOtherPkgMessage) =>
+        new Common.OtherPkgMessage(args).encode().finish() as Buffer,
       responseDeserialize: (argBuf: Buffer) =>
-        Common.OtherPkgMessageMsg.decode(argBuf)
+        Common.OtherPkgMessage.decode(argBuf)
     },
     findClientStream: {
       path: '/Users/FindClientStream',
       requestStream: true,
       responseStream: false,
-      requestType: RequestMsg,
-      responseType: Common.OtherPkgMessageMsg,
-      requestSerialize: (args: Request) =>
-        new RequestMsg(args).encode().finish() as Buffer,
-      requestDeserialize: (argBuf: Buffer) => RequestMsg.decode(argBuf),
-      responseSerialize: (args: Common.OtherPkgMessage) =>
-        new Common.OtherPkgMessageMsg(args).encode().finish() as Buffer,
+      requestType: Request,
+      responseType: Common.OtherPkgMessage,
+      requestSerialize: (args: IRequest) =>
+        new Request(args).encode().finish() as Buffer,
+      requestDeserialize: (argBuf: Buffer) => Request.decode(argBuf),
+      responseSerialize: (args: Common.IOtherPkgMessage) =>
+        new Common.OtherPkgMessage(args).encode().finish() as Buffer,
       responseDeserialize: (argBuf: Buffer) =>
-        Common.OtherPkgMessageMsg.decode(argBuf)
+        Common.OtherPkgMessage.decode(argBuf)
     },
     findServerStream: {
       path: '/Users/FindServerStream',
       requestStream: false,
       responseStream: true,
-      requestType: RequestMsg,
-      responseType: Common.OtherPkgMessageMsg,
-      requestSerialize: (args: Request) =>
-        new RequestMsg(args).encode().finish() as Buffer,
-      requestDeserialize: (argBuf: Buffer) => RequestMsg.decode(argBuf),
-      responseSerialize: (args: Common.OtherPkgMessage) =>
-        new Common.OtherPkgMessageMsg(args).encode().finish() as Buffer,
+      requestType: Request,
+      responseType: Common.OtherPkgMessage,
+      requestSerialize: (args: IRequest) =>
+        new Request(args).encode().finish() as Buffer,
+      requestDeserialize: (argBuf: Buffer) => Request.decode(argBuf),
+      responseSerialize: (args: Common.IOtherPkgMessage) =>
+        new Common.OtherPkgMessage(args).encode().finish() as Buffer,
       responseDeserialize: (argBuf: Buffer) =>
-        Common.OtherPkgMessageMsg.decode(argBuf)
+        Common.OtherPkgMessage.decode(argBuf)
     },
     findBidiStream: {
       path: '/Users/FindBidiStream',
       requestStream: true,
       responseStream: true,
-      requestType: RequestMsg,
-      responseType: Common.OtherPkgMessageMsg,
-      requestSerialize: (args: Request) =>
-        new RequestMsg(args).encode().finish() as Buffer,
-      requestDeserialize: (argBuf: Buffer) => RequestMsg.decode(argBuf),
-      responseSerialize: (args: Common.OtherPkgMessage) =>
-        new Common.OtherPkgMessageMsg(args).encode().finish() as Buffer,
+      requestType: Request,
+      responseType: Common.OtherPkgMessage,
+      requestSerialize: (args: IRequest) =>
+        new Request(args).encode().finish() as Buffer,
+      requestDeserialize: (argBuf: Buffer) => Request.decode(argBuf),
+      responseSerialize: (args: Common.IOtherPkgMessage) =>
+        new Common.OtherPkgMessage(args).encode().finish() as Buffer,
       responseDeserialize: (argBuf: Buffer) =>
-        Common.OtherPkgMessageMsg.decode(argBuf)
+        Common.OtherPkgMessage.decode(argBuf)
     }
   };
 
@@ -952,51 +954,61 @@ export namespace Foo {
     /**
      * @deprecated
      */
-    find(call: grpc.ServerUnaryCall<Request>): Promise<Common.OtherPkgMessage>;
     find(
-      call: grpc.ServerUnaryCall<Request>,
-      callback: grpc.sendUnaryData<Common.OtherPkgMessage>
+      call: grpc.ServerUnaryCall<IRequest>
+    ): Promise<Common.IOtherPkgMessage>;
+    find(
+      call: grpc.ServerUnaryCall<IRequest>,
+      callback: grpc.sendUnaryData<Common.IOtherPkgMessage>
     ): void;
     findClientStream(
-      call: grpc.ServerReadableStream<Request>
-    ): Promise<Common.OtherPkgMessage>;
+      call: grpc.ServerReadableStream<IRequest>
+    ): Promise<Common.IOtherPkgMessage>;
     findClientStream(
-      call: grpc.ServerReadableStream<Request>,
-      callback: grpc.sendUnaryData<Common.OtherPkgMessage>
+      call: grpc.ServerReadableStream<IRequest>,
+      callback: grpc.sendUnaryData<Common.IOtherPkgMessage>
     ): void;
-    findServerStream(call: grpc.ServerWriteableStream<Request>): void;
+    findServerStream(call: grpc.ServerWriteableStream<IRequest>): void;
     findBidiStream(
-      call: grpc.ServerDuplexStream<Request, Common.OtherPkgMessage>
+      call: grpc.ServerDuplexStream<IRequest, Common.IOtherPkgMessage>
     ): void;
   }
 
   export class UsersClient extends grpcts.Client {
+    constructor(
+      address: string,
+      credentials: grpc.ChannelCredentials,
+      trace: grpcts.ClientTrace = nodeTrace,
+      options?: object
+    ) {
+      super(usersServiceDefinition, address, credentials, trace, options);
+    }
     /**
      * @deprecated
      */
-    public find(req: Request, metadata?: grpcts.Metadata) {
+    public find(req: IRequest, metadata?: grpcts.Metadata) {
       logger.warn('method Find is deprecated');
-      return super.makeUnaryRequest<Request, Common.OtherPkgMessage>(
+      return super.makeUnaryRequest<IRequest, Common.IOtherPkgMessage>(
         'find',
         req,
         metadata
       );
     }
     public findClientStream(metadata?: grpcts.Metadata) {
-      return super.makeClientStreamRequest<Request, Common.OtherPkgMessage>(
+      return super.makeClientStreamRequest<IRequest, Common.IOtherPkgMessage>(
         'findClientStream',
         metadata
       );
     }
-    public findServerStream(req: Request, metadata?: grpcts.Metadata) {
-      return super.makeServerStreamRequest<Request, Common.OtherPkgMessage>(
+    public findServerStream(req: IRequest, metadata?: grpcts.Metadata) {
+      return super.makeServerStreamRequest<IRequest, Common.IOtherPkgMessage>(
         'findServerStream',
         req,
         metadata
       );
     }
     public findBidiStream(metadata?: grpcts.Metadata) {
-      return super.makeBidiStreamRequest<Request, Common.OtherPkgMessage>(
+      return super.makeBidiStreamRequest<IRequest, Common.IOtherPkgMessage>(
         'findBidiStream',
         metadata
       );

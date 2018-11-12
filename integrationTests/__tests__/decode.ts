@@ -62,7 +62,7 @@ describe('decode', () => {
   beforeEach(() => {
     const message = PbTest.fromObject(values)
     buffer = PbTest.encode(message).finish()
-    decoded = Foo.TestMsg.decode(buffer)
+    decoded = Foo.Test.decode(buffer)
   })
 
   describe.each([
@@ -141,7 +141,7 @@ describe('decode changed protos', () => {
   beforeEach(() => {
     const message = PbTest.fromObject(values)
     buffer = PbTest.encode(message).finish()
-    decoded = Foo.TestMsg.decode(buffer)
+    decoded = Foo.Test.decode(buffer)
   })
 
   it('ignores missing field', () => {

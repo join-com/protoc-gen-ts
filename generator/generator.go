@@ -623,7 +623,7 @@ func (g *generator) generateImplementation(service *google_protobuf.ServiceDescr
 		g.P("* @deprecated")
 		g.P("*/")
 	}
-	g.P(fmt.Sprintf("export interface %sImplementation extends grpcts.Implementations {", gen.CamelCase(*service.Name)))
+	g.P(fmt.Sprintf("export interface I%sImplementation extends grpcts.Implementations {", gen.CamelCase(*service.Name)))
 
 	for _, method := range service.Method {
 		g.methodDeprecated(method)
@@ -655,7 +655,7 @@ func (g *generator) generateClient(service *google_protobuf.ServiceDescriptorPro
 		g.P("*/")
 	}
 	g.P(fmt.Sprintf("export class %sClient extends grpcts.Client {", gen.CamelCase(*service.Name)))
-	g.P("constructor(address: string, credentials: grpc.ChannelCredentials, trace: grpcts.ClientTrace = nodeTrace, options?: object){")
+	g.P("constructor(address: string, credentials?: grpc.ChannelCredentials, trace: grpcts.ClientTrace = nodeTrace, options?: object){")
 	g.P(fmt.Sprintf("super(%sServiceDefinition, address, credentials, trace, options);", g.toLowerFirst(*service.Name)))
 	g.P("}")
 	for _, method := range service.Method {

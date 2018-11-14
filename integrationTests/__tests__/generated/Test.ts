@@ -950,7 +950,7 @@ export namespace Foo {
     }
   };
 
-  export interface UsersImplementation extends grpcts.Implementations {
+  export interface IUsersImplementation extends grpcts.Implementations {
     /**
      * @deprecated
      */

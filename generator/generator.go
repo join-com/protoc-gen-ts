@@ -337,9 +337,8 @@ func (g *generator) getWriteFunction(field *google_protobuf.FieldDescriptorProto
 func (g *generator) encodeEnumSwitch(field *google_protobuf.FieldDescriptorProto, name string, message *google_protobuf.DescriptorProto) {
 	enum := g.GetEnumTypeByName(*field.TypeName)
 	g.P(fmt.Sprintf("switch (val) {"))
-	typeName := g.getTsFieldType(field)
 	for _, value := range enum.Value {
-		g.P(fmt.Sprintf("case %s.%s:", typeName, *value.Name))
+		g.P(fmt.Sprintf("case '%s':", *value.Name))
 		g.P(fmt.Sprintf("return %d;", *value.Number))
 	}
 	g.P("default:")
@@ -412,10 +411,9 @@ func (g *generator) decodeEnumSwitch(field *google_protobuf.FieldDescriptorProto
 	enum := g.GetEnumTypeByName(*field.TypeName)
 
 	g.P(fmt.Sprintf("switch (val) {"))
-	typeName := g.getTsFieldType(field)
 	for _, value := range enum.Value {
 		g.P(fmt.Sprintf("case %d:", *value.Number))
-		g.P(fmt.Sprintf("return %s.%s;", typeName, *value.Name))
+		g.P(fmt.Sprintf("return '%s';", *value.Name))
 	}
 	g.P("default:")
 	g.P("return")
@@ -555,14 +553,11 @@ func (g *generator) generateMessageClass(message *google_protobuf.DescriptorProt
 func (g *generator) generateEnum(enum *google_protobuf.EnumDescriptorProto) {
 	g.P()
 
-	g.P(fmt.Sprintf("export enum %s {", g.enumName(enum)))
-
+	var s []string
 	for _, value := range enum.Value {
-		g.P(fmt.Sprintf("%s = '%s',", *value.Name, *value.Name))
+		s = append(s, "'"+*value.Name+"'")
 	}
-
-	g.P(fmt.Sprint("}"))
-
+	g.P(fmt.Sprintf("export type %s = %s", g.enumName(enum), strings.Join(s, " | ")))
 }
 
 func (g *generator) methodDeprecated(method *google_protobuf.MethodDescriptorProto) {

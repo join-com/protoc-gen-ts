@@ -17,7 +17,7 @@ beforeAll(() => {
 describe('encode', () => {
   let buffer: Uint8Array
   let decoded: any
-  const values = {
+  const values: Foo.ITest = {
     fieldInt32: 123,
     fieldInt32Repeated: [123, 12312],
     fieldInt64: 12321313,
@@ -44,8 +44,8 @@ describe('encode', () => {
     fieldStringRepeated: ['foo', 'bar'],
     fieldBytes: new Uint8Array([21, 31]),
     fieldBytesRepeated: [new Uint8Array([21, 31]), new Uint8Array([2, 31])],
-    fieldEnum: Foo.EnumType.UNKNOWN,
-    fieldEnumRepeated: [Foo.Role.EDIT, Foo.Role.VIEW],
+    fieldEnum: 'UNKNOWN',
+    fieldEnumRepeated: ['EDIT', 'VIEW'],
     message: {
       title: 'msg'
     },
@@ -125,14 +125,14 @@ describe('encode', () => {
     it(`encodes fieldFloat`, () => {
       expect(decoded.fieldFloat).toBeDefined()
       expect(parseFloat(decoded.fieldFloat)).toEqual(
-        Math.fround(values.fieldFloat)
+        Math.fround(values.fieldFloat!)
       )
     })
 
     it(`encodes fieldFloatRepeated`, () => {
       expect(decoded.fieldFloatRepeated).toBeDefined()
       expect(decoded.fieldFloatRepeated).toEqual(
-        values.fieldFloatRepeated.map(Math.fround)
+        values.fieldFloatRepeated!.map(Math.fround)
       )
     })
   })

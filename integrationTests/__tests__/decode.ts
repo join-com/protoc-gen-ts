@@ -31,8 +31,8 @@ const baseValues = {
   fieldStringRepeated: ['foo', 'bar'],
   fieldBytes: new Uint8Array([21, 31]),
   fieldBytesRepeated: [new Uint8Array([21, 31]), new Uint8Array([2, 31])],
-  fieldEnum: Foo.EnumType.UNKNOWN,
-  fieldEnumRepeated: [Foo.Role.EDIT, Foo.Role.VIEW],
+  fieldEnum: 'UNKNOWN',
+  fieldEnumRepeated: ['EDIT', 'VIEW'],
   message: {
     title: 'msg'
   },
@@ -145,7 +145,7 @@ describe('decode changed protos', () => {
   })
 
   it('ignores missing field', () => {
-    expect(decoded.fieldEnumRepeated).toEqual([Foo.Role.VIEW])
+    expect(decoded.fieldEnumRepeated).toEqual(['VIEW'])
     expect(decoded.fieldString2).not.toBeDefined()
     expect(decoded.fieldString3).not.toBeDefined()
   })

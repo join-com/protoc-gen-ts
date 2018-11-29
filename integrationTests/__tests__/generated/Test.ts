@@ -10,16 +10,9 @@ import * as grpcts from '@join-com/grpc-ts';
 import * as nodeTrace from '@join-com/node-trace';
 
 export namespace Foo {
-  export enum EnumType {
-    UNKNOWN = 'UNKNOWN',
-    ADMIN = 'ADMIN',
-    USER = 'USER'
-  }
+  export type EnumType = 'UNKNOWN' | 'ADMIN' | 'USER';
 
-  export enum Role {
-    VIEW = 'VIEW',
-    EDIT = 'EDIT'
-  }
+  export type Role = 'VIEW' | 'EDIT';
 
   export interface IRequest {
     id?: number;
@@ -499,11 +492,11 @@ export namespace Foo {
             message.fieldEnum = (val => {
               switch (val) {
                 case 0:
-                  return EnumType.UNKNOWN;
+                  return 'UNKNOWN';
                 case 1:
-                  return EnumType.ADMIN;
+                  return 'ADMIN';
                 case 2:
-                  return EnumType.USER;
+                  return 'USER';
                 default:
                   return;
               }
@@ -521,9 +514,9 @@ export namespace Foo {
                 const fieldEnumRepeated = (val => {
                   switch (val) {
                     case 0:
-                      return Role.VIEW;
+                      return 'VIEW';
                     case 1:
-                      return Role.EDIT;
+                      return 'EDIT';
                     default:
                       return;
                   }
@@ -536,9 +529,9 @@ export namespace Foo {
               const fieldEnumRepeated = (val => {
                 switch (val) {
                   case 0:
-                    return Role.VIEW;
+                    return 'VIEW';
                   case 1:
-                    return Role.EDIT;
+                    return 'EDIT';
                   default:
                     return;
                 }
@@ -803,11 +796,11 @@ export namespace Foo {
       if (this.fieldEnum != null) {
         const fieldEnum = (val => {
           switch (val) {
-            case EnumType.UNKNOWN:
+            case 'UNKNOWN':
               return 0;
-            case EnumType.ADMIN:
+            case 'ADMIN':
               return 1;
-            case EnumType.USER:
+            case 'USER':
               return 2;
             default:
               return;
@@ -821,9 +814,9 @@ export namespace Foo {
         for (const value of this.fieldEnumRepeated) {
           const fieldEnumRepeated = (val => {
             switch (val) {
-              case Role.VIEW:
+              case 'VIEW':
                 return 0;
-              case Role.EDIT:
+              case 'EDIT':
                 return 1;
               default:
                 return;
@@ -977,7 +970,7 @@ export namespace Foo {
   export class UsersClient extends grpcts.Client {
     constructor(
       address: string,
-      credentials: grpc.ChannelCredentials,
+      credentials?: grpc.ChannelCredentials,
       trace: grpcts.ClientTrace = nodeTrace,
       options?: object
     ) {

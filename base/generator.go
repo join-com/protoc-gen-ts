@@ -108,7 +108,6 @@ func (g *Generator) sideEffect() {
 	g.BuildEnumNameMap(g.Request)
 	g.BuildImportsMap(g.Request)
 	g.BuildMessageOrEnumToFileMap(g.Request)
-	log.Printf("#%v", g.messageToFileMap)
 	g.Reset()
 }
 

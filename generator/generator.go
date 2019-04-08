@@ -38,7 +38,6 @@ func (g *generator) tsFileNameWithExt(protoName *string) string {
 
 func (g *generator) generateGenericImports() {
 	g.P(`
-import * as grpc from 'grpc';
 import * as grpcts from '@join-com/grpc-ts';
 import * as nodeTrace from '@join-com/node-trace';
 `)
@@ -625,16 +624,16 @@ func (g *generator) generateImplementation(service *google_protobuf.ServiceDescr
 		inputTypeName := g.getTsTypeFromMessage(method.InputType, true)
 		outputTypeName := g.getTsTypeFromMessage(method.OutputType, true)
 		if method.ServerStreaming != nil && *method.ServerStreaming && method.ClientStreaming != nil && *method.ClientStreaming {
-			g.P(fmt.Sprintf("%s(call: grpc.ServerDuplexStream<%s, %s>): void;", g.toLowerFirst(*method.Name), inputTypeName, outputTypeName))
+			g.P(fmt.Sprintf("%s(call: grpcts.grpc.ServerDuplexStream<%s, %s>): void;", g.toLowerFirst(*method.Name), inputTypeName, outputTypeName))
 		} else if method.ServerStreaming != nil && *method.ServerStreaming {
 			// TODO why there is no type for write stream?
-			g.P(fmt.Sprintf("%s(call: grpc.ServerWriteableStream<%s>): void;", g.toLowerFirst(*method.Name), inputTypeName))
+			g.P(fmt.Sprintf("%s(call: grpcts.grpc.ServerWriteableStream<%s>): void;", g.toLowerFirst(*method.Name), inputTypeName))
 		} else if method.ClientStreaming != nil && *method.ClientStreaming {
-			g.P(fmt.Sprintf("%s(call: grpc.ServerReadableStream<%s>): Promise<%s>;", g.toLowerFirst(*method.Name), inputTypeName, outputTypeName))
-			g.P(fmt.Sprintf("%s(call: grpc.ServerReadableStream<%s>, callback: grpc.sendUnaryData<%s>): void;", g.toLowerFirst(*method.Name), inputTypeName, outputTypeName))
+			g.P(fmt.Sprintf("%s(call: grpcts.grpc.ServerReadableStream<%s>): Promise<%s>;", g.toLowerFirst(*method.Name), inputTypeName, outputTypeName))
+			g.P(fmt.Sprintf("%s(call: grpcts.grpc.ServerReadableStream<%s>, callback: grpcts.grpc.sendUnaryData<%s>): void;", g.toLowerFirst(*method.Name), inputTypeName, outputTypeName))
 		} else {
-			g.P(fmt.Sprintf("%s(call: grpc.ServerUnaryCall<%s>): Promise<%s>;", g.toLowerFirst(*method.Name), inputTypeName, outputTypeName))
-			g.P(fmt.Sprintf("%s(call: grpc.ServerUnaryCall<%s>, callback: grpc.sendUnaryData<%s>): void;", g.toLowerFirst(*method.Name), inputTypeName, outputTypeName))
+			g.P(fmt.Sprintf("%s(call: grpcts.grpc.ServerUnaryCall<%s>): Promise<%s>;", g.toLowerFirst(*method.Name), inputTypeName, outputTypeName))
+			g.P(fmt.Sprintf("%s(call: grpcts.grpc.ServerUnaryCall<%s>, callback: grpcts.grpc.sendUnaryData<%s>): void;", g.toLowerFirst(*method.Name), inputTypeName, outputTypeName))
 		}
 	}
 
@@ -650,7 +649,7 @@ func (g *generator) generateClient(service *google_protobuf.ServiceDescriptorPro
 		g.P("*/")
 	}
 	g.P(fmt.Sprintf("export class %sClient extends grpcts.Client {", gen.CamelCase(*service.Name)))
-	g.P("constructor(address: string, credentials?: grpc.ChannelCredentials, trace: grpcts.ClientTrace = nodeTrace, options?: object){")
+	g.P("constructor(address: string, credentials?: grpcts.grpc.ChannelCredentials, trace: grpcts.ClientTrace = nodeTrace, options?: object){")
 	g.P(fmt.Sprintf("super(%sServiceDefinition, address, credentials, trace, options);", g.toLowerFirst(*service.Name)))
 	g.P("}")
 	for _, method := range service.Method {

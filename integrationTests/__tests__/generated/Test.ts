@@ -948,29 +948,29 @@ export namespace Foo {
      * @deprecated
      */
     find(
-      call: grpc.ServerUnaryCall<IRequest>
+      call: grpcts.grpc.ServerUnaryCall<IRequest>
     ): Promise<Common.IOtherPkgMessage>;
     find(
-      call: grpc.ServerUnaryCall<IRequest>,
-      callback: grpc.sendUnaryData<Common.IOtherPkgMessage>
+      call: grpcts.grpc.ServerUnaryCall<IRequest>,
+      callback: grpcts.grpc.sendUnaryData<Common.IOtherPkgMessage>
     ): void;
     findClientStream(
-      call: grpc.ServerReadableStream<IRequest>
+      call: grpcts.grpc.ServerReadableStream<IRequest>
     ): Promise<Common.IOtherPkgMessage>;
     findClientStream(
-      call: grpc.ServerReadableStream<IRequest>,
-      callback: grpc.sendUnaryData<Common.IOtherPkgMessage>
+      call: grpcts.grpc.ServerReadableStream<IRequest>,
+      callback: grpcts.grpc.sendUnaryData<Common.IOtherPkgMessage>
     ): void;
-    findServerStream(call: grpc.ServerWriteableStream<IRequest>): void;
+    findServerStream(call: grpcts.grpc.ServerWriteableStream<IRequest>): void;
     findBidiStream(
-      call: grpc.ServerDuplexStream<IRequest, Common.IOtherPkgMessage>
+      call: grpcts.grpc.ServerDuplexStream<IRequest, Common.IOtherPkgMessage>
     ): void;
   }
 
   export class UsersClient extends grpcts.Client {
     constructor(
       address: string,
-      credentials?: grpc.ChannelCredentials,
+      credentials?: grpcts.grpc.ChannelCredentials,
       trace: grpcts.ClientTrace = nodeTrace,
       options?: object
     ) {

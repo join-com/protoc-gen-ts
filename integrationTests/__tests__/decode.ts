@@ -95,12 +95,12 @@ describe('decode', () => {
   })
 
   describe('timestamp', () => {
-    it(`encodes timestamp`, () => {
+    it('encodes timestamp', () => {
       expect(decoded.timestamp).toBeDefined()
       expect(decoded.timestamp).toEqual(new Date('2014-11-01T12:24:33.123'))
     })
 
-    it(`encodes timestampRepeated`, () => {
+    it('encodes timestampRepeated', () => {
       expect(decoded.timestampRepeated).toBeDefined()
       expect(decoded.timestampRepeated).toEqual([
         new Date('2014-02-26T12:00:00.234'),
@@ -110,43 +110,18 @@ describe('decode', () => {
   })
 
   describe('fieldFloat', () => {
-    it(`encodes fieldFloat`, () => {
+    it('encodes fieldFloat', () => {
       expect(decoded.fieldFloat).toBeDefined()
       expect(parseFloat(decoded.fieldFloat)).toEqual(
         Math.fround(values.fieldFloat)
       )
     })
 
-    it(`encodes fieldFloatRepeated`, () => {
+    it('encodes fieldFloatRepeated', () => {
       expect(decoded.fieldFloatRepeated).toBeDefined()
       expect(decoded.fieldFloatRepeated).toEqual(
         values.fieldFloatRepeated.map(Math.fround)
       )
     })
-  })
-})
-
-describe('decode changed protos', () => {
-  const root = loadSync(path.join(__dirname, 'protoBefore', 'test.proto'))
-  const PbTest = root.lookupType('foo.Test')
-  let buffer: Uint8Array
-  let decoded: any
-  const values = {
-    ...baseValues,
-    fieldEnumRepeated: ['EXECUTE', 'VIEW'],
-    fieldString2: 'test2',
-    fieldString3: 'test3'
-  }
-
-  beforeEach(() => {
-    const message = PbTest.fromObject(values)
-    buffer = PbTest.encode(message).finish()
-    decoded = Foo.Test.decode(buffer)
-  })
-
-  it('ignores missing field', () => {
-    expect(decoded.fieldEnumRepeated).toEqual(['VIEW'])
-    expect(decoded.fieldString2).not.toBeDefined()
-    expect(decoded.fieldString3).not.toBeDefined()
   })
 })

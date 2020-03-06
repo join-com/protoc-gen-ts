@@ -108,12 +108,12 @@ describe('encode', () => {
         (timestamp.seconds || 0) * 1000 + (timestamp.nanos || 0) / 1000000
       )
 
-    it(`encodes timestamp`, () => {
+    it('encodes timestamp', () => {
       expect(decoded.timestamp).toBeDefined()
       expect(toDate(decoded.timestamp)).toEqual(values.timestamp)
     })
 
-    it(`encodes timestampRepeated`, () => {
+    it('encodes timestampRepeated', () => {
       expect(decoded.timestampRepeated).toBeDefined()
       expect(decoded.timestampRepeated.map(toDate)).toEqual(
         values.timestampRepeated
@@ -122,14 +122,14 @@ describe('encode', () => {
   })
 
   describe('fieldFloat', () => {
-    it(`encodes fieldFloat`, () => {
+    it('encodes fieldFloat', () => {
       expect(decoded.fieldFloat).toBeDefined()
       expect(parseFloat(decoded.fieldFloat)).toEqual(
         Math.fround(values.fieldFloat!)
       )
     })
 
-    it(`encodes fieldFloatRepeated`, () => {
+    it('encodes fieldFloatRepeated', () => {
       expect(decoded.fieldFloatRepeated).toBeDefined()
       expect(decoded.fieldFloatRepeated).toEqual(
         values.fieldFloatRepeated!.map(Math.fround)

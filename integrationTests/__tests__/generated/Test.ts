@@ -5,7 +5,6 @@ import * as protobufjs from 'protobufjs/minimal';
 // @ts-ignore ignored as it's generated and it's difficult to predict if logger is needed
 import { logger } from '@join-com/gcloud-logger-trace';
 
-import * as grpc from 'grpc';
 import * as grpcts from '@join-com/grpc-ts';
 import * as nodeTrace from '@join-com/node-trace';
 
@@ -974,7 +973,14 @@ export namespace Foo {
       trace: grpcts.ClientTrace = nodeTrace,
       options?: object
     ) {
-      super(usersServiceDefinition, address, credentials, trace, options);
+      super(
+        usersServiceDefinition,
+        address,
+        credentials,
+        trace,
+        options,
+        logger
+      );
     }
     /**
      * @deprecated

@@ -1,0 +1,4 @@
+github.com/antonversal/protoc-gen-ts v0.0.0-20181129162337-cff0e8267918 h1:ydopfV985c50DgeLxWpDMtoO1El42qyldlnMBufZgX8=
+github.com/antonversal/protoc-gen-ts v0.0.0-20181129162337-cff0e8267918/go.mod h1:w6mTDPpw1OYAjeqI646OhDOC/v8AdvlyRs7lQ06ijm0=
+github.com/golang/protobuf v1.3.4 h1:87PNWwrRvUSnqS4dlcBU/ftvOIBep4sYuBLlh6rX2wk=
+github.com/golang/protobuf v1.3.4/go.mod h1:vzj43D7+SQXF/4pzW/hwtAqwc6iTitCiVSaWz5lYuqw=

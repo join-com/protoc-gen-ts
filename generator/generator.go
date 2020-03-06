@@ -650,7 +650,7 @@ func (g *generator) generateClient(service *google_protobuf.ServiceDescriptorPro
 	}
 	g.P(fmt.Sprintf("export class %sClient extends grpcts.Client {", gen.CamelCase(*service.Name)))
 	g.P("constructor(address: string, credentials?: grpcts.grpc.ChannelCredentials, trace: grpcts.ClientTrace = nodeTrace, options?: object){")
-	g.P(fmt.Sprintf("super(%sServiceDefinition, address, credentials, trace, options);", g.toLowerFirst(*service.Name)))
+	g.P(fmt.Sprintf("super(%sServiceDefinition, address, credentials, trace, options, logger);", g.toLowerFirst(*service.Name)))
 	g.P("}")
 	for _, method := range service.Method {
 		inputTypeName := g.getTsTypeFromMessage(method.InputType, true)

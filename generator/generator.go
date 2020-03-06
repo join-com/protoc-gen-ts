@@ -6,11 +6,11 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/antonversal/protoc-gen-ts/base"
 	"github.com/golang/protobuf/proto"
 	google_protobuf "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	gen "github.com/golang/protobuf/protoc-gen-go/generator"
 	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
+	"github.com/join-com/protoc-gen-ts/base"
 )
 
 type generator struct {

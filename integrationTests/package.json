@@ -5,26 +5,27 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "test": "jest --runInBand --forceExit",
     "proto:prettier": "prettier --write '__tests__/generated/**/*.ts'",
     "proto:clean": "find __tests__/generated ! -name 'tslint.json' ! -name '.prettierrc' -type f -exec rm -f {} +",
     "proto:build": "yarn proto:clean && protoc __tests__/proto/*.proto -I __tests__/proto --ts_out=/$PWD/__tests__/generated && yarn proto:prettier"
   },
   "dependencies": {
-    "@join-com/gcloud-logger-trace": "^0.1.5",
-    "@join-com/grpc-ts": "1.0.0-3",
-    "grpc": "^1.16.0",
+    "@join-com/gcloud-logger-trace": "^0.1.6",
+    "@join-com/grpc-ts": "1.1.7",
+    "grpc": "^1.24.2",
     "protobufjs": "^6.8.8"
   },
   "devDependencies": {
-    "@types/jest": "^23.3.9",
-    "@types/node": "^10.12.5",
-    "jest": "^23.6.0",
-    "jest-extended": "^0.11.0",
-    "jest-watch-typeahead": "^0.2.0",
-    "prettier": "^1.15.2",
-    "ts-jest": "^23.10.4",
-    "tslint": "^5.11.0",
-    "tslint-config-prettier": "^1.15.0",
-    "typescript": "^3.1.6"
+    "@types/jest": "^25.1.3",
+    "@types/node": "^13.7.7",
+    "jest": "^25.1.0",
+    "jest-extended": "^0.11.5",
+    "jest-watch-typeahead": "^0.4.2",
+    "prettier": "^1.19.1",
+    "ts-jest": "^25.2.1",
+    "tslint": "^6.0.0",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "3.8.3"
   }
 }

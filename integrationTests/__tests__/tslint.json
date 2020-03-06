@@ -1,0 +1,29 @@
+{
+  "defaultSeverity": "error",
+  "extends": ["tslint:latest", "tslint-config-prettier"],
+  "jsRules": {
+    "semicolon": false,
+    "object-literal-sort-keys": false
+  },
+  "rules": {
+    "quotemark": [true, "single", "avoid-escape", "avoid-template"],
+    "trailing-comma": false,
+    "semicolon": false,
+    "object-literal-sort-keys": false,
+    "no-submodule-imports": false,
+    "no-object-literal-type-assertion": false,
+    "prefer-object-spread": false,
+    "no-namespace": false,
+    "ordered-imports": false,
+    "interface-name": false,
+    "no-empty-interface": false,
+    "max-classes-per-file": false,
+    "no-unused-variable": [true],
+    "variable-name": [true, "check-format", "allow-leading-underscore"],
+    "no-bitwise": false
+  },
+  "rulesDirectory": [],
+  "linterOptions": {
+    "exclude": ["server/migration/*.ts"]
+  }
+}

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/antonversal/protoc-gen-ts/generator"
+	"github.com/join-com/protoc-gen-ts/generator"
 )
 
 func main() {

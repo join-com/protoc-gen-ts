@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@join-com/gcloud-logger-trace": "^0.1.6",
-    "@join-com/grpc-ts": "1.1.7",
+    "@join-com/grpc-ts": "2.0.0",
     "grpc": "^1.24.2",
     "protobufjs": "^6.8.8"
   },

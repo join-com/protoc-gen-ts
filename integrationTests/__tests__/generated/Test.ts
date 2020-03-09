@@ -964,21 +964,11 @@ export namespace Foo {
     ): void
   }
 
+  export type ClientConfig = Omit<grpcts.Config, 'definition'>
+
   export class UsersClient extends grpcts.Client {
-    constructor(
-      address: string,
-      credentials?: grpcts.grpc.ChannelCredentials,
-      trace: grpcts.ClientTrace = nodeTrace,
-      options?: object
-    ) {
-      super(
-        usersServiceDefinition,
-        address,
-        credentials,
-        trace,
-        options,
-        logger
-      )
+    constructor(config: ClientConfig) {
+      super({ definition: usersServiceDefinition, trace: nodeTrace, ...config })
     }
     /**
      * @deprecated

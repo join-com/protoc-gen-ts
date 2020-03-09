@@ -403,10 +403,10 @@
   dependencies:
     "@join-com/gcloud-logger" "^0.1.6"
 
-"@join-com/grpc-ts@1.1.7":
-  version "1.1.7"
-  resolved "https://registry.yarnpkg.com/@join-com/grpc-ts/-/grpc-ts-1.1.7.tgz#ce18ee0cb76d25404a6692b0ef58eb237ce649b4"
-  integrity sha512-S8J1uXCbtRrqo1riS8zYXsxp6i8DgyobBJ1TKfm/c0If1lnAjww25U3EJ+pJaNY8gMSpu+qVq8ErWz2tWQc99w==
+"@join-com/grpc-ts@2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@join-com/grpc-ts/-/grpc-ts-2.0.0.tgz#7a678936979685cefea98e533a21c24fafc764b1"
+  integrity sha512-P4ermSbKHUpkpyG9olOs/Y02oyTBp7FtSq+2TQ1ugbjuYcymQ/D/f1brXx27c9f0+dehw6CMJGtHqe3ID1Otew==
   dependencies:
     grpc "^1.24.2"
 

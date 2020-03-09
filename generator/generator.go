@@ -641,6 +641,11 @@ func (g *generator) generateImplementation(service *google_protobuf.ServiceDescr
 
 }
 
+func (g *generator) generateClientConfigType() {
+	g.P()
+	g.P(fmt.Sprintf("export type ClientConfig = Omit<grpcts.Config, 'definition'>;"))
+}
+
 func (g *generator) generateClient(service *google_protobuf.ServiceDescriptorProto, packageName string, protoFileName string) {
 	g.P()
 	if g.isServiceDeprecated(service) {
@@ -649,8 +654,8 @@ func (g *generator) generateClient(service *google_protobuf.ServiceDescriptorPro
 		g.P("*/")
 	}
 	g.P(fmt.Sprintf("export class %sClient extends grpcts.Client {", gen.CamelCase(*service.Name)))
-	g.P("constructor(address: string, credentials?: grpcts.grpc.ChannelCredentials, trace: grpcts.ClientTrace = nodeTrace, options?: object){")
-	g.P(fmt.Sprintf("super(%sServiceDefinition, address, credentials, trace, options, logger);", g.toLowerFirst(*service.Name)))
+	g.P("constructor(config: ClientConfig){")
+	g.P(fmt.Sprintf("super({ definition: %sServiceDefinition, trace: nodeTrace, ...config });", g.toLowerFirst(*service.Name)))
 	g.P("}")
 	for _, method := range service.Method {
 		inputTypeName := g.getTsTypeFromMessage(method.InputType, true)
@@ -713,6 +718,7 @@ func (g *generator) Make(protoFile *google_protobuf.FileDescriptorProto, protoFi
 	for _, service := range protoFile.Service {
 		g.generateDefinition(service)
 		g.generateImplementation(service)
+		g.generateClientConfigType()
 		g.generateClient(service, *protoFile.Package, *protoFile.Name)
 	}
 

@@ -14,6 +14,7 @@ commands:
   do_all:
     description: Compile & test protoc-gen-ts
     steps:
+      - checkout
       - run:
           name: Install test dependencies
           command: cd ./integrationTests && yarn

@@ -1,5 +1,16 @@
 {
-    "files.autoSave": "afterDelay",
-    "editor.formatOnSave": true,
+  "files.autoSave": "afterDelay",
+  "editor.formatOnSave": true,
+  "[go]": {
     "editor.tabSize": 4
+  },
+  "[javascript]": {
+    "editor.tabSize": 2
+  },
+  "[typescript]": {
+    "editor.tabSize": 2
+  },
+  "[json]": {
+    "editor.tabSize": 2
+  }
 }

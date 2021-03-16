@@ -10,7 +10,7 @@ commands:
     description: Install protobuf's protoc generator
     steps:
       - run:
-          command: apt install -y protobuf-compiler
+          command: sudo apt install -y protobuf-compiler
   do_all:
     description: Compile & test protoc-gen-ts
     steps:

@@ -1,5 +1,5 @@
 module github.com/join-com/protoc-gen-ts
 
-go 1.14
+go 1.16
 
-require github.com/golang/protobuf v1.3.4
+require github.com/golang/protobuf v1.4.3

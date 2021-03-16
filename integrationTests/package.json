@@ -1,6 +1,4 @@
 {
-  "name": "itegrationTests",
-  "version": "1.0.0",
   "description": "tests for protoc-gen-ts",
   "main": "index.js",
   "license": "MIT",
@@ -12,9 +10,9 @@
   },
   "dependencies": {
     "@join-com/gcloud-logger-trace": "^0.1.6",
-    "@join-com/grpc-ts": "2.0.0",
+    "@join-com/grpc-ts": "^2.0.2",
     "grpc": "^1.24.2",
-    "protobufjs": "^6.8.8"
+    "protobufjs": "^6.10.2"
   },
   "devDependencies": {
     "@types/jest": "^25.1.3",

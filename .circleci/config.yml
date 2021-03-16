@@ -20,7 +20,7 @@ commands:
           command: cd ./integrationTests && yarn
       - run:
           name: Compile & Run Tests
-          command: yarn all
+          command: cd ./integrationTests && yarn all
 
 jobs:
   build:

@@ -1,2 +1,0 @@
-- [ ] Check Long type
-- [ ] Support no package(no namespace)

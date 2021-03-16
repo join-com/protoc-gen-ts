@@ -3,10 +3,13 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "test": "jest --runInBand --forceExit",
-    "proto:prettier": "prettier --write '__tests__/generated/**/*.ts'",
+    "all": "yarn compile && yarn proto:build && yarn test",
+    "compile": "cd .. && ./build.sh",
+    "proto:build": "yarn proto:clean && yarn proto:generate && yarn proto:prettier",
     "proto:clean": "find __tests__/generated ! -name 'tslint.json' ! -name '.prettierrc' -type f -exec rm -f {} +",
-    "proto:build": "yarn proto:clean && protoc __tests__/proto/*.proto -I __tests__/proto --ts_out=/$PWD/__tests__/generated && yarn proto:prettier"
+    "proto:generate": "export PATH=\"${PWD}/../dist:${PATH}\" && protoc __tests__/proto/*.proto -I __tests__/proto --ts_out=/${PWD}/__tests__/generated",
+    "proto:prettier": "prettier --write '__tests__/generated/**/*.ts'",
+    "test": "export PATH=\"${PWD}/../dist:${PATH}\" && jest --runInBand --forceExit"
   },
   "dependencies": {
     "@join-com/gcloud-logger-trace": "^0.1.6",
@@ -15,15 +18,15 @@
     "protobufjs": "^6.10.2"
   },
   "devDependencies": {
-    "@types/jest": "^25.1.3",
-    "@types/node": "^13.7.7",
-    "jest": "^25.1.0",
+    "@types/jest": "^26.0.20",
+    "@types/node": "^14.14.35",
+    "jest": "^26.6.3",
     "jest-extended": "^0.11.5",
     "jest-watch-typeahead": "^0.4.2",
     "prettier": "^1.19.1",
-    "ts-jest": "^25.2.1",
-    "tslint": "^6.0.0",
+    "ts-jest": "^26.5.3",
+    "tslint": "^6.1.3",
     "tslint-config-prettier": "^1.18.0",
-    "typescript": "3.8.3"
+    "typescript": "^4.2.3"
   }
 }

@@ -1,0 +1,25 @@
+version: 2.1
+
+docker-auth: &docker-auth
+  auth:
+    username: ${DOCKER_LOGIN}
+    password: ${DOCKER_PASSWORD}
+
+commands:
+  do_all:
+    description: Compile & test protoc-gen-ts
+    steps:
+      - run:
+          name: Install test dependencies
+          command: cd ./integrationTests && yarn
+      - run:
+          name: Compile & Run Tests
+          command: yarn all
+
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.16-node
+        <<: *docker-auth
+    steps:
+      - do_all

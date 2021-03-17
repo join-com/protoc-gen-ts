@@ -11,7 +11,7 @@ commands:
     steps:
       - run:
           command: sudo apt install -y protobuf-compiler
-  do_all:
+  compile_and_test:
     description: Compile & test protoc-gen-ts
     steps:
       - checkout
@@ -19,11 +19,17 @@ commands:
           name: Install test dependencies
           command: cd ./integrationTests && yarn
       - run:
-          name: Compile & Run Tests
-          command: cd ./integrationTests && yarn all
+          name: Compile
+          command: cd ./integrationTests && yarn compile
+      - run:
+          name: Generate TS code
+          command: cd ./integrationTests && yarn proto:build
+      - run:
+          name: Test
+          command: cd ./integrationTests && yarn test
 
 jobs:
-  build:
+  build_and_test:
     docker:
       - image: circleci/golang:1.16-node
         <<: *docker-auth

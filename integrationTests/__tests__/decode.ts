@@ -97,14 +97,14 @@ describe('decode', () => {
   describe('timestamp', () => {
     it('encodes timestamp', () => {
       expect(decoded.timestamp).toBeDefined()
-      expect(decoded.timestamp).toEqual(new Date('2014-11-01T12:24:33.123'))
+      expect(decoded.timestamp).toEqual(new Date('2014-11-01T11:24:33.123Z'))
     })
 
     it('encodes timestampRepeated', () => {
       expect(decoded.timestampRepeated).toBeDefined()
       expect(decoded.timestampRepeated).toEqual([
-        new Date('2014-02-26T12:00:00.234'),
-        new Date('2013-05-26T12:00:10.221')
+        new Date('2014-02-26T11:00:00.234Z'),
+        new Date('2013-05-26T10:00:10.221Z')
       ])
     })
   })

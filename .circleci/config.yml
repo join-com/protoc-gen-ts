@@ -1,0 +1,32 @@
+version: 2.1
+
+docker-auth: &docker-auth
+  auth:
+    username: ${DOCKER_LOGIN}
+    password: ${DOCKER_PASSWORD}
+
+commands:
+  install_protoc:
+    description: Install protobuf's protoc generator
+    steps:
+      - run:
+          command: sudo apt install -y protobuf-compiler
+  do_all:
+    description: Compile & test protoc-gen-ts
+    steps:
+      - checkout
+      - run:
+          name: Install test dependencies
+          command: cd ./integrationTests && yarn
+      - run:
+          name: Compile & Run Tests
+          command: cd ./integrationTests && yarn all
+
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.16-node
+        <<: *docker-auth
+    steps:
+      - install_protoc
+      - do_all

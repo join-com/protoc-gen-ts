@@ -10,7 +10,7 @@ import (
 	google_protobuf "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	gen "github.com/golang/protobuf/protoc-gen-go/generator"
 	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
-	"github.com/join-com/protoc-gen-ts/base"
+	"github.com/join-com/protoc-gen-ts/legacy/base"
 )
 
 type generator struct {
@@ -117,10 +117,6 @@ func (g *generator) getTsFieldTypeForScalar(typeID google_protobuf.FieldDescript
 	m[google_protobuf.FieldDescriptorProto_TYPE_SINT32] = "number"    // TYPE_SINT32 - Uses ZigZag encoding.
 	m[google_protobuf.FieldDescriptorProto_TYPE_SINT64] = "number"    // TYPE_SINT64 - Uses ZigZag encoding.
 	return m[typeID]
-}
-
-func (g *generator) isFieldOneOf(field *google_protobuf.FieldDescriptorProto) bool {
-	return field.OneofIndex != nil
 }
 
 func (g *generator) isFieldDeprecated(field *google_protobuf.FieldDescriptorProto) bool {
@@ -335,7 +331,7 @@ func (g *generator) getWriteFunction(field *google_protobuf.FieldDescriptorProto
 
 func (g *generator) encodeEnumSwitch(field *google_protobuf.FieldDescriptorProto, name string, message *google_protobuf.DescriptorProto) {
 	enum := g.GetEnumTypeByName(*field.TypeName)
-	g.P(fmt.Sprintf("switch (val) {"))
+	g.P("switch (val) {")
 	for _, value := range enum.Value {
 		g.P(fmt.Sprintf("case '%s':", *value.Name))
 		g.P(fmt.Sprintf("return %d;", *value.Number))
@@ -409,7 +405,7 @@ func (g *generator) generateEncode(message *google_protobuf.DescriptorProto) {
 func (g *generator) decodeEnumSwitch(field *google_protobuf.FieldDescriptorProto, name string, message *google_protobuf.DescriptorProto) {
 	enum := g.GetEnumTypeByName(*field.TypeName)
 
-	g.P(fmt.Sprintf("switch (val) {"))
+	g.P("switch (val) {")
 	for _, value := range enum.Value {
 		g.P(fmt.Sprintf("case %d:", *value.Number))
 		g.P(fmt.Sprintf("return '%s';", *value.Name))
@@ -637,13 +633,13 @@ func (g *generator) generateImplementation(service *google_protobuf.ServiceDescr
 		}
 	}
 
-	g.P(fmt.Sprint("}"))
+	g.P("}")
 
 }
 
 func (g *generator) generateClientConfigType() {
 	g.P()
-	g.P(fmt.Sprintf("export type ClientConfig = Omit<grpcts.Config, 'definition'>;"))
+	g.P("export type ClientConfig = Omit<grpcts.Config, 'definition'>;")
 }
 
 func (g *generator) generateClient(service *google_protobuf.ServiceDescriptorProto, packageName string, protoFileName string) {
@@ -665,29 +661,29 @@ func (g *generator) generateClient(service *google_protobuf.ServiceDescriptorPro
 			g.P(fmt.Sprintf("public %s(metadata?: grpcts.Metadata) {", g.toLowerFirst(*method.Name)))
 			g.methodDeprecatedLog(method)
 			g.P(fmt.Sprintf("return super.makeBidiStreamRequest<%s, %s>('%s', metadata);", inputTypeName, outputTypeName, g.toLowerFirst(*method.Name)))
-			g.P(fmt.Sprint("}"))
+			g.P("}")
 		} else if method.ServerStreaming != nil && *method.ServerStreaming {
 			outputTypeName := g.getTsTypeFromMessage(method.OutputType, true)
 			g.P(fmt.Sprintf("public %s(req: %s, metadata?: grpcts.Metadata) {", g.toLowerFirst(*method.Name), inputTypeName))
 			g.methodDeprecatedLog(method)
 			g.P(fmt.Sprintf("return super.makeServerStreamRequest<%s, %s>('%s', req, metadata);", inputTypeName, outputTypeName, g.toLowerFirst(*method.Name)))
-			g.P(fmt.Sprint("}"))
+			g.P("}")
 		} else if method.ClientStreaming != nil && *method.ClientStreaming {
 			outputTypeName := g.getTsTypeFromMessage(method.OutputType, true)
 			g.P(fmt.Sprintf("public %s(metadata?: grpcts.Metadata) {", g.toLowerFirst(*method.Name)))
 			g.methodDeprecatedLog(method)
 			g.P(fmt.Sprintf("return super.makeClientStreamRequest<%s, %s>('%s', metadata);", inputTypeName, outputTypeName, g.toLowerFirst(*method.Name)))
-			g.P(fmt.Sprint("};"))
+			g.P("};")
 		} else {
 			outputTypeName := g.getTsTypeFromMessage(method.OutputType, true)
 			g.P(fmt.Sprintf("public %s(req: %s, metadata?: grpcts.Metadata) {", g.toLowerFirst(*method.Name), inputTypeName))
 			g.methodDeprecatedLog(method)
 			g.P(fmt.Sprintf("return super.makeUnaryRequest<%s, %s>('%s', req, metadata);", inputTypeName, outputTypeName, g.toLowerFirst(*method.Name)))
-			g.P(fmt.Sprint("};"))
+			g.P("};")
 		}
 	}
 
-	g.P(fmt.Sprint("}"))
+	g.P("}")
 
 }
 

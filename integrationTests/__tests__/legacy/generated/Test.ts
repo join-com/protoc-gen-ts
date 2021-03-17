@@ -488,7 +488,7 @@ export namespace Foo {
             message.fieldBytesRepeated.push(new Uint8Array(reader.bytes()))
             break
           case 29:
-            message.fieldEnum = (val => {
+            message.fieldEnum = ((val) => {
               switch (val) {
                 case 0:
                   return 'UNKNOWN'
@@ -510,7 +510,7 @@ export namespace Foo {
             if ((tag & 7) === 2) {
               const end2 = reader.uint32() + reader.pos
               while (reader.pos < end2) {
-                const fieldEnumRepeated = (val => {
+                const fieldEnumRepeated = ((val) => {
                   switch (val) {
                     case 0:
                       return 'VIEW'
@@ -525,7 +525,7 @@ export namespace Foo {
                 }
               }
             } else {
-              const fieldEnumRepeated = (val => {
+              const fieldEnumRepeated = ((val) => {
                 switch (val) {
                   case 0:
                     return 'VIEW'
@@ -791,7 +791,7 @@ export namespace Foo {
         }
       }
       if (this.fieldEnum != null) {
-        const fieldEnum = (val => {
+        const fieldEnum = ((val) => {
           switch (val) {
             case 'UNKNOWN':
               return 0
@@ -809,7 +809,7 @@ export namespace Foo {
       }
       if (this.fieldEnumRepeated != null) {
         for (const value of this.fieldEnumRepeated) {
-          const fieldEnumRepeated = (val => {
+          const fieldEnumRepeated = ((val) => {
             switch (val) {
               case 'VIEW':
                 return 0
@@ -840,7 +840,7 @@ export namespace Foo {
       if (this.timestamp != null) {
         const msg = new GoogleProtobuf.Timestamp({
           seconds: Math.floor(this.timestamp.getTime() / 1000),
-          nanos: this.timestamp.getMilliseconds() * 1000000
+          nanos: this.timestamp.getMilliseconds() * 1000000,
         })
         msg.encode(writer.uint32(282).fork()).ldelim()
       }
@@ -851,7 +851,7 @@ export namespace Foo {
           }
           const msg = new GoogleProtobuf.Timestamp({
             seconds: Math.floor(value.getTime() / 1000),
-            nanos: value.getMilliseconds() * 1000000
+            nanos: value.getMilliseconds() * 1000000,
           })
           msg.encode(writer.uint32(290).fork()).ldelim()
         }
@@ -894,7 +894,7 @@ export namespace Foo {
       responseSerialize: (args: Common.IOtherPkgMessage) =>
         new Common.OtherPkgMessage(args).encode().finish() as Buffer,
       responseDeserialize: (argBuf: Buffer) =>
-        Common.OtherPkgMessage.decode(argBuf)
+        Common.OtherPkgMessage.decode(argBuf),
     },
     findClientStream: {
       path: '/Users/FindClientStream',
@@ -908,7 +908,7 @@ export namespace Foo {
       responseSerialize: (args: Common.IOtherPkgMessage) =>
         new Common.OtherPkgMessage(args).encode().finish() as Buffer,
       responseDeserialize: (argBuf: Buffer) =>
-        Common.OtherPkgMessage.decode(argBuf)
+        Common.OtherPkgMessage.decode(argBuf),
     },
     findServerStream: {
       path: '/Users/FindServerStream',
@@ -922,7 +922,7 @@ export namespace Foo {
       responseSerialize: (args: Common.IOtherPkgMessage) =>
         new Common.OtherPkgMessage(args).encode().finish() as Buffer,
       responseDeserialize: (argBuf: Buffer) =>
-        Common.OtherPkgMessage.decode(argBuf)
+        Common.OtherPkgMessage.decode(argBuf),
     },
     findBidiStream: {
       path: '/Users/FindBidiStream',
@@ -936,8 +936,8 @@ export namespace Foo {
       responseSerialize: (args: Common.IOtherPkgMessage) =>
         new Common.OtherPkgMessage(args).encode().finish() as Buffer,
       responseDeserialize: (argBuf: Buffer) =>
-        Common.OtherPkgMessage.decode(argBuf)
-    }
+        Common.OtherPkgMessage.decode(argBuf),
+    },
   }
 
   export interface IUsersImplementation extends grpcts.Implementations {

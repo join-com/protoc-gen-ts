@@ -9,9 +9,9 @@
     "lint:eslint": "eslint . --ext .ts --max-warnings 0",
     "lint:tsc": "tsc --noEmit && eslint",
     "proto:build": "yarn proto:clean && yarn proto:generate && yarn proto:prettier",
-    "proto:clean": "find __tests__/generated ! -name 'tslint.json' ! -name '.prettierrc' -type f -exec rm -f {} +",
-    "proto:generate": "export PATH=\"${PWD}/../dist:${PATH}\" && protoc __tests__/proto/*.proto -I __tests__/proto --ts_out=/${PWD}/__tests__/generated",
-    "proto:prettier": "prettier --write '__tests__/generated/**/*.ts'",
+    "proto:clean": "find __tests__/legacy/generated ! -name 'tslint.json' ! -name '.prettierrc' -type f -exec rm -f {} +",
+    "proto:generate": "export PATH=\"${PWD}/../dist:${PATH}\" && protoc __tests__/legacy/proto/*.proto -I __tests__/legacy/proto --ts_out=\"${PWD}/__tests__/legacy/generated\"",
+    "proto:prettier": "prettier --write '__tests__/legacy/generated/**/*.ts'",
     "test": "export PATH=\"${PWD}/../dist:${PATH}\" && jest --runInBand --forceExit"
   },
   "dependencies": {

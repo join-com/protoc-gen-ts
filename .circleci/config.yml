@@ -35,4 +35,4 @@ jobs:
         <<: *docker-auth
     steps:
       - install_protoc
-      - do_all
+      - compile_and_test

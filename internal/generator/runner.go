@@ -36,5 +36,5 @@ func (r *Runner) Run(plugin *protogen.Plugin) error {
 }
 
 func (r *Runner) generateTypescriptFile(protoFile *protogen.File, generatedFileStream *protogen.GeneratedFile) {
-	//
+	generatedFileStream.P("// Hello world")
 }

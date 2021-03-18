@@ -2,6 +2,9 @@ syntax = "proto3";
 
 package foo;
 
+// aa
+option go_package = "github.com/join-com/protoc-gen-ts/foo";
+
 import "google/protobuf/timestamp.proto";
 
 import "common/common.proto";

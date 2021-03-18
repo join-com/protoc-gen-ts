@@ -13,5 +13,14 @@
   },
   "[json]": {
     "editor.tabSize": 2
+  },
+  "[proto3]": {
+    "editor.tabSize": 2
+  },
+  "protoc": {
+    "compile_on_save": false,
+    "options": [
+      "--proto_path=integrationTests/proto/**/*"
+    ]
   }
 }

@@ -6,7 +6,8 @@ insert_final_newline = true
 indent_style = space
 
 [*.go]
-indent_size = 4
+indent_style = tab
+tab_width = 4
 
 [*.{js,json,ts,proto}]
 indent_size = 2

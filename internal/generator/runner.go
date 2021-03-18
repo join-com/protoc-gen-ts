@@ -3,8 +3,6 @@ package generator
 import (
 	"errors"
 	"fmt"
-	"path/filepath"
-	"strings"
 
 	"github.com/iancoleman/strcase"
 	"github.com/join-com/protoc-gen-ts/internal/utils"
@@ -12,11 +10,13 @@ import (
 )
 
 type Runner struct {
+	indentLevel    int
 	packagesByFile map[string]string
 }
 
 func NewRunner() Runner {
 	return Runner{
+		indentLevel:    0,
 		packagesByFile: make(map[string]string),
 	}
 }
@@ -34,7 +34,6 @@ func (r *Runner) Run(plugin *protogen.Plugin) error {
 	// Generation step
 	for _, file := range plugin.Files {
 		outputPath := fromProtoPathToGeneratedPath(file.Desc.Path()) + ".ts"
-
 		generatedFileStream := plugin.NewGeneratedFile(outputPath, "")
 		r.generateTypescriptFile(file, generatedFileStream)
 	}
@@ -51,6 +50,7 @@ func (r *Runner) generateTypescriptFile(protoFile *protogen.File, generatedFileS
 	generatedFileStream.P("// GENERATED CODE -- DO NOT EDIT!\n")
 
 	r.generateTypescriptImports(protoFile.Proto.Dependency, generatedFileStream)
+	r.generateTypescriptNamespace(protoFile, generatedFileStream)
 }
 
 func (r *Runner) generateTypescriptImports(dependencies []string, generatedFileStream *protogen.GeneratedFile) {
@@ -74,10 +74,11 @@ func (r *Runner) generateTypescriptImports(dependencies []string, generatedFileS
 	generatedFileStream.P("")
 }
 
-func fromProtoPathToGeneratedPath(protoPath string) string {
-	outputDirectory := filepath.Dir(protoPath)
-	outputFileName := strcase.ToCamel(strings.TrimSuffix(filepath.Base(protoPath), filepath.Ext(protoPath)))
-	generatedPath := fmt.Sprintf("%s/%s", outputDirectory, outputFileName)
+func (r *Runner) generateTypescriptNamespace(protoFile *protogen.File, generatedFileStream *protogen.GeneratedFile) {
+	namespaceName := strcase.ToCamel(protoFile.Proto.GetPackage())
+	generatedFileStream.P(fmt.Sprintf("namespace %s {\n", namespaceName))
+	r.indentLevel += 2
 
-	return generatedPath
+	generatedFileStream.P("\n}\n")
+	r.indentLevel -= 2
 }

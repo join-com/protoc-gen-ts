@@ -1,5 +1,9 @@
 package generator
 
+/*
+ * Entry point for the 'generator' package.
+ */
+
 import (
 	"flag"
 

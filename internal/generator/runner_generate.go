@@ -58,6 +58,13 @@ func (r *Runner) generateTypescriptNamespace(protoFile *protogen.File, generated
 
 func (r *Runner) generateTypescriptEnums(protoFile *protogen.File, generatedFileStream *protogen.GeneratedFile) {
 	for _, enumDescriptor := range protoFile.Proto.GetEnumType() {
+		options := enumDescriptor.GetOptions()
+		if options != nil {
+			if options.Deprecated != nil && *options.Deprecated {
+				r.P(generatedFileStream, "/**\n  * @deprecated\n */")
+			}
+		}
+
 		var values []string
 		for _, enumValue := range enumDescriptor.GetValue() {
 			values = append(values, "'"+enumValue.GetName()+"'")
@@ -73,6 +80,13 @@ func (r *Runner) generateTypescriptEnums(protoFile *protogen.File, generatedFile
 
 func (r *Runner) generateTypescriptMessageInterfaces(protoFile *protogen.File, generatedFileStream *protogen.GeneratedFile) {
 	for _, messageSpec := range protoFile.Proto.GetMessageType() {
+		options := messageSpec.GetOptions()
+		if options != nil {
+			if options.Deprecated != nil && *options.Deprecated {
+				r.P(generatedFileStream, "/**\n  * @deprecated\n */")
+			}
+		}
+
 		interfaceName := "export interface I" + strcase.ToCamel(messageSpec.GetName()) + " {"
 
 		r.P(generatedFileStream, interfaceName)

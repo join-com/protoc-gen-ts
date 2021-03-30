@@ -14,6 +14,9 @@ export namespace Foo {
     id?: number
   }
 
+  /**
+   * @deprecated
+   */
   export interface INested {
     title?: string
   }

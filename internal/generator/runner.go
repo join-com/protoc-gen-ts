@@ -12,15 +12,15 @@ import (
 
 type Runner struct {
 	currentNamespace string
-	indentLevel    int
-	packagesByFile map[string]string
+	indentLevel      int
+	packagesByFile   map[string]string
 }
 
 func NewRunner() Runner {
 	return Runner{
 		currentNamespace: "",
-		indentLevel:    0,
-		packagesByFile: make(map[string]string),
+		indentLevel:      0,
+		packagesByFile:   make(map[string]string),
 	}
 }
 
@@ -29,12 +29,12 @@ func (r *Runner) Run(plugin *protogen.Plugin) error {
 		return errors.New("there are no files to generate")
 	}
 
-	// Data collection step
+	// Data collection step (files are listed in topological order)
 	for _, file := range plugin.Files {
 		r.collectData(file)
 	}
 
-	// Generation step
+	// Generation step (files are listed in topological order)
 	for _, file := range plugin.Files {
 		outputPath := fromProtoPathToGeneratedPath(file.Desc.Path()) + ".ts"
 		generatedFileStream := plugin.NewGeneratedFile(outputPath, "")

@@ -36,3 +36,8 @@ jobs:
     steps:
       - install_protoc
       - compile_and_test
+
+workflows:
+  all:
+    jobs:
+      - build_and_test

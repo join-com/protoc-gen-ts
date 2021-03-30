@@ -1,5 +1,9 @@
 package generator
 
+/*
+ * Code generation orchestrator
+ */
+
 import (
 	"errors"
 

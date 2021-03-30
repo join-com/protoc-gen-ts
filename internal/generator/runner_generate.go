@@ -1,5 +1,9 @@
 package generator
 
+/*
+ * Runner's methods to to generate typescript files
+ */
+
 import (
 	"fmt"
 

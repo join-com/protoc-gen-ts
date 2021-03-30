@@ -19,25 +19,26 @@
     "v2:prettier": "prettier --write '__tests__/v2/generated/**/*.ts'"
   },
   "dependencies": {
-    "@join-com/gcloud-logger-trace": "^0.1.6",
+    "@join-com/gcloud-logger-trace": "^0.1.17",
+    "@join-com/grpc": "^0.0.5",
     "@join-com/grpc-ts": "^2.0.2",
-    "grpc": "^1.24.2",
+    "grpc": "^1.24.6",
     "protobufjs": "^6.10.2"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.20",
-    "@types/node": "^14.14.35",
-    "@typescript-eslint/eslint-plugin": "^4.18.0",
-    "@typescript-eslint/parser": "^4.18.0",
-    "eslint": "^7.22.0",
+    "@types/jest": "^26.0.22",
+    "@types/node": "^14.14.37",
+    "@typescript-eslint/eslint-plugin": "^4.20.0",
+    "@typescript-eslint/parser": "^4.20.0",
+    "eslint": "^7.23.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-jest": "^24.3.2",
     "eslint-plugin-node": "^11.1.0",
     "jest": "^26.6.3",
     "jest-extended": "^0.11.5",
-    "jest-watch-typeahead": "^0.4.2",
+    "jest-watch-typeahead": "^0.6.1",
     "prettier": "^2.2.1",
-    "ts-jest": "^26.5.3",
+    "ts-jest": "^26.5.4",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^4.2.3"
   }

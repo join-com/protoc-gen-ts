@@ -17,16 +17,16 @@ commands:
       - checkout
       - run:
           name: Install test dependencies
-          command: cd ./integrationTests && yarn
+          command: cd ./tests && yarn
       - run:
           name: Compile
-          command: cd ./integrationTests && yarn compile
+          command: cd ./tests && yarn compile
       - run:
           name: Generate TS code
-          command: cd ./integrationTests && yarn proto:build
+          command: cd ./tests && yarn proto:build
       - run:
           name: Test
-          command: cd ./integrationTests && yarn test
+          command: cd ./tests && yarn test
 
 jobs:
   build_and_test:

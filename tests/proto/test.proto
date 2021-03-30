@@ -2,11 +2,10 @@ syntax = "proto3";
 
 package foo;
 
-// aa
+// "Dummy" option to make protoc happy (useful for Golang code generation, not for TS)
 option go_package = "github.com/join-com/protoc-gen-ts/foo";
 
 import "google/protobuf/timestamp.proto";
-
 import "common/common.proto";
 
 service Users {

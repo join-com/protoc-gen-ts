@@ -3,4 +3,4 @@
 import * as joinGRPC from '@join-com/grpc'
 import * as nodeTrace from '@join-com/node-trace'
 
-namespace Common {}
+export namespace Common {}

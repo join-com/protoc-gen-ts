@@ -2,12 +2,6 @@ import * as path from 'path'
 import { Type, loadSync } from 'protobufjs'
 import { Foo } from './generated/Test'
 
-// TODO:
-// 1. deprecated log
-// 2. test changes in messages adding fields, removing
-// 3. test enums changes
-// 4. test if not sent
-
 let PbTest: Type
 beforeAll(() => {
   const root = loadSync(path.join(__dirname, '..', '..', 'proto', 'test.proto'))

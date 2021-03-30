@@ -6,6 +6,7 @@ package generator
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/iancoleman/strcase"
 	"github.com/join-com/protoc-gen-ts/internal/utils"
@@ -43,9 +44,25 @@ func (r *Runner) generateTypescriptImports(dependencies []string, generatedFileS
 
 func (r *Runner) generateTypescriptNamespace(protoFile *protogen.File, generatedFileStream *protogen.GeneratedFile) {
 	namespaceName := strcase.ToCamel(protoFile.Proto.GetPackage())
-	generatedFileStream.P(fmt.Sprintf("namespace %s {\n", namespaceName))
+	generatedFileStream.P(fmt.Sprintf("export namespace %s {\n", namespaceName))
 	r.indentLevel += 2
+
+	r.generateTypescriptEnums(protoFile, generatedFileStream)
 
 	generatedFileStream.P("\n}\n")
 	r.indentLevel -= 2
+}
+
+func (r *Runner) generateTypescriptEnums(protoFile *protogen.File, generatedFileStream *protogen.GeneratedFile) {
+	for _, enumDescriptor := range protoFile.Proto.GetEnumType() {
+		var values []string
+		for _, enumValue := range enumDescriptor.GetValue() {
+			values = append(values, fmt.Sprintf("'%s'", enumValue.GetName()))
+		}
+
+		enumName := strcase.ToCamel(enumDescriptor.GetName())
+		enumValues := strings.Join(values, " | ")
+
+		r.P(generatedFileStream, fmt.Sprintf("export type %s = %s", enumName, enumValues))
+	}
 }

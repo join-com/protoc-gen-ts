@@ -6,4 +6,7 @@ import * as nodeTrace from '@join-com/node-trace'
 import { GoogleProtobuf } from './google/protobuf/Timestamp'
 import { Common } from './common/Common'
 
-namespace Foo {}
+export namespace Foo {
+  export type EnumType = 'UNKNOWN' | 'ADMIN' | 'USER'
+  export type Role = 'VIEW' | 'EDIT'
+}

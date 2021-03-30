@@ -88,12 +88,6 @@ func (r *Runner) generateTypescriptMessageInterfaces(protoFile *protogen.File, g
 }
 
 func getMessageFieldType(messageField *descriptorpb.FieldDescriptorProto) string {
-
-	// log.Print("{")
-	// log.Print(fmt.Sprintf("  type: %s,", messageField.GetType()))
-	// log.Print(fmt.Sprintf("  name: %s", messageField.GetTypeName()))
-	// log.Print("}")
-
 	baseType := "unknown"
 
 	switch messageField.GetType() {
@@ -125,6 +119,12 @@ func getMessageFieldType(messageField *descriptorpb.FieldDescriptorProto) string
 		baseType = "number"
 	case descriptorpb.FieldDescriptorProto_TYPE_STRING:
 		baseType = "string"
+	case descriptorpb.FieldDescriptorProto_TYPE_BYTES:
+		baseType = "Uint8Array"
+	case descriptorpb.FieldDescriptorProto_TYPE_ENUM:
+		baseType = getEnumOrMessageTypeName(messageField.GetTypeName(), false)
+	case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE:
+		baseType = getEnumOrMessageTypeName(messageField.GetTypeName(), true)
 	}
 
 	if messageField.GetLabel() == descriptorpb.FieldDescriptorProto_LABEL_REPEATED {
@@ -132,4 +132,13 @@ func getMessageFieldType(messageField *descriptorpb.FieldDescriptorProto) string
 	}
 
 	return baseType
+}
+
+func getEnumOrMessageTypeName(typeName string, isInterface bool) string {
+	names := strings.Split(typeName, ".")
+	interfaceName := names[len(names)-1]
+	if isInterface {
+		interfaceName = "I" + interfaceName
+	}
+	return interfaceName
 }

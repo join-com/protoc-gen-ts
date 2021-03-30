@@ -45,16 +45,16 @@ export namespace Foo {
     fieldBoolRepeated?: boolean[]
     fieldString?: string
     fieldStringRepeated?: string[]
-    fieldBytes?: unknown
-    fieldBytesRepeated?: unknown[]
-    fieldEnum?: unknown
-    fieldEnumRepeated?: unknown[]
-    message?: unknown
-    messageRepeated?: unknown[]
-    timestamp?: unknown
-    timestampRepeated?: unknown[]
-    otherPkgMessage?: unknown
-    otherPkgMessageRepeated?: unknown[]
+    fieldBytes?: Uint8Array
+    fieldBytesRepeated?: Uint8Array[]
+    fieldEnum?: EnumType
+    fieldEnumRepeated?: Role[]
+    message?: INested
+    messageRepeated?: INested[]
+    timestamp?: ITimestamp
+    timestampRepeated?: ITimestamp[]
+    otherPkgMessage?: IOtherPkgMessage
+    otherPkgMessageRepeated?: IOtherPkgMessage[]
     fieldInt64?: number
     fieldInt64Repeated?: number[]
   }

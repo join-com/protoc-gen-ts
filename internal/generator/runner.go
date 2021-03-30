@@ -11,12 +11,14 @@ import (
 )
 
 type Runner struct {
+	currentNamespace string
 	indentLevel    int
 	packagesByFile map[string]string
 }
 
 func NewRunner() Runner {
 	return Runner{
+		currentNamespace: "",
 		indentLevel:    0,
 		packagesByFile: make(map[string]string),
 	}

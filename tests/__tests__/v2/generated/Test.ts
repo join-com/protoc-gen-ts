@@ -51,10 +51,10 @@ export namespace Foo {
     fieldEnumRepeated?: Role[]
     message?: INested
     messageRepeated?: INested[]
-    timestamp?: ITimestamp
-    timestampRepeated?: ITimestamp[]
-    otherPkgMessage?: IOtherPkgMessage
-    otherPkgMessageRepeated?: IOtherPkgMessage[]
+    timestamp?: GoogleProtobuf.ITimestamp
+    timestampRepeated?: GoogleProtobuf.ITimestamp[]
+    otherPkgMessage?: Common.IOtherPkgMessage
+    otherPkgMessageRepeated?: Common.IOtherPkgMessage[]
     fieldInt64?: number
     fieldInt64Repeated?: number[]
   }

@@ -15,3 +15,7 @@ func fromProtoPathToGeneratedPath(protoPath string) string {
 
 	return generatedPath
 }
+
+func getNamespaceFromProtoPackage(protoPackage string) string {
+	return strcase.ToCamel(protoPackage)
+}

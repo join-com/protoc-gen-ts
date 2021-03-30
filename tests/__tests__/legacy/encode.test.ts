@@ -10,7 +10,7 @@ import { Foo } from './generated/Test'
 
 let PbTest: Type
 beforeAll(() => {
-  const root = loadSync(path.join(__dirname, 'proto', 'test.proto'))
+  const root = loadSync(path.join(__dirname, '..', '..', 'proto', 'test.proto'))
   PbTest = root.lookupType('foo.Test')
 })
 

@@ -3,4 +3,9 @@
 import * as joinGRPC from '@join-com/grpc'
 import * as nodeTrace from '@join-com/node-trace'
 
-export namespace GoogleProtobuf {}
+export namespace GoogleProtobuf {
+  export interface ITimestamp {
+    seconds?: number
+    nanos?: number
+  }
+}

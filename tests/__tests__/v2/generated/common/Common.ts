@@ -3,4 +3,9 @@
 import * as joinGRPC from '@join-com/grpc'
 import * as nodeTrace from '@join-com/node-trace'
 
-export namespace Common {}
+export namespace Common {
+  export interface IOtherPkgMessage {
+    firstName?: string
+    latsName?: string
+  }
+}

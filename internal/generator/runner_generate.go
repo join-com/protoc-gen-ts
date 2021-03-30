@@ -11,6 +11,7 @@ import (
 	"github.com/iancoleman/strcase"
 	"github.com/join-com/protoc-gen-ts/internal/utils"
 	"google.golang.org/protobuf/compiler/protogen"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 func (r *Runner) generateTypescriptFile(protoFile *protogen.File, generatedFileStream *protogen.GeneratedFile) {
@@ -44,12 +45,13 @@ func (r *Runner) generateTypescriptImports(dependencies []string, generatedFileS
 
 func (r *Runner) generateTypescriptNamespace(protoFile *protogen.File, generatedFileStream *protogen.GeneratedFile) {
 	namespaceName := strcase.ToCamel(protoFile.Proto.GetPackage())
-	generatedFileStream.P(fmt.Sprintf("export namespace %s {\n", namespaceName))
+	r.P(generatedFileStream, fmt.Sprintf("export namespace %s {\n", namespaceName))
 	r.indentLevel += 2
 
 	r.generateTypescriptEnums(protoFile, generatedFileStream)
+	r.generateTypescriptMessageInterfaces(protoFile, generatedFileStream)
 
-	generatedFileStream.P("\n}\n")
+	r.P(generatedFileStream, "\n}")
 	r.indentLevel -= 2
 }
 
@@ -65,4 +67,69 @@ func (r *Runner) generateTypescriptEnums(protoFile *protogen.File, generatedFile
 
 		r.P(generatedFileStream, fmt.Sprintf("export type %s = %s", enumName, enumValues))
 	}
+	r.P(generatedFileStream, "")
+}
+
+func (r *Runner) generateTypescriptMessageInterfaces(protoFile *protogen.File, generatedFileStream *protogen.GeneratedFile) {
+	for _, messageSpec := range protoFile.Proto.GetMessageType() {
+		interfaceName := fmt.Sprintf("export interface I%s {", strcase.ToCamel(messageSpec.GetName()))
+
+		r.P(generatedFileStream, interfaceName)
+		r.indentLevel += 2
+
+		for _, field := range messageSpec.GetField() {
+			// TODO: Add support for required fields (via proto options)
+			r.P(generatedFileStream, fmt.Sprintf("%s?: %s", field.GetJsonName(), getMessageFieldType(field)))
+		}
+
+		r.indentLevel -= 2
+		r.P(generatedFileStream, "}\n")
+	}
+}
+
+func getMessageFieldType(messageField *descriptorpb.FieldDescriptorProto) string {
+
+	// log.Print("{")
+	// log.Print(fmt.Sprintf("  type: %s,", messageField.GetType()))
+	// log.Print(fmt.Sprintf("  name: %s", messageField.GetTypeName()))
+	// log.Print("}")
+
+	baseType := "unknown"
+
+	switch messageField.GetType() {
+	case descriptorpb.FieldDescriptorProto_TYPE_BOOL:
+		baseType = "boolean"
+	case descriptorpb.FieldDescriptorProto_TYPE_INT32:
+		baseType = "number"
+	case descriptorpb.FieldDescriptorProto_TYPE_UINT32:
+		baseType = "number"
+	case descriptorpb.FieldDescriptorProto_TYPE_SINT32:
+		baseType = "number"
+	case descriptorpb.FieldDescriptorProto_TYPE_INT64:
+		baseType = "number"
+	case descriptorpb.FieldDescriptorProto_TYPE_UINT64:
+		baseType = "number"
+	case descriptorpb.FieldDescriptorProto_TYPE_SINT64:
+		baseType = "number"
+	case descriptorpb.FieldDescriptorProto_TYPE_FLOAT:
+		baseType = "number"
+	case descriptorpb.FieldDescriptorProto_TYPE_DOUBLE:
+		baseType = "number"
+	case descriptorpb.FieldDescriptorProto_TYPE_FIXED32:
+		baseType = "number"
+	case descriptorpb.FieldDescriptorProto_TYPE_FIXED64:
+		baseType = "number"
+	case descriptorpb.FieldDescriptorProto_TYPE_SFIXED32:
+		baseType = "number"
+	case descriptorpb.FieldDescriptorProto_TYPE_SFIXED64:
+		baseType = "number"
+	case descriptorpb.FieldDescriptorProto_TYPE_STRING:
+		baseType = "string"
+	}
+
+	if messageField.GetLabel() == descriptorpb.FieldDescriptorProto_LABEL_REPEATED {
+		baseType = fmt.Sprintf("%s[]", baseType)
+	}
+
+	return baseType
 }

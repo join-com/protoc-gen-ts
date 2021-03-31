@@ -23,8 +23,8 @@ func (r *Runner) generateTypescriptFile(protoFile *protogen.File, generatedFileS
 
 func (r *Runner) generateTypescriptImports(currentSourcePath string, importSourcePaths []string, generatedFileStream *protogen.GeneratedFile) {
 	// Generic imports
-	generatedFileStream.P("import * as joinGRPC from '@join-com/grpc'")
-	generatedFileStream.P("import * as nodeTrace from '@join-com/node-trace'")
+	generatedFileStream.P("// import * as joinGRPC from '@join-com/grpc'")        // TODO: Remove comment when import is used
+	generatedFileStream.P("// import * as nodeTrace from '@join-com/node-trace'") // TODO: Remove comment when import is used
 	generatedFileStream.P("")
 
 	// Custom imports

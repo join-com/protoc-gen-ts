@@ -54,8 +54,8 @@ describe('(v2) interfaces', () => {
   // Existence if ITest is implicitly tested by importing it
 
   it('generates correct types for interface fields', () => {
-    type Extends<A, B> = A extends B ? true : false
-    type IsOk<K extends keyof TypesMap & keyof Foo.ITest> = Extends<
+    type Match<A, B> = A extends B ? (B extends A ? true : false) : false
+    type IsOk<K extends keyof TypesMap & keyof Foo.ITest> = Match<
       Foo.ITest[K],
       TypesMap[K]
     >

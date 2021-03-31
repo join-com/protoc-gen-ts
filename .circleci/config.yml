@@ -22,8 +22,14 @@ commands:
           name: Compile
           command: cd ./tests && yarn compile
       - run:
-          name: Generate TS code
+          name: Generate TS code (legacy)
           command: cd ./tests && yarn proto:build
+      - run:
+          name: Generate TS code (v2)
+          command: cd ./tests && yarn v2:build
+      - run:
+          name: Lint generated code
+          command: cd ./tests && yarn lint
       - run:
           name: Test
           command: cd ./tests && yarn test

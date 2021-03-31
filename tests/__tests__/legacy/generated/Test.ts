@@ -1,6 +1,7 @@
 // GENERATED CODE -- DO NOT EDIT!
 import { GoogleProtobuf } from './google/protobuf/Timestamp'
 import { Common } from './common/Common'
+import { Common as CommonExtra } from './common/Extra'
 import * as protobufjs from 'protobufjs/minimal'
 // @ts-ignore ignored as it's generated and it's difficult to predict if logger is needed
 import { logger } from '@join-com/gcloud-logger-trace'
@@ -876,6 +877,49 @@ export namespace Foo {
         for (const value of this.fieldInt64Repeated) {
           writer.uint32(320).int64(value)
         }
+      }
+      return writer
+    }
+  }
+
+  export interface ISecondTest {
+    extraPkgMessage?: CommonExtra.IExtraPkgMessage
+  }
+
+  export class SecondTest implements ISecondTest {
+    public static decode(
+      inReader: Uint8Array | protobufjs.Reader,
+      length?: number
+    ) {
+      const reader = !(inReader instanceof protobufjs.Reader)
+        ? protobufjs.Reader.create(inReader)
+        : inReader
+      const end = length === undefined ? reader.len : reader.pos + length
+      const message = new SecondTest()
+      while (reader.pos < end) {
+        const tag = reader.uint32()
+        switch (tag >>> 3) {
+          case 1:
+            message.extraPkgMessage = CommonExtra.ExtraPkgMessage.decode(
+              reader,
+              reader.uint32()
+            )
+            break
+          default:
+            reader.skipType(tag & 7)
+            break
+        }
+      }
+      return message
+    }
+    public extraPkgMessage?: CommonExtra.IExtraPkgMessage
+    constructor(attrs?: ISecondTest) {
+      Object.assign(this, attrs)
+    }
+    public encode(writer: protobufjs.Writer = protobufjs.Writer.create()) {
+      if (this.extraPkgMessage != null) {
+        const msg = new CommonExtra.ExtraPkgMessage(this.extraPkgMessage)
+        msg.encode(writer.uint32(10).fork()).ldelim()
       }
       return writer
     }

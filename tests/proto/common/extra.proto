@@ -5,7 +5,7 @@ option go_package = "github.com/join-com/protoc-gen-ts/foo/common";
 
 package common;
 
-message OtherPkgMessage {
+message ExtraPkgMessage {
   string first_name = 1[deprecated=true];
   string lats_name = 2;
 }

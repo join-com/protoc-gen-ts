@@ -4,7 +4,8 @@ import * as joinGRPC from '@join-com/grpc'
 import * as nodeTrace from '@join-com/node-trace'
 
 import { GoogleProtobuf } from './google/protobuf/Timestamp'
-import { Common } from './common/Common'
+import { Common as Common_Common } from './common/Common'
+import { Common as Common_Extra } from './common/Extra'
 
 export namespace Foo {
   export type EnumType = 'UNKNOWN' | 'ADMIN' | 'USER'
@@ -56,9 +57,13 @@ export namespace Foo {
     messageRepeated?: INested[]
     timestamp?: GoogleProtobuf.ITimestamp
     timestampRepeated?: GoogleProtobuf.ITimestamp[]
-    otherPkgMessage?: Common.IOtherPkgMessage
-    otherPkgMessageRepeated?: Common.IOtherPkgMessage[]
+    otherPkgMessage?: Common_Common.IOtherPkgMessage
+    otherPkgMessageRepeated?: Common_Common.IOtherPkgMessage[]
     fieldInt64?: number
     fieldInt64Repeated?: number[]
+  }
+
+  export interface ISecondTest {
+    extraPkgMessage?: Common_Extra.IExtraPkgMessage
   }
 }

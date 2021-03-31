@@ -3,6 +3,7 @@ package generator
 import (
 	"strings"
 
+	"github.com/join-com/protoc-gen-ts/internal/utils"
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
@@ -54,17 +55,41 @@ func (r *Runner) getMessageFieldType(messageField *descriptorpb.FieldDescriptorP
 }
 
 func (r *Runner) getEnumOrMessageTypeName(typeName string, isInterface bool) string {
-	names := strings.Split(typeName, ".")
+	typeParts := strings.Split(typeName, ".")
+	lastIndex := len(typeParts) - 1
 
-	interfaceName := names[len(names)-1]
+	interfaceName := typeParts[lastIndex]
 	if isInterface {
 		interfaceName = "I" + interfaceName
 	}
 
-	importName := getNamespaceFromProtoPackage(strings.Join(names[0:len(names)-1], "."))
+	protoPackageName := strings.Join(typeParts[0:lastIndex], ".")
+	importName := getNamespaceFromProtoPackage(protoPackageName)
 
 	if importName == "" || importName == r.currentNamespace {
 		return interfaceName
 	}
-	return importName + "." + interfaceName
+
+	symbolsMapKey := strings.TrimPrefix(protoPackageName, ".")
+	symbolsMap, ok := r.filesForExportedPackageSymbols[symbolsMapKey]
+	if !ok || symbolsMap == nil {
+		utils.LogError("Unable to retrieve symbols map for " + protoPackageName)
+	}
+
+	symbolSourcePath, ok := symbolsMap[typeParts[lastIndex]]
+	if !ok {
+		utils.LogError("Unable to retrieve source path for symbol " + typeParts[lastIndex] + " in " + protoPackageName)
+	}
+
+	alternativeImportNames, ok := r.alternativeImportNames[r.currentProtoFilePath]
+	if !ok || alternativeImportNames == nil {
+		utils.LogError("Unable to retrieve alternative import names for " + r.currentProtoFilePath)
+	}
+
+	alternativeImportName, ok := alternativeImportNames[symbolSourcePath]
+	if !ok {
+		utils.LogError("Unable to retrieve alternative import name for " + symbolSourcePath + " in " + r.currentProtoFilePath)
+	}
+
+	return alternativeImportName + "." + interfaceName
 }

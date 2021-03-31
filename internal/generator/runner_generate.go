@@ -17,29 +17,50 @@ func (r *Runner) generateTypescriptFile(protoFile *protogen.File, generatedFileS
 	// TODO: Generate comment with version, in order to improve traceability & debugging experience
 	generatedFileStream.P("// GENERATED CODE -- DO NOT EDIT!\n")
 
-	r.generateTypescriptImports(protoFile.Proto.Dependency, generatedFileStream)
+	r.generateTypescriptImports(protoFile.Desc.Path(), protoFile.Proto.GetDependency(), generatedFileStream)
 	r.generateTypescriptNamespace(protoFile, generatedFileStream)
 }
 
-func (r *Runner) generateTypescriptImports(dependencies []string, generatedFileStream *protogen.GeneratedFile) {
+func (r *Runner) generateTypescriptImports(currentSourcePath string, importSourcePaths []string, generatedFileStream *protogen.GeneratedFile) {
 	// Generic imports
 	generatedFileStream.P("import * as joinGRPC from '@join-com/grpc'")
 	generatedFileStream.P("import * as nodeTrace from '@join-com/node-trace'")
 	generatedFileStream.P("")
 
 	// Custom imports
-	for _, dependency := range dependencies {
-		packageName, validPkgName := r.packagesByFile[dependency]
-		if !validPkgName {
-			utils.LogError("Unable to retrieve package name for " + dependency)
-		}
+	for _, importSourcePath := range importSourcePaths {
 		generatedFileStream.P(fmt.Sprintf(
 			"import { %s } from './%s'",
-			strcase.ToCamel(packageName),
-			fromProtoPathToGeneratedPath(dependency),
+			r.generateImportName(currentSourcePath, importSourcePath),
+			fromProtoPathToGeneratedPath(importSourcePath),
 		))
 	}
 	generatedFileStream.P("")
+}
+
+func (r *Runner) generateImportName(currentSourcePath string, importSourcePath string) string {
+	packageName, validPkgName := r.packagesByFile[importSourcePath]
+	if !validPkgName {
+		utils.LogError("Unable to retrieve package name for " + importSourcePath)
+	}
+
+	pkgNamespace := strcase.ToCamel(packageName)
+
+	alternativeImportNames, validImportsMap := r.alternativeImportNames[currentSourcePath]
+	if !validImportsMap || alternativeImportNames == nil {
+		utils.LogError("Unable to retrieve alternative imports map for " + currentSourcePath)
+	}
+
+	alternativeImportName, validAlternativeName := alternativeImportNames[importSourcePath]
+	if !validAlternativeName {
+		utils.LogError("Unable to retrieve alternative import name for " + importSourcePath + " on " + currentSourcePath)
+	}
+
+	if pkgNamespace == alternativeImportName {
+		return pkgNamespace
+	} else {
+		return pkgNamespace + " as " + alternativeImportName
+	}
 }
 
 func (r *Runner) generateTypescriptNamespace(protoFile *protogen.File, generatedFileStream *protogen.GeneratedFile) {
@@ -57,8 +78,8 @@ func (r *Runner) generateTypescriptNamespace(protoFile *protogen.File, generated
 }
 
 func (r *Runner) generateTypescriptEnums(protoFile *protogen.File, generatedFileStream *protogen.GeneratedFile) {
-	for _, enumDescriptor := range protoFile.Proto.GetEnumType() {
-		options := enumDescriptor.GetOptions()
+	for _, enumSpec := range protoFile.Proto.GetEnumType() {
+		options := enumSpec.GetOptions()
 		if options != nil {
 			if options.Deprecated != nil && *options.Deprecated {
 				r.P(generatedFileStream, "/**\n  * @deprecated\n */")
@@ -66,11 +87,11 @@ func (r *Runner) generateTypescriptEnums(protoFile *protogen.File, generatedFile
 		}
 
 		var values []string
-		for _, enumValue := range enumDescriptor.GetValue() {
+		for _, enumValue := range enumSpec.GetValue() {
 			values = append(values, "'"+enumValue.GetName()+"'")
 		}
 
-		enumName := strcase.ToCamel(enumDescriptor.GetName())
+		enumName := strcase.ToCamel(enumSpec.GetName())
 		enumValues := strings.Join(values, " | ")
 
 		r.P(generatedFileStream, "export type "+enumName+" = "+enumValues)
@@ -80,9 +101,9 @@ func (r *Runner) generateTypescriptEnums(protoFile *protogen.File, generatedFile
 
 func (r *Runner) generateTypescriptMessageInterfaces(protoFile *protogen.File, generatedFileStream *protogen.GeneratedFile) {
 	for _, messageSpec := range protoFile.Proto.GetMessageType() {
-		options := messageSpec.GetOptions()
-		if options != nil {
-			if options.Deprecated != nil && *options.Deprecated {
+		messageOptions := messageSpec.GetOptions()
+		if messageOptions != nil {
+			if messageOptions.GetDeprecated() {
 				r.P(generatedFileStream, "/**\n  * @deprecated\n */")
 			}
 		}
@@ -94,6 +115,12 @@ func (r *Runner) generateTypescriptMessageInterfaces(protoFile *protogen.File, g
 
 		for _, field := range messageSpec.GetField() {
 			// TODO: Add support for required fields (via proto options)
+			fieldOptions := field.GetOptions()
+			if fieldOptions != nil {
+				if messageOptions.GetDeprecated() {
+					r.P(generatedFileStream, "/**\n  * @deprecated\n */")
+				}
+			}
 			r.P(generatedFileStream, field.GetJsonName()+"?: "+r.getMessageFieldType(field))
 		}
 

@@ -1,3 +1,4 @@
+import { Common } from './generated/common/Common'
 import { Foo } from './generated/Test'
 
 type TypesMap = {
@@ -48,18 +49,35 @@ type TypesMap = {
   // byte buffers
   fieldBytes?: Uint8Array
   fieldBytesRepeated?: Uint8Array[]
+
+  // enums
+  fieldEnum?: Foo.EnumType
+  fieldEnumRepeated?: Foo.Role[]
+
+  // messages/interfaces (same namespace)
+  message?: Foo.INested
+  messageRepeated?: Foo.INested[]
+
+  // message/interfaces (different namespace)
+  otherPkgMessage?: Common.IOtherPkgMessage
+  otherPkgMessageRepeated?: Common.IOtherPkgMessage[]
 }
 
 describe('(v2) interfaces', () => {
   // Existence if ITest is implicitly tested by importing it
 
   it('generates correct types for interface fields', () => {
+    // We don't directly compare Foo.ITest against TypesMap because all properties are optional
+
     type Match<A, B> = A extends B ? (B extends A ? true : never) : never
     type IsOk<K extends keyof TypesMap & keyof Foo.ITest> = Match<
       Foo.ITest[K],
       TypesMap[K]
-    >
+    > extends true
+      ? Match<NonNullable<Foo.ITest[K]>, NonNullable<TypesMap[K]>>
+      : never
 
+    // booleans
     const tBool_Ok: IsOk<'fieldBool'> = true
     expect(tBool_Ok).toBe(true)
 
@@ -157,5 +175,26 @@ describe('(v2) interfaces', () => {
 
     const tBytesR_Ok: IsOk<'fieldBytesRepeated'> = true
     expect(tBytesR_Ok).toBe(true)
+
+    // enums
+    const tEnum_Ok: IsOk<'fieldEnum'> = true
+    expect(tEnum_Ok).toBe(true)
+
+    const tEnumR_Ok: IsOk<'fieldEnumRepeated'> = true
+    expect(tEnumR_Ok).toBe(true)
+
+    // messages/interfaces (same namespace)
+    const tMessage_Ok: IsOk<'message'> = true
+    expect(tMessage_Ok).toBe(true)
+
+    const tMessageR_Ok: IsOk<'messageRepeated'> = true
+    expect(tMessageR_Ok).toBe(true)
+
+    // message/interfaces (different namespace)
+    const tOtherPkgMessage_Ok: IsOk<'otherPkgMessage'> = true
+    expect(tOtherPkgMessage_Ok).toBe(true)
+
+    const tOtherPkgMessageR_Ok: IsOk<'otherPkgMessageRepeated'> = true
+    expect(tOtherPkgMessageR_Ok).toBe(true)
   })
 })

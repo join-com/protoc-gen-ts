@@ -1,0 +1,45 @@
+{
+  "description": "tests for protoc-gen-ts",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "all": "yarn compile && yarn proto:build && yarn test",
+    "compile": "cd .. && ./build.sh",
+    "lint": "yarn lint:tsc && yarn lint:eslint",
+    "lint:eslint": "eslint . --ext .ts --max-warnings 0",
+    "lint:tsc": "tsc --noEmit && eslint",
+    "proto:build": "yarn proto:clean && yarn proto:generate && yarn proto:prettier",
+    "proto:clean": "find __tests__/legacy/generated ! -name 'tslint.json' ! -name '.prettierrc' -type f -exec rm -f {} +",
+    "proto:generate": "export PATH=\"${PWD}/../dist:${PATH}\" && protoc proto/*.proto -I proto --ts_out=\"${PWD}/__tests__/legacy/generated\"",
+    "proto:prettier": "prettier --write '__tests__/legacy/generated/**/*.ts'",
+    "test": "export PATH=\"${PWD}/../dist:${PATH}\" && jest --runInBand --forceExit",
+    "v2:build": "yarn v2:clean && yarn v2:generate && yarn v2:prettier",
+    "v2:clean": "find __tests__/v2/generated ! -name 'tslint.json' ! -name '.prettierrc' -type f -exec rm -f {} +",
+    "v2:generate": "export PROTOC_TS_GENERATOR=V2 && export PATH=\"${PWD}/../dist:${PATH}\" && protoc proto/*.proto -I proto --ts_out=\"${PWD}/__tests__/v2/generated\"",
+    "v2:prettier": "prettier --write '__tests__/v2/generated/**/*.ts'"
+  },
+  "dependencies": {
+    "@join-com/gcloud-logger-trace": "^0.1.17",
+    "@join-com/grpc": "^0.0.5",
+    "@join-com/grpc-ts": "^2.0.2",
+    "grpc": "^1.24.6",
+    "protobufjs": "^6.10.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.22",
+    "@types/node": "^14.14.37",
+    "@typescript-eslint/eslint-plugin": "^4.20.0",
+    "@typescript-eslint/parser": "^4.20.0",
+    "eslint": "^7.23.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-jest": "^24.3.2",
+    "eslint-plugin-node": "^11.1.0",
+    "jest": "^26.6.3",
+    "jest-extended": "^0.11.5",
+    "jest-watch-typeahead": "^0.6.1",
+    "prettier": "^2.2.1",
+    "ts-jest": "^26.5.4",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^4.2.3"
+  }
+}

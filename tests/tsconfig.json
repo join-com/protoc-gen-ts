@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": "./__tests__",
+    "noEmit": true
+  }
+}

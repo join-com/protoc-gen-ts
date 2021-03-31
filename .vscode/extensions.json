@@ -1,5 +1,8 @@
 {
   "recommendations": [
-    "golang.go"
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "golang.go",
+    "zxh404.vscode-proto3"
   ]
 }

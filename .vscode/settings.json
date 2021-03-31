@@ -8,9 +8,19 @@
     "editor.tabSize": 2
   },
   "[typescript]": {
-    "editor.tabSize": 2
+    "editor.tabSize": 2,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[json]": {
     "editor.tabSize": 2
+  },
+  "[proto3]": {
+    "editor.tabSize": 2
+  },
+  "protoc": {
+    "compile_on_save": false,
+    "options": [
+      "--proto_path=integrationTests/proto/**/*"
+    ]
   }
 }

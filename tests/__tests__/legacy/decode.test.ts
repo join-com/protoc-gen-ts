@@ -1,6 +1,6 @@
+import * as path from 'path'
 import { Foo } from './generated/Test'
 import { loadSync } from 'protobufjs'
-import * as path from 'path'
 
 const baseValues = {
   fieldInt32: 123,
@@ -34,30 +34,31 @@ const baseValues = {
   fieldEnum: 'UNKNOWN',
   fieldEnumRepeated: ['EDIT', 'VIEW'],
   message: {
-    title: 'msg'
+    title: 'msg',
   },
   messageRepeated: [
     {
-      title: 'msg1'
+      title: 'msg1',
     },
     {
-      title: 'msg2'
-    }
+      title: 'msg2',
+    },
   ],
   timestamp: { seconds: 1414841073, nanos: 123000000 },
   timestampRepeated: [
     { seconds: 1393412400, nanos: 234000000 },
-    { seconds: 1369562410, nanos: 221000000 }
-  ]
+    { seconds: 1369562410, nanos: 221000000 },
+  ],
 }
 
 describe('decode', () => {
   const values = baseValues
 
-  const root = loadSync(path.join(__dirname, 'proto', 'test.proto'))
+  const root = loadSync(path.join(__dirname, '..', '..', 'proto', 'test.proto'))
   const PbTest = root.lookupType('foo.Test')
   let buffer: Uint8Array
-  let decoded: any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let decoded: Foo.Test & Record<string, any>
 
   beforeEach(() => {
     const message = PbTest.fromObject(values)
@@ -80,17 +81,19 @@ describe('decode', () => {
     'fieldString',
     'fieldEnum',
     'fieldBytes',
-    'message'
-  ])('%s', fieldName => {
+    'message',
+  ])('%s', (fieldName: keyof typeof decoded) => {
     it(`decodes ${fieldName}`, () => {
       expect(decoded[fieldName]).toBeDefined()
-      expect(decoded[fieldName]).toEqual((values as any)[fieldName])
+      expect(decoded[fieldName]).toEqual(
+        values[fieldName as keyof typeof values]
+      )
     })
 
     it(`decodes ${fieldName}Repeated`, () => {
       const name = `${fieldName}Repeated`
       expect(decoded[name]).toBeDefined()
-      expect(decoded[name]).toEqual((values as any)[name])
+      expect(decoded[name]).toEqual(values[name as keyof typeof values])
     })
   })
 
@@ -104,7 +107,7 @@ describe('decode', () => {
       expect(decoded.timestampRepeated).toBeDefined()
       expect(decoded.timestampRepeated).toEqual([
         new Date('2014-02-26T11:00:00.234Z'),
-        new Date('2013-05-26T10:00:10.221Z')
+        new Date('2013-05-26T10:00:10.221Z'),
       ])
     })
   })
@@ -112,9 +115,7 @@ describe('decode', () => {
   describe('fieldFloat', () => {
     it('encodes fieldFloat', () => {
       expect(decoded.fieldFloat).toBeDefined()
-      expect(parseFloat(decoded.fieldFloat)).toEqual(
-        Math.fround(values.fieldFloat)
-      )
+      expect(decoded.fieldFloat).toEqual(Math.fround(values.fieldFloat))
     })
 
     it('encodes fieldFloatRepeated', () => {

@@ -9,18 +9,37 @@ import (
 	"strings"
 
 	"github.com/iancoleman/strcase"
+	"github.com/join-com/protoc-gen-ts/internal/join_proto"
 	"github.com/join-com/protoc-gen-ts/internal/utils"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 func (r *Runner) collectData(protoFile *protogen.File) {
+	r.collectCodeGenerationOptions(protoFile)
+	if !r.generateCodeOptions[r.currentProtoFilePath] {
+		return
+	}
+
 	packageName := protoFile.Proto.GetPackage()
 
 	r.packagesByFile[r.currentProtoFilePath] = packageName
 
 	r.collectExportedSymbols(packageName, protoFile.Proto)
 	r.collectImportsMap(packageName, protoFile.Proto)
+}
+
+func (r *Runner) collectCodeGenerationOptions(protoFile *protogen.File) {
+	generateCode, ok := join_proto.GetBooleanCustomFileOption("typescript_generate_code", protoFile.Proto.Options, r.extensionTypes)
+	if !ok {
+		generateCode = true
+	}
+	generateImports, ok := join_proto.GetBooleanCustomFileOption("typescript_generate_imports", protoFile.Proto.Options, r.extensionTypes)
+	if !ok {
+		generateImports = true
+	}
+	r.generateCodeOptions[r.currentProtoFilePath] = generateCode && protoFile.Proto.GetSyntax() == "proto3"
+	r.importCodeOptions[r.currentProtoFilePath] = generateImports && protoFile.Proto.GetSyntax() == "proto3"
 }
 
 func (r *Runner) collectExportedSymbols(packageName string, proto *descriptorpb.FileDescriptorProto) {
@@ -52,6 +71,10 @@ func (r *Runner) collectImportsMap(packageName string, proto *descriptorpb.FileD
 
 	packageRelatedFilesCounter := make(map[string]int)
 	for _, importSourcePath := range proto.GetDependency() {
+		if !r.importCodeOptions[importSourcePath] {
+			continue
+		}
+
 		packageName, validPkgName := r.packagesByFile[importSourcePath]
 		if !validPkgName {
 			utils.LogError("Unable to retrieve package name for " + importSourcePath)
@@ -60,6 +83,10 @@ func (r *Runner) collectImportsMap(packageName string, proto *descriptorpb.FileD
 	}
 
 	for _, importSourcePath := range proto.GetDependency() {
+		if !r.importCodeOptions[importSourcePath] {
+			continue
+		}
+
 		// We don't need to validate its existence, as we do it in the previous loop
 		packageName := r.packagesByFile[importSourcePath]
 

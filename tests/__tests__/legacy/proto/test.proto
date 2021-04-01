@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package foo;
 
-// "Dummy" option to make protoc happy (useful for Golang code generation, not for TS)
+// Makes protoc happy (useful for Golang code generation, not for TS)
 option go_package = "github.com/join-com/protoc-gen-ts/foo";
 
 import "google/protobuf/timestamp.proto";
@@ -101,5 +101,5 @@ message Test {
 }
 
 message SecondTest {
-  common.ExtraPkgMessage extra_pkg_message = 1;
+  common.ExtraPkgMessage extra_pkg_message = 1; 
 }

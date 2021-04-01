@@ -63,7 +63,7 @@ export namespace Foo {
     fieldInt64Repeated?: number[]
   }
 
-  export interface ISecondTest {
-    extraPkgMessage?: Common_Extra.IExtraPkgMessage
+  export interface ICustomOptionsTest {
+    requiredField: Common_Extra.IExtraPkgMessage
   }
 }

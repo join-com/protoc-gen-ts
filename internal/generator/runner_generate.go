@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/iancoleman/strcase"
+	"github.com/join-com/protoc-gen-ts/internal/join_proto"
 	"github.com/join-com/protoc-gen-ts/internal/utils"
 	"google.golang.org/protobuf/compiler/protogen"
 )
@@ -29,6 +30,10 @@ func (r *Runner) generateTypescriptImports(currentSourcePath string, importSourc
 
 	// Custom imports
 	for _, importSourcePath := range importSourcePaths {
+		if !r.importCodeOptions[importSourcePath] {
+			continue
+		}
+
 		generatedFileStream.P(fmt.Sprintf(
 			"import { %s } from './%s'",
 			r.generateImportName(currentSourcePath, importSourcePath),
@@ -113,15 +118,22 @@ func (r *Runner) generateTypescriptMessageInterfaces(protoFile *protogen.File, g
 		r.P(generatedFileStream, interfaceName)
 		r.indentLevel += 2
 
-		for _, field := range messageSpec.GetField() {
+		for _, fieldSpec := range messageSpec.GetField() {
 			// TODO: Add support for required fields (via proto options)
-			fieldOptions := field.GetOptions()
+			fieldOptions := fieldSpec.GetOptions()
 			if fieldOptions != nil {
 				if messageOptions.GetDeprecated() {
 					r.P(generatedFileStream, "/**\n  * @deprecated\n */")
 				}
 			}
-			r.P(generatedFileStream, field.GetJsonName()+"?: "+r.getMessageFieldType(field))
+
+			separator := "?: "
+			required, found := join_proto.GetBooleanCustomFieldOption("typescript_required", fieldSpec.GetOptions(), r.extensionTypes)
+			if found && required {
+				separator = ": "
+			}
+
+			r.P(generatedFileStream, fieldSpec.GetJsonName()+separator+r.getMessageFieldType(fieldSpec))
 		}
 
 		r.indentLevel -= 2

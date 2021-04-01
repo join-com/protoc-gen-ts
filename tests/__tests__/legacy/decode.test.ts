@@ -54,7 +54,7 @@ const baseValues = {
 describe('decode', () => {
   const values = baseValues
 
-  const root = loadSync(path.join(__dirname, '..', '..', 'proto', 'test.proto'))
+  const root = loadSync(path.join(__dirname, 'proto', 'test.proto'))
   const PbTest = root.lookupType('foo.Test')
   let buffer: Uint8Array
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

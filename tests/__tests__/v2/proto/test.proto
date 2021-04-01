@@ -1,0 +1,109 @@
+syntax = "proto3";
+
+package foo;
+
+// Makes protoc happy (useful for Golang code generation, not for TS)
+option go_package = "github.com/join-com/protoc-gen-ts/foo";
+option (join.protobuf.typescript_generate_code) = true;
+option (join.protobuf.typescript_generate_imports) = true;
+
+import "google/protobuf/timestamp.proto";
+import "common/common.proto";
+import "common/extra.proto";
+
+import "options.proto";
+
+service Users {
+  rpc Find(Request) returns (common.OtherPkgMessage) {
+    option deprecated = true;
+  }
+  rpc FindClientStream(stream Request) returns (common.OtherPkgMessage) {}
+  rpc FindServerStream(Request) returns (stream common.OtherPkgMessage) {}
+  rpc FindBidiStream(stream Request) returns (stream common.OtherPkgMessage) {}
+}
+
+enum EnumType {
+  UNKNOWN = 0;
+  ADMIN = 1;
+  USER = 2;
+}
+
+enum Role {
+  VIEW = 0;
+  EDIT = 1;
+}
+
+message Request {
+  int32 id = 1;
+}
+
+
+message Nested {
+  option deprecated = true;
+  string title = 1;
+}
+
+message Test {
+  reserved 31, 32;
+  int32 field_int32 = 1;
+  repeated int32 field_int32_repeated = 2;
+
+  double field_double = 3;
+  repeated double field_double_repeated = 4;
+
+  float field_float = 5;
+  repeated float field_float_repeated = 6;
+
+  uint32 field_uint32 = 7;
+  repeated uint32 field_uint32_repeated = 8;
+
+  uint64 field_uint64 = 9;
+  repeated uint64 field_uint64_repeated = 10;
+
+  sint32 field_sint32 = 11;
+  repeated sint32 field_sint32_repeated = 12;
+
+  sint64 field_sint64 = 13[deprecated = true];
+  repeated sint64 field_sint64_repeated = 14;
+
+  fixed32 field_fixed32 = 15;
+  repeated fixed32 field_fixed32_repeated = 16;
+
+  fixed64 field_fixed64 = 17;
+  repeated fixed64 field_fixed64_repeated = 18;
+
+  sfixed32 field_sfixed32 = 19;
+  repeated sfixed32 field_sfixed32_repeated = 20;
+
+  sfixed64 field_sfixed64 = 21;
+  repeated sfixed64 field_sfixed64_repeated = 22;
+
+  bool field_bool = 23;
+  repeated bool field_bool_repeated = 24;
+
+  string field_string = 25;
+  repeated string field_string_repeated = 26;
+
+  bytes field_bytes = 27;
+  repeated bytes field_bytes_repeated = 28;
+
+  EnumType field_enum = 29;
+  repeated Role field_enum_repeated = 30;
+
+  Nested message = 33;
+  repeated Nested message_repeated = 34;
+
+  google.protobuf.Timestamp timestamp = 35;
+  repeated google.protobuf.Timestamp timestamp_repeated = 36;
+
+  common.OtherPkgMessage other_pkg_message = 37;
+  repeated common.OtherPkgMessage other_pkg_message_repeated = 38;
+
+  int64 field_int64 = 39;
+  repeated int64 field_int64_repeated = 40;
+
+}
+
+message CustomOptionsTest {
+  common.ExtraPkgMessage requiredField = 1 [(join.protobuf.typescript_required) = true]; 
+}

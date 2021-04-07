@@ -7,7 +7,6 @@ option go_package = "github.com/join-com/protoc-gen-ts/foo";
 
 import "google/protobuf/timestamp.proto";
 import "common/common.proto";
-import "common/extra.proto";
 
 service Users {
   rpc Find(Request) returns (common.OtherPkgMessage) {
@@ -98,8 +97,4 @@ message Test {
   int64 field_int64 = 39;
   repeated int64 field_int64_repeated = 40;
 
-}
-
-message SecondTest {
-  common.ExtraPkgMessage extra_pkg_message = 1; 
 }

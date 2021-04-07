@@ -2,6 +2,7 @@
 
 // import * as joinGRPC from '@join-com/grpc'
 // import * as nodeTrace from '@join-com/node-trace'
+import * as protobufjs from 'protobufjs/light'
 
 import { GoogleProtobuf } from './google/protobuf/Timestamp'
 import { Common as Common_Common } from './common/Common'
@@ -9,7 +10,17 @@ import { Common as Common_Extra } from './common/Extra'
 
 export namespace Foo {
   export type EnumType = 'UNKNOWN' | 'ADMIN' | 'USER'
+  export enum EnumType_Enum {
+    UNKNOWN = 0,
+    ADMIN = 1,
+    USER = 2,
+  }
+
   export type Role = 'VIEW' | 'EDIT'
+  export enum Role_Enum {
+    VIEW = 0,
+    EDIT = 1,
+  }
 
   export interface IRequest {
     id?: number
@@ -63,7 +74,175 @@ export namespace Foo {
     fieldInt64Repeated?: number[]
   }
 
-  export interface ISecondTest {
-    extraPkgMessage?: Common_Extra.IExtraPkgMessage
+  export interface ICustomOptionsTest {
+    requiredField: Common_Extra.IExtraPkgMessage
+    typicalOptionalField?: number
+    customOptionalField?: number
+  }
+
+  export interface IRequiredPropertiesTest {
+    requiredField: number
+    customRequiredField: number
+    optionalField?: number
+  }
+
+  @protobufjs.Type.d('Request')
+  export class Request extends protobufjs.Message<Request> implements IRequest {
+    @protobufjs.Field.d(1, 'int32')
+    public id?: number
+  }
+
+  /**
+   * @deprecated
+   */
+  @protobufjs.Type.d('Nested')
+  export class Nested extends protobufjs.Message<Nested> implements INested {
+    @protobufjs.Field.d(1, 'string')
+    public title?: string
+  }
+
+  @protobufjs.Type.d('Test')
+  export class Test extends protobufjs.Message<Test> implements ITest {
+    @protobufjs.Field.d(1, 'int32')
+    public fieldInt32?: number
+
+    @protobufjs.Field.d(2, 'int32', 'repeated')
+    public fieldInt32Repeated?: number[]
+
+    @protobufjs.Field.d(3, 'double')
+    public fieldDouble?: number
+
+    @protobufjs.Field.d(4, 'double', 'repeated')
+    public fieldDoubleRepeated?: number[]
+
+    @protobufjs.Field.d(5, 'float')
+    public fieldFloat?: number
+
+    @protobufjs.Field.d(6, 'float', 'repeated')
+    public fieldFloatRepeated?: number[]
+
+    @protobufjs.Field.d(7, 'uint32')
+    public fieldUint32?: number
+
+    @protobufjs.Field.d(8, 'uint32', 'repeated')
+    public fieldUint32Repeated?: number[]
+
+    @protobufjs.Field.d(9, 'uint64')
+    public fieldUint64?: number
+
+    @protobufjs.Field.d(10, 'uint64', 'repeated')
+    public fieldUint64Repeated?: number[]
+
+    @protobufjs.Field.d(11, 'sint32')
+    public fieldSint32?: number
+
+    @protobufjs.Field.d(12, 'sint32', 'repeated')
+    public fieldSint32Repeated?: number[]
+
+    @protobufjs.Field.d(13, 'sint64')
+    public fieldSint64?: number
+
+    @protobufjs.Field.d(14, 'sint64', 'repeated')
+    public fieldSint64Repeated?: number[]
+
+    @protobufjs.Field.d(15, 'fixed32')
+    public fieldFixed32?: number
+
+    @protobufjs.Field.d(16, 'fixed32', 'repeated')
+    public fieldFixed32Repeated?: number[]
+
+    @protobufjs.Field.d(17, 'fixed64')
+    public fieldFixed64?: number
+
+    @protobufjs.Field.d(18, 'fixed64', 'repeated')
+    public fieldFixed64Repeated?: number[]
+
+    @protobufjs.Field.d(19, 'sfixed32')
+    public fieldSfixed32?: number
+
+    @protobufjs.Field.d(20, 'sfixed32', 'repeated')
+    public fieldSfixed32Repeated?: number[]
+
+    @protobufjs.Field.d(21, 'sfixed64')
+    public fieldSfixed64?: number
+
+    @protobufjs.Field.d(22, 'sfixed64', 'repeated')
+    public fieldSfixed64Repeated?: number[]
+
+    @protobufjs.Field.d(23, 'bool')
+    public fieldBool?: boolean
+
+    @protobufjs.Field.d(24, 'bool', 'repeated')
+    public fieldBoolRepeated?: boolean[]
+
+    @protobufjs.Field.d(25, 'string')
+    public fieldString?: string
+
+    @protobufjs.Field.d(26, 'string', 'repeated')
+    public fieldStringRepeated?: string[]
+
+    @protobufjs.Field.d(27, 'bytes')
+    public fieldBytes?: Uint8Array
+
+    @protobufjs.Field.d(28, 'bytes', 'repeated')
+    public fieldBytesRepeated?: Uint8Array[]
+
+    @protobufjs.Field.d(29, EnumType_Enum)
+    public fieldEnum?: EnumType
+
+    @protobufjs.Field.d(30, Role_Enum, 'repeated')
+    public fieldEnumRepeated?: Role[]
+
+    @protobufjs.Field.d(33, Nested)
+    public message?: INested
+
+    @protobufjs.Field.d(34, Nested, 'repeated')
+    public messageRepeated?: INested[]
+
+    @protobufjs.Field.d(35, GoogleProtobuf.Timestamp)
+    public timestamp?: GoogleProtobuf.ITimestamp
+
+    @protobufjs.Field.d(36, GoogleProtobuf.Timestamp, 'repeated')
+    public timestampRepeated?: GoogleProtobuf.ITimestamp[]
+
+    @protobufjs.Field.d(37, Common_Common.OtherPkgMessage)
+    public otherPkgMessage?: Common_Common.IOtherPkgMessage
+
+    @protobufjs.Field.d(38, Common_Common.OtherPkgMessage, 'repeated')
+    public otherPkgMessageRepeated?: Common_Common.IOtherPkgMessage[]
+
+    @protobufjs.Field.d(39, 'int64')
+    public fieldInt64?: number
+
+    @protobufjs.Field.d(40, 'int64', 'repeated')
+    public fieldInt64Repeated?: number[]
+  }
+
+  @protobufjs.Type.d('CustomOptionsTest')
+  export class CustomOptionsTest
+    extends protobufjs.Message<CustomOptionsTest>
+    implements ICustomOptionsTest {
+    @protobufjs.Field.d(1, Common_Extra.ExtraPkgMessage)
+    public requiredField!: Common_Extra.IExtraPkgMessage
+
+    @protobufjs.Field.d(2, 'int32')
+    public typicalOptionalField?: number
+
+    @protobufjs.Field.d(3, 'int32')
+    public customOptionalField?: number
+  }
+
+  @protobufjs.Type.d('RequiredPropertiesTest')
+  export class RequiredPropertiesTest
+    extends protobufjs.Message<RequiredPropertiesTest>
+    implements IRequiredPropertiesTest {
+    @protobufjs.Field.d(1, 'int32')
+    public requiredField!: number
+
+    @protobufjs.Field.d(2, 'int32')
+    public customRequiredField!: number
+
+    @protobufjs.Field.d(3, 'int32')
+    public optionalField?: number
   }
 }

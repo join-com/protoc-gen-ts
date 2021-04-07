@@ -1,16 +1,17 @@
 package generator
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/join-com/protoc-gen-ts/internal/utils"
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
-func (r *Runner) getMessageFieldType(messageField *descriptorpb.FieldDescriptorProto) string {
+func (r *Runner) getMessageFieldType(fieldSpec *descriptorpb.FieldDescriptorProto) string {
 	baseType := "unknown"
 
-	switch messageField.GetType() {
+	switch fieldSpec.GetType() {
 	case descriptorpb.FieldDescriptorProto_TYPE_BOOL:
 		baseType = "boolean"
 	case descriptorpb.FieldDescriptorProto_TYPE_INT32:
@@ -42,12 +43,12 @@ func (r *Runner) getMessageFieldType(messageField *descriptorpb.FieldDescriptorP
 	case descriptorpb.FieldDescriptorProto_TYPE_BYTES:
 		baseType = "Uint8Array"
 	case descriptorpb.FieldDescriptorProto_TYPE_ENUM:
-		baseType = r.getEnumOrMessageTypeName(messageField.GetTypeName(), false)
+		baseType = r.getEnumOrMessageTypeName(fieldSpec.GetTypeName(), false)
 	case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE:
-		baseType = r.getEnumOrMessageTypeName(messageField.GetTypeName(), true)
+		baseType = r.getEnumOrMessageTypeName(fieldSpec.GetTypeName(), true)
 	}
 
-	if messageField.GetLabel() == descriptorpb.FieldDescriptorProto_LABEL_REPEATED {
+	if fieldSpec.GetLabel() == descriptorpb.FieldDescriptorProto_LABEL_REPEATED {
 		baseType += "[]"
 	}
 
@@ -92,4 +93,59 @@ func (r *Runner) getEnumOrMessageTypeName(typeName string, isInterface bool) str
 	}
 
 	return alternativeImportName + "." + interfaceName
+}
+
+func (r *Runner) getMessageFieldDecorator(fieldSpec *descriptorpb.FieldDescriptorProto) string {
+	decorator := "@protobufjs.Field.d(" + strconv.FormatInt(int64(*fieldSpec.Number), 10) + ", " + r.getMessagProtobufType(fieldSpec)
+
+	if fieldSpec.GetLabel() == descriptorpb.FieldDescriptorProto_LABEL_REPEATED {
+		decorator += ", 'repeated'"
+	}
+
+	decorator += ")"
+
+	return decorator
+}
+
+func (r *Runner) getMessagProtobufType(fieldSpec *descriptorpb.FieldDescriptorProto) string {
+	baseType := "unknown"
+
+	switch fieldSpec.GetType() {
+	case descriptorpb.FieldDescriptorProto_TYPE_BOOL:
+		baseType = "'bool'"
+	case descriptorpb.FieldDescriptorProto_TYPE_INT32:
+		baseType = "'int32'"
+	case descriptorpb.FieldDescriptorProto_TYPE_UINT32:
+		baseType = "'uint32'"
+	case descriptorpb.FieldDescriptorProto_TYPE_SINT32:
+		baseType = "'sint32'"
+	case descriptorpb.FieldDescriptorProto_TYPE_INT64:
+		baseType = "'int64'"
+	case descriptorpb.FieldDescriptorProto_TYPE_UINT64:
+		baseType = "'uint64'"
+	case descriptorpb.FieldDescriptorProto_TYPE_SINT64:
+		baseType = "'sint64'"
+	case descriptorpb.FieldDescriptorProto_TYPE_FLOAT:
+		baseType = "'float'"
+	case descriptorpb.FieldDescriptorProto_TYPE_DOUBLE:
+		baseType = "'double'"
+	case descriptorpb.FieldDescriptorProto_TYPE_FIXED32:
+		baseType = "'fixed32'"
+	case descriptorpb.FieldDescriptorProto_TYPE_FIXED64:
+		baseType = "'fixed64'"
+	case descriptorpb.FieldDescriptorProto_TYPE_SFIXED32:
+		baseType = "'sfixed32'"
+	case descriptorpb.FieldDescriptorProto_TYPE_SFIXED64:
+		baseType = "'sfixed64'"
+	case descriptorpb.FieldDescriptorProto_TYPE_STRING:
+		baseType = "'string'"
+	case descriptorpb.FieldDescriptorProto_TYPE_BYTES:
+		baseType = "'bytes'"
+	case descriptorpb.FieldDescriptorProto_TYPE_ENUM:
+		baseType = r.getEnumOrMessageTypeName(fieldSpec.GetTypeName(), false) + "_Enum"
+	case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE:
+		baseType = r.getEnumOrMessageTypeName(fieldSpec.GetTypeName(), false)
+	}
+
+	return baseType
 }

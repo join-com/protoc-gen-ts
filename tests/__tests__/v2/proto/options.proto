@@ -1,0 +1,37 @@
+////////////////////////////////////////////////////////////////////////////////
+// This file contains proto definitions that are meant to be used in real     //
+// code, not just tests.                                                      //
+////////////////////////////////////////////////////////////////////////////////
+
+
+syntax = "proto2";
+
+package join.protobuf;
+
+// Makes protoc happy (useful for Golang code generation, not for TS)
+option go_package = "github.com/join-com/protoc-gen-ts/generated";
+option (typescript_generate_code) = false;
+option (typescript_generate_imports) = false;
+
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.FileOptions {
+  // Tells protoc-gen-ts to generate a .ts file corresponding to the .proto file
+  optional bool typescript_generate_code = 50001 [default = true];
+
+  // Tells protoc-gen-ts to generate TS imports when the file is imported in protoc files
+  optional bool typescript_generate_imports = 50002 [default = true];
+}
+
+extend google.protobuf.MessageOptions {
+  // WARNING: EXPERIMENTAL. Marks fields as not optional for the whole message.
+  optional bool typescript_required_fields = 50101 [default = false];
+}
+
+extend google.protobuf.FieldOptions {
+  // WARNING: EXPERIMENTAL. Marks field as not optional
+  optional bool typescript_required = 50201 [default = false];
+
+  // WARNING: EXPERIMENTAL. Marks field as optional (useful for messages with typescript_required)
+  optional bool typescript_optional = 50202 [default = false];
+}

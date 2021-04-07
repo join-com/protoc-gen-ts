@@ -106,10 +106,16 @@ func (r *Runner) generateTypescriptEnums(protoFile *protogen.File, generatedFile
 
 func (r *Runner) generateTypescriptMessageInterfaces(protoFile *protogen.File, generatedFileStream *protogen.GeneratedFile) {
 	for _, messageSpec := range protoFile.Proto.GetMessageType() {
+		requiredFields := false
 		messageOptions := messageSpec.GetOptions()
 		if messageOptions != nil {
 			if messageOptions.GetDeprecated() {
 				r.P(generatedFileStream, "/**\n  * @deprecated\n */")
+			}
+
+			_requiredFields, found := join_proto.GetBooleanCustomMessageOption("typescript_required_fields", messageOptions, r.extensionTypes)
+			if found {
+				requiredFields = _requiredFields
 			}
 		}
 
@@ -128,8 +134,12 @@ func (r *Runner) generateTypescriptMessageInterfaces(protoFile *protogen.File, g
 			}
 
 			separator := "?: "
-			required, found := join_proto.GetBooleanCustomFieldOption("typescript_required", fieldSpec.GetOptions(), r.extensionTypes)
-			if found && required {
+			requiredField, foundRequired := join_proto.GetBooleanCustomFieldOption("typescript_required", fieldSpec.GetOptions(), r.extensionTypes)
+			optionalField, foundOptional := join_proto.GetBooleanCustomFieldOption("typescript_optional", fieldSpec.GetOptions(), r.extensionTypes)
+			if foundRequired && requiredField && foundOptional && optionalField {
+				utils.LogError("incompatible options for field " + fieldSpec.GetName() + " in " + messageSpec.GetName())
+			}
+			if requiredFields && !(foundOptional && optionalField) || foundRequired && requiredField {
 				separator = ": "
 			}
 

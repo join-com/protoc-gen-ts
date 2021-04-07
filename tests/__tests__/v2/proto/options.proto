@@ -23,13 +23,15 @@ extend google.protobuf.FileOptions {
   optional bool typescript_generate_imports = 50002 [default = true];
 }
 
+extend google.protobuf.MessageOptions {
+  // WARNING: EXPERIMENTAL. Marks fields as not optional for the whole message.
+  optional bool typescript_required_fields = 50101 [default = false];
+}
+
 extend google.protobuf.FieldOptions {
   // WARNING: EXPERIMENTAL. Marks field as not optional
-  optional bool typescript_required = 60001 [default = false];
+  optional bool typescript_required = 50201 [default = false];
 
-  // WARNING: EXPERIMENTAL. Marks field as not optional at serialization time
-  optional bool typescript_write_required = 60002 [default = false];
-
-  // WARNING: EXPERIMENTAL. Marks field as not optional at deserialization time
-  optional bool typescript_read_required = 60003 [default = false];
+  // WARNING: EXPERIMENTAL. Marks field as optional (useful for messages with typescript_required)
+  optional bool typescript_optional = 50202 [default = false];
 }

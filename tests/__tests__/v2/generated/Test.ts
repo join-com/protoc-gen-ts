@@ -65,5 +65,13 @@ export namespace Foo {
 
   export interface ICustomOptionsTest {
     requiredField: Common_Extra.IExtraPkgMessage
+    typicalOptionalField?: number
+    customOptionalField?: number
+  }
+
+  export interface IRequiredPropertiesTest {
+    requiredField: number
+    customRequiredField: number
+    optionalField?: number
   }
 }

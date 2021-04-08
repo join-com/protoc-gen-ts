@@ -212,10 +212,15 @@ func (r *Runner) generateTypescriptMessageClass(generatedFileStream *protogen.Ge
 	}
 
 	className := strcase.ToCamel(messageSpec.GetName())
+	hasEnums := messageHasEnums(messageSpec)
+	implementedInterfaces := "ConvertibleTo<I" + className + ">"
+	if !hasEnums {
+		implementedInterfaces += ", I" + className
+	}
 	r.P(
 		generatedFileStream,
 		"@protobufjs.Type.d('"+className+"')",
-		"export class "+className+" extends protobufjs.Message<"+className+"> implements ConvertibleTo<I"+className+"> {\n",
+		"export class "+className+" extends protobufjs.Message<"+className+"> implements "+implementedInterfaces+" {\n",
 	)
 	r.indentLevel += 2
 
@@ -223,7 +228,7 @@ func (r *Runner) generateTypescriptMessageClass(generatedFileStream *protogen.Ge
 		r.generateTypescriptClassField(generatedFileStream, fieldSpec, messageSpec, messageOptions, requiredFields)
 	}
 
-	r.generateTypescriptClassPatchedMethods(generatedFileStream, messageSpec, requiredFields)
+	r.generateTypescriptClassPatchedMethods(generatedFileStream, messageSpec, requiredFields, hasEnums)
 
 	r.indentLevel -= 2
 	r.P(generatedFileStream, "}\n")
@@ -260,9 +265,9 @@ func (r *Runner) generateTypescriptClassField(
 	)
 }
 
-func (r *Runner) generateTypescriptClassPatchedMethods(generatedFileStream *protogen.GeneratedFile, messageSpec *descriptorpb.DescriptorProto, requiredFields bool) {
+func (r *Runner) generateTypescriptClassPatchedMethods(generatedFileStream *protogen.GeneratedFile, messageSpec *descriptorpb.DescriptorProto, requiredFields bool, hasEnums bool) {
 	// asInterface method
-	r.generateAsInterfaceMethod(generatedFileStream, messageSpec, requiredFields)
+	r.generateAsInterfaceMethod(generatedFileStream, messageSpec, requiredFields, hasEnums)
 
 	// Decode method
 
@@ -271,12 +276,12 @@ func (r *Runner) generateTypescriptClassPatchedMethods(generatedFileStream *prot
 	// Create method
 }
 
-func (r *Runner) generateAsInterfaceMethod(generatedFileStream *protogen.GeneratedFile, messageSpec *descriptorpb.DescriptorProto, requiredFields bool) {
+func (r *Runner) generateAsInterfaceMethod(generatedFileStream *protogen.GeneratedFile, messageSpec *descriptorpb.DescriptorProto, requiredFields bool, hasEnums bool) {
 	className := strcase.ToCamel(messageSpec.GetName())
 	r.P(generatedFileStream, "public asInterface(): I"+className+"{")
 	r.indentLevel += 2
 
-	if messageHasEnums(messageSpec) {
+	if hasEnums {
 		r.P(generatedFileStream, "return {")
 		r.indentLevel += 2
 

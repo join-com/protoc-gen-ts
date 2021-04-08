@@ -93,7 +93,7 @@ export namespace Foo {
   @protobufjs.Type.d('Request')
   export class Request
     extends protobufjs.Message<Request>
-    implements ConvertibleTo<IRequest> {
+    implements ConvertibleTo<IRequest>, IRequest {
     @protobufjs.Field.d(1, 'int32')
     public id?: number
 
@@ -108,7 +108,7 @@ export namespace Foo {
   @protobufjs.Type.d('Nested')
   export class Nested
     extends protobufjs.Message<Nested>
-    implements ConvertibleTo<INested> {
+    implements ConvertibleTo<INested>, INested {
     @protobufjs.Field.d(1, 'string')
     public title?: string
 
@@ -288,7 +288,7 @@ export namespace Foo {
   @protobufjs.Type.d('CustomOptionsTest')
   export class CustomOptionsTest
     extends protobufjs.Message<CustomOptionsTest>
-    implements ConvertibleTo<ICustomOptionsTest> {
+    implements ConvertibleTo<ICustomOptionsTest>, ICustomOptionsTest {
     @protobufjs.Field.d(1, Common_Extra.ExtraPkgMessage)
     public requiredField!: Common_Extra.ExtraPkgMessage
 
@@ -306,7 +306,7 @@ export namespace Foo {
   @protobufjs.Type.d('RequiredPropertiesTest')
   export class RequiredPropertiesTest
     extends protobufjs.Message<RequiredPropertiesTest>
-    implements ConvertibleTo<IRequiredPropertiesTest> {
+    implements ConvertibleTo<IRequiredPropertiesTest>, IRequiredPropertiesTest {
     @protobufjs.Field.d(1, 'int32')
     public requiredField!: number
 

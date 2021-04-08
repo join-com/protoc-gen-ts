@@ -9,18 +9,22 @@ import { Common as Common_Common } from './common/Common'
 import { Common as Common_Extra } from './common/Extra'
 
 export namespace Foo {
-  export type EnumType = 'UNKNOWN' | 'ADMIN' | 'USER'
+  interface ConvertibleTo<T> {
+    asInterface(): T
+  }
+
   export enum EnumType_Enum {
     UNKNOWN = 0,
     ADMIN = 1,
     USER = 2,
   }
+  export type EnumType = keyof typeof EnumType_Enum
 
-  export type Role = 'VIEW' | 'EDIT'
   export enum Role_Enum {
     VIEW = 0,
     EDIT = 1,
   }
+  export type Role = keyof typeof Role_Enum
 
   export interface IRequest {
     id?: number
@@ -87,22 +91,36 @@ export namespace Foo {
   }
 
   @protobufjs.Type.d('Request')
-  export class Request extends protobufjs.Message<Request> {
+  export class Request
+    extends protobufjs.Message<Request>
+    implements ConvertibleTo<IRequest> {
     @protobufjs.Field.d(1, 'int32')
     public id?: number
+
+    public asInterface(): IRequest {
+      return this
+    }
   }
 
   /**
    * @deprecated
    */
   @protobufjs.Type.d('Nested')
-  export class Nested extends protobufjs.Message<Nested> {
+  export class Nested
+    extends protobufjs.Message<Nested>
+    implements ConvertibleTo<INested> {
     @protobufjs.Field.d(1, 'string')
     public title?: string
+
+    public asInterface(): INested {
+      return this
+    }
   }
 
   @protobufjs.Type.d('Test')
-  export class Test extends protobufjs.Message<Test> {
+  export class Test
+    extends protobufjs.Message<Test>
+    implements ConvertibleTo<ITest> {
     @protobufjs.Field.d(1, 'int32')
     public fieldInt32?: number
 
@@ -216,10 +234,61 @@ export namespace Foo {
 
     @protobufjs.Field.d(40, 'int64', 'repeated')
     public fieldInt64Repeated?: number[]
+
+    public asInterface(): ITest {
+      return {
+        fieldInt32: this.fieldInt32,
+        fieldInt32Repeated: this.fieldInt32Repeated,
+        fieldDouble: this.fieldDouble,
+        fieldDoubleRepeated: this.fieldDoubleRepeated,
+        fieldFloat: this.fieldFloat,
+        fieldFloatRepeated: this.fieldFloatRepeated,
+        fieldUint32: this.fieldUint32,
+        fieldUint32Repeated: this.fieldUint32Repeated,
+        fieldUint64: this.fieldUint64,
+        fieldUint64Repeated: this.fieldUint64Repeated,
+        fieldSint32: this.fieldSint32,
+        fieldSint32Repeated: this.fieldSint32Repeated,
+        fieldSint64: this.fieldSint64,
+        fieldSint64Repeated: this.fieldSint64Repeated,
+        fieldFixed32: this.fieldFixed32,
+        fieldFixed32Repeated: this.fieldFixed32Repeated,
+        fieldFixed64: this.fieldFixed64,
+        fieldFixed64Repeated: this.fieldFixed64Repeated,
+        fieldSfixed32: this.fieldSfixed32,
+        fieldSfixed32Repeated: this.fieldSfixed32Repeated,
+        fieldSfixed64: this.fieldSfixed64,
+        fieldSfixed64Repeated: this.fieldSfixed64Repeated,
+        fieldBool: this.fieldBool,
+        fieldBoolRepeated: this.fieldBoolRepeated,
+        fieldString: this.fieldString,
+        fieldStringRepeated: this.fieldStringRepeated,
+        fieldBytes: this.fieldBytes,
+        fieldBytesRepeated: this.fieldBytesRepeated,
+        fieldEnum: (this.fieldEnum !== undefined
+          ? EnumType_Enum[this.fieldEnum]!
+          : undefined) as EnumType | undefined,
+        fieldEnumRepeated: this.fieldEnumRepeated?.map(
+          (e) => Role_Enum[e]! as Role
+        ),
+        message: this.message?.asInterface(),
+        messageRepeated: this.messageRepeated?.map((o) => o.asInterface()),
+        timestamp: this.timestamp?.asInterface(),
+        timestampRepeated: this.timestampRepeated?.map((o) => o.asInterface()),
+        otherPkgMessage: this.otherPkgMessage?.asInterface(),
+        otherPkgMessageRepeated: this.otherPkgMessageRepeated?.map((o) =>
+          o.asInterface()
+        ),
+        fieldInt64: this.fieldInt64,
+        fieldInt64Repeated: this.fieldInt64Repeated,
+      }
+    }
   }
 
   @protobufjs.Type.d('CustomOptionsTest')
-  export class CustomOptionsTest extends protobufjs.Message<CustomOptionsTest> {
+  export class CustomOptionsTest
+    extends protobufjs.Message<CustomOptionsTest>
+    implements ConvertibleTo<ICustomOptionsTest> {
     @protobufjs.Field.d(1, Common_Extra.ExtraPkgMessage)
     public requiredField!: Common_Extra.ExtraPkgMessage
 
@@ -228,10 +297,16 @@ export namespace Foo {
 
     @protobufjs.Field.d(3, 'int32')
     public customOptionalField?: number
+
+    public asInterface(): ICustomOptionsTest {
+      return this
+    }
   }
 
   @protobufjs.Type.d('RequiredPropertiesTest')
-  export class RequiredPropertiesTest extends protobufjs.Message<RequiredPropertiesTest> {
+  export class RequiredPropertiesTest
+    extends protobufjs.Message<RequiredPropertiesTest>
+    implements ConvertibleTo<IRequiredPropertiesTest> {
     @protobufjs.Field.d(1, 'int32')
     public requiredField!: number
 
@@ -240,5 +315,9 @@ export namespace Foo {
 
     @protobufjs.Field.d(3, 'int32')
     public optionalField?: number
+
+    public asInterface(): IRequiredPropertiesTest {
+      return this
+    }
   }
 }

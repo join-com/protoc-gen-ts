@@ -87,7 +87,7 @@ export namespace Foo {
   }
 
   @protobufjs.Type.d('Request')
-  export class Request extends protobufjs.Message<Request> implements IRequest {
+  export class Request extends protobufjs.Message<Request> {
     @protobufjs.Field.d(1, 'int32')
     public id?: number
   }
@@ -96,13 +96,13 @@ export namespace Foo {
    * @deprecated
    */
   @protobufjs.Type.d('Nested')
-  export class Nested extends protobufjs.Message<Nested> implements INested {
+  export class Nested extends protobufjs.Message<Nested> {
     @protobufjs.Field.d(1, 'string')
     public title?: string
   }
 
   @protobufjs.Type.d('Test')
-  export class Test extends protobufjs.Message<Test> implements ITest {
+  export class Test extends protobufjs.Message<Test> {
     @protobufjs.Field.d(1, 'int32')
     public fieldInt32?: number
 
@@ -188,28 +188,28 @@ export namespace Foo {
     public fieldBytesRepeated?: Uint8Array[]
 
     @protobufjs.Field.d(29, EnumType_Enum)
-    public fieldEnum?: EnumType
+    public fieldEnum?: EnumType_Enum
 
     @protobufjs.Field.d(30, Role_Enum, 'repeated')
-    public fieldEnumRepeated?: Role[]
+    public fieldEnumRepeated?: Role_Enum[]
 
     @protobufjs.Field.d(33, Nested)
-    public message?: INested
+    public message?: Nested
 
     @protobufjs.Field.d(34, Nested, 'repeated')
-    public messageRepeated?: INested[]
+    public messageRepeated?: Nested[]
 
     @protobufjs.Field.d(35, GoogleProtobuf.Timestamp)
-    public timestamp?: GoogleProtobuf.ITimestamp
+    public timestamp?: GoogleProtobuf.Timestamp
 
     @protobufjs.Field.d(36, GoogleProtobuf.Timestamp, 'repeated')
-    public timestampRepeated?: GoogleProtobuf.ITimestamp[]
+    public timestampRepeated?: GoogleProtobuf.Timestamp[]
 
     @protobufjs.Field.d(37, Common_Common.OtherPkgMessage)
-    public otherPkgMessage?: Common_Common.IOtherPkgMessage
+    public otherPkgMessage?: Common_Common.OtherPkgMessage
 
     @protobufjs.Field.d(38, Common_Common.OtherPkgMessage, 'repeated')
-    public otherPkgMessageRepeated?: Common_Common.IOtherPkgMessage[]
+    public otherPkgMessageRepeated?: Common_Common.OtherPkgMessage[]
 
     @protobufjs.Field.d(39, 'int64')
     public fieldInt64?: number
@@ -219,11 +219,9 @@ export namespace Foo {
   }
 
   @protobufjs.Type.d('CustomOptionsTest')
-  export class CustomOptionsTest
-    extends protobufjs.Message<CustomOptionsTest>
-    implements ICustomOptionsTest {
+  export class CustomOptionsTest extends protobufjs.Message<CustomOptionsTest> {
     @protobufjs.Field.d(1, Common_Extra.ExtraPkgMessage)
-    public requiredField!: Common_Extra.IExtraPkgMessage
+    public requiredField!: Common_Extra.ExtraPkgMessage
 
     @protobufjs.Field.d(2, 'int32')
     public typicalOptionalField?: number
@@ -233,9 +231,7 @@ export namespace Foo {
   }
 
   @protobufjs.Type.d('RequiredPropertiesTest')
-  export class RequiredPropertiesTest
-    extends protobufjs.Message<RequiredPropertiesTest>
-    implements IRequiredPropertiesTest {
+  export class RequiredPropertiesTest extends protobufjs.Message<RequiredPropertiesTest> {
     @protobufjs.Field.d(1, 'int32')
     public requiredField!: number
 

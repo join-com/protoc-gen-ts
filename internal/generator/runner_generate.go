@@ -13,6 +13,7 @@ import (
 	"github.com/join-com/protoc-gen-ts/internal/join_proto"
 	"github.com/join-com/protoc-gen-ts/internal/utils"
 	"google.golang.org/protobuf/compiler/protogen"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 func (r *Runner) generateTypescriptFile(protoFile *protogen.File, generatedFileStream *protogen.GeneratedFile) {
@@ -20,7 +21,7 @@ func (r *Runner) generateTypescriptFile(protoFile *protogen.File, generatedFileS
 	generatedFileStream.P("// GENERATED CODE -- DO NOT EDIT!\n")
 
 	r.generateTypescriptImports(protoFile.Desc.Path(), protoFile.Proto.GetDependency(), generatedFileStream)
-	r.generateTypescriptNamespace(protoFile, generatedFileStream)
+	r.generateTypescriptNamespace(generatedFileStream, protoFile)
 }
 
 func (r *Runner) generateTypescriptImports(currentSourcePath string, importSourcePaths []string, generatedFileStream *protogen.GeneratedFile) {
@@ -70,14 +71,14 @@ func (r *Runner) generateImportName(currentSourcePath string, importSourcePath s
 	}
 }
 
-func (r *Runner) generateTypescriptNamespace(protoFile *protogen.File, generatedFileStream *protogen.GeneratedFile) {
+func (r *Runner) generateTypescriptNamespace(generatedFileStream *protogen.GeneratedFile, protoFile *protogen.File) {
 	namespace := getNamespaceFromProtoPackage(protoFile.Proto.GetPackage())
 	r.P(generatedFileStream, fmt.Sprintf("export namespace %s {\n", namespace))
 	r.indentLevel += 2
 	r.currentNamespace = namespace
 
-	r.generateTypescriptEnums(protoFile, generatedFileStream)
-	r.generateTypescriptMessageInterfaces(protoFile, generatedFileStream)
+	r.generateTypescriptEnums(generatedFileStream, protoFile)
+	r.generateTypescriptMessageInterfaces(generatedFileStream, protoFile)
 	r.generateTypescriptMessageClasses(protoFile, generatedFileStream)
 
 	r.currentNamespace = ""
@@ -85,7 +86,7 @@ func (r *Runner) generateTypescriptNamespace(protoFile *protogen.File, generated
 	r.P(generatedFileStream, "\n}")
 }
 
-func (r *Runner) generateTypescriptEnums(protoFile *protogen.File, generatedFileStream *protogen.GeneratedFile) {
+func (r *Runner) generateTypescriptEnums(generatedFileStream *protogen.GeneratedFile, protoFile *protogen.File) {
 	for _, enumSpec := range protoFile.Proto.GetEnumType() {
 		options := enumSpec.GetOptions()
 		if options != nil {
@@ -95,7 +96,7 @@ func (r *Runner) generateTypescriptEnums(protoFile *protogen.File, generatedFile
 		}
 
 		var values []string
-		enumValueSpecs := enumSpec.GetValue() 
+		enumValueSpecs := enumSpec.GetValue()
 		for _, enumValue := range enumValueSpecs {
 			values = append(values, "'"+enumValue.GetName()+"'")
 		}
@@ -107,8 +108,8 @@ func (r *Runner) generateTypescriptEnums(protoFile *protogen.File, generatedFile
 		r.P(generatedFileStream, "export enum "+enumName+"_Enum {")
 		r.indentLevel += 2
 		for valueIndex, enumValue := range enumValueSpecs {
-			valueLine := enumValue.GetName()+" = "+strconv.FormatInt(int64(enumValue.GetNumber()), 10)
-			if valueIndex < len(enumValueSpecs) - 1 {
+			valueLine := enumValue.GetName() + " = " + strconv.FormatInt(int64(enumValue.GetNumber()), 10)
+			if valueIndex < len(enumValueSpecs)-1 {
 				valueLine += ","
 			}
 			r.P(generatedFileStream, valueLine)
@@ -119,7 +120,7 @@ func (r *Runner) generateTypescriptEnums(protoFile *protogen.File, generatedFile
 	r.P(generatedFileStream, "")
 }
 
-func (r *Runner) generateTypescriptMessageInterfaces(protoFile *protogen.File, generatedFileStream *protogen.GeneratedFile) {
+func (r *Runner) generateTypescriptMessageInterfaces(generatedFileStream *protogen.GeneratedFile, protoFile *protogen.File) {
 	for _, messageSpec := range protoFile.Proto.GetMessageType() {
 		requiredFields := false
 		messageOptions := messageSpec.GetOptions()
@@ -156,7 +157,7 @@ func (r *Runner) generateTypescriptMessageInterfaces(protoFile *protogen.File, g
 				separator = ": "
 			}
 
-			r.P(generatedFileStream, fieldSpec.GetJsonName()+separator+r.getMessageFieldType(fieldSpec))
+			r.P(generatedFileStream, fieldSpec.GetJsonName()+separator+r.getInterfaceFieldType(fieldSpec))
 		}
 
 		r.indentLevel -= 2
@@ -166,53 +167,77 @@ func (r *Runner) generateTypescriptMessageInterfaces(protoFile *protogen.File, g
 
 func (r *Runner) generateTypescriptMessageClasses(protoFile *protogen.File, generatedFileStream *protogen.GeneratedFile) {
 	for _, messageSpec := range protoFile.Proto.GetMessageType() {
-		requiredFields := false
-		messageOptions := messageSpec.GetOptions()
-		if messageOptions != nil {
-			if messageOptions.GetDeprecated() {
-				r.P(generatedFileStream, "/**\n  * @deprecated\n */")
-			}
-
-			_requiredFields, found := join_proto.GetBooleanCustomMessageOption("typescript_required_fields", messageOptions, r.extensionTypes)
-			if found {
-				requiredFields = _requiredFields
-			}
-		}
-
-		className := strcase.ToCamel(messageSpec.GetName())
-		r.P(
-			generatedFileStream,
-			"@protobufjs.Type.d('"+className+"')",
-			"export class "+className+" extends protobufjs.Message<"+className+"> implements I"+className+" {\n",
-		)
-		r.indentLevel += 2
-
-		for _, fieldSpec := range messageSpec.GetField() {
-			fieldOptions := fieldSpec.GetOptions()
-			if fieldOptions != nil {
-				if messageOptions.GetDeprecated() {
-					r.P(generatedFileStream, "/**\n  * @deprecated\n */")
-				}
-			}
-
-			separator := "?: "
-			requiredField, foundRequired := join_proto.GetBooleanCustomFieldOption("typescript_required", fieldSpec.GetOptions(), r.extensionTypes)
-			optionalField, foundOptional := join_proto.GetBooleanCustomFieldOption("typescript_optional", fieldSpec.GetOptions(), r.extensionTypes)
-			if foundRequired && requiredField && foundOptional && optionalField {
-				utils.LogError("incompatible options for field " + fieldSpec.GetName() + " in " + messageSpec.GetName())
-			}
-			if requiredFields && !(foundOptional && optionalField) || foundRequired && requiredField {
-				separator = "!: "
-			}
-
-			r.P(
-				generatedFileStream,
-				r.getMessageFieldDecorator(fieldSpec),
-				"public "+fieldSpec.GetJsonName()+separator+r.getMessageFieldType(fieldSpec)+"\n",
-			)
-		}
-
-		r.indentLevel -= 2
-		r.P(generatedFileStream, "}\n")
+		r.generateTypescriptMessageClass(messageSpec, generatedFileStream)
 	}
+}
+
+func (r *Runner) generateTypescriptMessageClass(messageSpec *descriptorpb.DescriptorProto, generatedFileStream *protogen.GeneratedFile) {
+	requiredFields := false
+	messageOptions := messageSpec.GetOptions()
+	if messageOptions != nil {
+		if messageOptions.GetDeprecated() {
+			r.P(generatedFileStream, "/**\n  * @deprecated\n */")
+		}
+
+		_requiredFields, found := join_proto.GetBooleanCustomMessageOption("typescript_required_fields", messageOptions, r.extensionTypes)
+		if found {
+			requiredFields = _requiredFields
+		}
+	}
+
+	className := strcase.ToCamel(messageSpec.GetName())
+	r.P(
+		generatedFileStream,
+		"@protobufjs.Type.d('"+className+"')",
+		"export class "+className+" extends protobufjs.Message<"+className+"> {\n",
+	)
+	r.indentLevel += 2
+
+	for _, fieldSpec := range messageSpec.GetField() {
+		r.generateTypescriptClassField(generatedFileStream, fieldSpec, messageSpec, messageOptions, requiredFields)
+	}
+
+	r.generateTypescriptClassPatchedMethods()
+
+	r.indentLevel -= 2
+	r.P(generatedFileStream, "}\n")
+}
+
+func (r *Runner) generateTypescriptClassField(
+	generatedFileStream *protogen.GeneratedFile,
+	fieldSpec *descriptorpb.FieldDescriptorProto,
+	messageSpec *descriptorpb.DescriptorProto,
+	messageOptions *descriptorpb.MessageOptions,
+	requiredFields bool,
+) {
+	fieldOptions := fieldSpec.GetOptions()
+	if fieldOptions != nil {
+		if messageOptions.GetDeprecated() {
+			r.P(generatedFileStream, "/**\n  * @deprecated\n */")
+		}
+	}
+
+	separator := "?: "
+	requiredField, foundRequired := join_proto.GetBooleanCustomFieldOption("typescript_required", fieldSpec.GetOptions(), r.extensionTypes)
+	optionalField, foundOptional := join_proto.GetBooleanCustomFieldOption("typescript_optional", fieldSpec.GetOptions(), r.extensionTypes)
+	if foundRequired && requiredField && foundOptional && optionalField {
+		utils.LogError("incompatible options for field " + fieldSpec.GetName() + " in " + messageSpec.GetName())
+	}
+	if requiredFields && !(foundOptional && optionalField) || foundRequired && requiredField {
+		separator = "!: "
+	}
+
+	r.P(
+		generatedFileStream,
+		r.getMessageFieldDecorator(fieldSpec),
+		"public "+fieldSpec.GetJsonName()+separator+r.getClassFieldType(fieldSpec)+"\n",
+	)
+}
+
+func (r *Runner) generateTypescriptClassPatchedMethods() {
+	// Decode method
+
+	// Encode method
+
+	// Create method
 }

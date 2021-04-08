@@ -11,9 +11,7 @@ export namespace Common {
   }
 
   @protobufjs.Type.d('ExtraPkgMessage')
-  export class ExtraPkgMessage
-    extends protobufjs.Message<ExtraPkgMessage>
-    implements IExtraPkgMessage {
+  export class ExtraPkgMessage extends protobufjs.Message<ExtraPkgMessage> {
     @protobufjs.Field.d(1, 'string')
     public firstName?: string
 

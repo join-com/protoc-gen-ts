@@ -27,5 +27,11 @@ export namespace GoogleProtobuf {
     public asInterface(): ITimestamp {
       return this
     }
+
+    public static decodePatched(
+      reader: protobufjs.Reader | Uint8Array
+    ): ITimestamp {
+      return Timestamp.decode(reader)
+    }
   }
 }

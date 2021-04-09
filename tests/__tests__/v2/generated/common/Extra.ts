@@ -27,5 +27,11 @@ export namespace Common {
     public asInterface(): IExtraPkgMessage {
       return this
     }
+
+    public static decodePatched(
+      reader: protobufjs.Reader | Uint8Array
+    ): IExtraPkgMessage {
+      return ExtraPkgMessage.decode(reader)
+    }
   }
 }

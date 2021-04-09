@@ -100,6 +100,12 @@ export namespace Foo {
     public asInterface(): IRequest {
       return this
     }
+
+    public static decodePatched(
+      reader: protobufjs.Reader | Uint8Array
+    ): IRequest {
+      return Request.decode(reader)
+    }
   }
 
   /**
@@ -114,6 +120,12 @@ export namespace Foo {
 
     public asInterface(): INested {
       return this
+    }
+
+    public static decodePatched(
+      reader: protobufjs.Reader | Uint8Array
+    ): INested {
+      return Nested.decode(reader)
     }
   }
 
@@ -237,34 +249,7 @@ export namespace Foo {
 
     public asInterface(): ITest {
       return {
-        fieldInt32: this.fieldInt32,
-        fieldInt32Repeated: this.fieldInt32Repeated,
-        fieldDouble: this.fieldDouble,
-        fieldDoubleRepeated: this.fieldDoubleRepeated,
-        fieldFloat: this.fieldFloat,
-        fieldFloatRepeated: this.fieldFloatRepeated,
-        fieldUint32: this.fieldUint32,
-        fieldUint32Repeated: this.fieldUint32Repeated,
-        fieldUint64: this.fieldUint64,
-        fieldUint64Repeated: this.fieldUint64Repeated,
-        fieldSint32: this.fieldSint32,
-        fieldSint32Repeated: this.fieldSint32Repeated,
-        fieldSint64: this.fieldSint64,
-        fieldSint64Repeated: this.fieldSint64Repeated,
-        fieldFixed32: this.fieldFixed32,
-        fieldFixed32Repeated: this.fieldFixed32Repeated,
-        fieldFixed64: this.fieldFixed64,
-        fieldFixed64Repeated: this.fieldFixed64Repeated,
-        fieldSfixed32: this.fieldSfixed32,
-        fieldSfixed32Repeated: this.fieldSfixed32Repeated,
-        fieldSfixed64: this.fieldSfixed64,
-        fieldSfixed64Repeated: this.fieldSfixed64Repeated,
-        fieldBool: this.fieldBool,
-        fieldBoolRepeated: this.fieldBoolRepeated,
-        fieldString: this.fieldString,
-        fieldStringRepeated: this.fieldStringRepeated,
-        fieldBytes: this.fieldBytes,
-        fieldBytesRepeated: this.fieldBytesRepeated,
+        ...this,
         fieldEnum: (this.fieldEnum !== undefined
           ? EnumType_Enum[this.fieldEnum]!
           : undefined) as EnumType | undefined,
@@ -279,8 +264,29 @@ export namespace Foo {
         otherPkgMessageRepeated: this.otherPkgMessageRepeated?.map((o) =>
           o.asInterface()
         ),
-        fieldInt64: this.fieldInt64,
-        fieldInt64Repeated: this.fieldInt64Repeated,
+      }
+    }
+
+    public static decodePatched(reader: protobufjs.Reader | Uint8Array): ITest {
+      const decoded = Test.decode(reader)
+      return {
+        ...decoded,
+        fieldEnum: (decoded.fieldEnum !== undefined
+          ? EnumType_Enum[decoded.fieldEnum]!
+          : undefined) as EnumType | undefined,
+        fieldEnumRepeated: decoded.fieldEnumRepeated?.map(
+          (e) => Role_Enum[e]! as Role
+        ),
+        message: decoded.message?.asInterface(),
+        messageRepeated: decoded.messageRepeated?.map((o) => o.asInterface()),
+        timestamp: decoded.timestamp?.asInterface(),
+        timestampRepeated: decoded.timestampRepeated?.map((o) =>
+          o.asInterface()
+        ),
+        otherPkgMessage: decoded.otherPkgMessage?.asInterface(),
+        otherPkgMessageRepeated: decoded.otherPkgMessageRepeated?.map((o) =>
+          o.asInterface()
+        ),
       }
     }
   }
@@ -301,6 +307,12 @@ export namespace Foo {
     public asInterface(): ICustomOptionsTest {
       return this
     }
+
+    public static decodePatched(
+      reader: protobufjs.Reader | Uint8Array
+    ): ICustomOptionsTest {
+      return CustomOptionsTest.decode(reader)
+    }
   }
 
   @protobufjs.Type.d('RequiredPropertiesTest')
@@ -318,6 +330,12 @@ export namespace Foo {
 
     public asInterface(): IRequiredPropertiesTest {
       return this
+    }
+
+    public static decodePatched(
+      reader: protobufjs.Reader | Uint8Array
+    ): IRequiredPropertiesTest {
+      return RequiredPropertiesTest.decode(reader)
     }
   }
 }

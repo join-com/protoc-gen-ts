@@ -270,6 +270,7 @@ func (r *Runner) generateTypescriptClassPatchedMethods(generatedFileStream *prot
 	r.generateAsInterfaceMethod(generatedFileStream, messageSpec, requiredFields, hasEnums)
 
 	// Decode method
+	r.generateDecodePatchedMethod(generatedFileStream, messageSpec, requiredFields, hasEnums)
 
 	// Encode method
 
@@ -285,8 +286,9 @@ func (r *Runner) generateAsInterfaceMethod(generatedFileStream *protogen.Generat
 		r.P(generatedFileStream, "return {")
 		r.indentLevel += 2
 
+		r.P(generatedFileStream, "...this,")
 		for _, fieldSpec := range messageSpec.GetField() {
-			r.generatePatchedInterfaceField(generatedFileStream, fieldSpec, messageSpec, requiredFields)
+			r.generatePatchedInterfaceField(generatedFileStream, fieldSpec, messageSpec, requiredFields, "this")
 		}
 
 		r.indentLevel -= 2
@@ -304,7 +306,13 @@ func (r *Runner) generatePatchedInterfaceField(
 	fieldSpec *descriptorpb.FieldDescriptorProto,
 	messageSpec *descriptorpb.DescriptorProto,
 	requiredFields bool,
+	sourceObject string,
 ) {
+	fieldType := fieldSpec.GetType()
+	if fieldType != descriptorpb.FieldDescriptorProto_TYPE_ENUM && fieldType != descriptorpb.FieldDescriptorProto_TYPE_MESSAGE {
+		return
+	}
+
 	fieldOptions := fieldSpec.GetOptions()
 	separator := "?: "
 	requiredField, foundRequired := join_proto.GetBooleanCustomFieldOption("typescript_required", fieldOptions, r.extensionTypes)
@@ -320,9 +328,8 @@ func (r *Runner) generatePatchedInterfaceField(
 
 	isRepeated := fieldSpec.GetLabel() == descriptorpb.FieldDescriptorProto_LABEL_REPEATED
 
-	value := "this." + fieldSpec.GetJsonName()
-	switch fieldSpec.GetType() {
-	case descriptorpb.FieldDescriptorProto_TYPE_ENUM:
+	value := sourceObject + "." + fieldSpec.GetJsonName()
+	if fieldType == descriptorpb.FieldDescriptorProto_TYPE_ENUM {
 		unionTypeName := r.getEnumOrMessageTypeName(fieldSpec.GetTypeName(), false)
 		enumTypeName := unionTypeName + "_Enum"
 		if confirmRequired {
@@ -338,7 +345,7 @@ func (r *Runner) generatePatchedInterfaceField(
 				value = "((" + value + " !== undefined) ? (" + enumTypeName + "[" + value + "]!) : undefined) as " + unionTypeName + " | undefined,"
 			}
 		}
-	case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE:
+	} else {
 		if confirmRequired {
 			if isRepeated {
 				value += ".map((o) => o.asInterface()),"
@@ -352,11 +359,34 @@ func (r *Runner) generatePatchedInterfaceField(
 				value += "?.asInterface(),"
 			}
 		}
-	default:
-		value += ","
 	}
 
 	r.P(generatedFileStream, fieldSpec.GetJsonName()+separator+value)
+}
+
+func (r *Runner) generateDecodePatchedMethod(generatedFileStream *protogen.GeneratedFile, messageSpec *descriptorpb.DescriptorProto, requiredFields bool, hasEnums bool) {
+	className := strcase.ToCamel(messageSpec.GetName())
+	r.P(generatedFileStream, "public static decodePatched(reader: protobufjs.Reader | Uint8Array): I"+className+" {")
+	r.indentLevel += 2
+
+	if hasEnums {
+		r.P(generatedFileStream, "const decoded = "+className+".decode(reader)")
+		r.P(generatedFileStream, "return {")
+		r.indentLevel += 2
+
+		r.P(generatedFileStream, "...decoded,")
+		for _, fieldSpec := range messageSpec.GetField() {
+			r.generatePatchedInterfaceField(generatedFileStream, fieldSpec, messageSpec, requiredFields, "decoded")
+		}
+
+		r.indentLevel -= 2
+		r.P(generatedFileStream, "}")
+	} else {
+		r.P(generatedFileStream, "return "+className+".decode(reader)")
+	}
+
+	r.indentLevel -= 2
+	r.P(generatedFileStream, "}\n")
 }
 
 func messageHasEnums(messageSpec *descriptorpb.DescriptorProto) bool {

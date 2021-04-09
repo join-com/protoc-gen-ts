@@ -268,26 +268,7 @@ export namespace Foo {
     }
 
     public static decodePatched(reader: protobufjs.Reader | Uint8Array): ITest {
-      const decoded = Test.decode(reader)
-      return {
-        ...decoded,
-        fieldEnum: (decoded.fieldEnum !== undefined
-          ? EnumType_Enum[decoded.fieldEnum]!
-          : undefined) as EnumType | undefined,
-        fieldEnumRepeated: decoded.fieldEnumRepeated?.map(
-          (e) => Role_Enum[e]! as Role
-        ),
-        message: decoded.message?.asInterface(),
-        messageRepeated: decoded.messageRepeated?.map((o) => o.asInterface()),
-        timestamp: decoded.timestamp?.asInterface(),
-        timestampRepeated: decoded.timestampRepeated?.map((o) =>
-          o.asInterface()
-        ),
-        otherPkgMessage: decoded.otherPkgMessage?.asInterface(),
-        otherPkgMessageRepeated: decoded.otherPkgMessageRepeated?.map((o) =>
-          o.asInterface()
-        ),
-      }
+      return Test.decode(reader).asInterface()
     }
   }
 

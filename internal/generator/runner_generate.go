@@ -370,17 +370,18 @@ func (r *Runner) generateDecodePatchedMethod(generatedFileStream *protogen.Gener
 	r.indentLevel += 2
 
 	if hasEnums {
-		r.P(generatedFileStream, "const decoded = "+className+".decode(reader)")
-		r.P(generatedFileStream, "return {")
-		r.indentLevel += 2
+		r.P(generatedFileStream, "return "+className+".decode(reader).asInterface()")
+		// r.P(generatedFileStream, "const decoded = "+className+".decode(reader)")
+		// r.P(generatedFileStream, "return {")
+		// r.indentLevel += 2
 
-		r.P(generatedFileStream, "...decoded,")
-		for _, fieldSpec := range messageSpec.GetField() {
-			r.generatePatchedInterfaceField(generatedFileStream, fieldSpec, messageSpec, requiredFields, "decoded")
-		}
+		// r.P(generatedFileStream, "...decoded,")
+		// for _, fieldSpec := range messageSpec.GetField() {
+		// 	r.generatePatchedInterfaceField(generatedFileStream, fieldSpec, messageSpec, requiredFields, "decoded")
+		// }
 
-		r.indentLevel -= 2
-		r.P(generatedFileStream, "}")
+		// r.indentLevel -= 2
+		// r.P(generatedFileStream, "}")
 	} else {
 		r.P(generatedFileStream, "return "+className+".decode(reader)")
 	}

@@ -28,10 +28,21 @@ export namespace Common {
       return this
     }
 
+    public static fromInterface(value: IOtherPkgMessage): OtherPkgMessage {
+      return OtherPkgMessage.fromObject(value)
+    }
+
     public static decodePatched(
       reader: protobufjs.Reader | Uint8Array
     ): IOtherPkgMessage {
       return OtherPkgMessage.decode(reader)
+    }
+
+    public static encodePatched(
+      message: IOtherPkgMessage,
+      writer?: protobufjs.Writer
+    ): protobufjs.Writer {
+      return OtherPkgMessage.encode(message, writer)
     }
   }
 }

@@ -101,10 +101,21 @@ export namespace Foo {
       return this
     }
 
+    public static fromInterface(value: IRequest): Request {
+      return Request.fromObject(value)
+    }
+
     public static decodePatched(
       reader: protobufjs.Reader | Uint8Array
     ): IRequest {
       return Request.decode(reader)
+    }
+
+    public static encodePatched(
+      message: IRequest,
+      writer?: protobufjs.Writer
+    ): protobufjs.Writer {
+      return Request.encode(message, writer)
     }
   }
 
@@ -122,10 +133,21 @@ export namespace Foo {
       return this
     }
 
+    public static fromInterface(value: INested): Nested {
+      return Nested.fromObject(value)
+    }
+
     public static decodePatched(
       reader: protobufjs.Reader | Uint8Array
     ): INested {
       return Nested.decode(reader)
+    }
+
+    public static encodePatched(
+      message: INested,
+      writer?: protobufjs.Writer
+    ): protobufjs.Writer {
+      return Nested.encode(message, writer)
     }
   }
 
@@ -267,8 +289,49 @@ export namespace Foo {
       }
     }
 
+    public static fromInterface(value: ITest): Test {
+      const patchedValue = {
+        ...value,
+        fieldEnum: (value.fieldEnum !== undefined
+          ? EnumType_Enum[value.fieldEnum]!
+          : undefined) as EnumType_Enum | undefined,
+        fieldEnumRepeated: value.fieldEnumRepeated?.map((e) => Role_Enum[e]!),
+        message:
+          value.message !== undefined
+            ? Nested.fromInterface(value.message)
+            : undefined,
+        messageRepeated: value.messageRepeated?.map((o) =>
+          Nested.fromInterface(o)
+        ),
+        timestamp:
+          value.timestamp !== undefined
+            ? GoogleProtobuf.Timestamp.fromInterface(value.timestamp)
+            : undefined,
+        timestampRepeated: value.timestampRepeated?.map((o) =>
+          GoogleProtobuf.Timestamp.fromInterface(o)
+        ),
+        otherPkgMessage:
+          value.otherPkgMessage !== undefined
+            ? Common_Common.OtherPkgMessage.fromInterface(value.otherPkgMessage)
+            : undefined,
+        otherPkgMessageRepeated: value.otherPkgMessageRepeated?.map((o) =>
+          Common_Common.OtherPkgMessage.fromInterface(o)
+        ),
+      }
+
+      return Test.fromObject(patchedValue)
+    }
+
     public static decodePatched(reader: protobufjs.Reader | Uint8Array): ITest {
       return Test.decode(reader).asInterface()
+    }
+
+    public static encodePatched(
+      message: ITest,
+      writer?: protobufjs.Writer
+    ): protobufjs.Writer {
+      const transformedMessage = Test.fromInterface(message)
+      return Test.encode(transformedMessage, writer)
     }
   }
 
@@ -289,10 +352,21 @@ export namespace Foo {
       return this
     }
 
+    public static fromInterface(value: ICustomOptionsTest): CustomOptionsTest {
+      return CustomOptionsTest.fromObject(value)
+    }
+
     public static decodePatched(
       reader: protobufjs.Reader | Uint8Array
     ): ICustomOptionsTest {
       return CustomOptionsTest.decode(reader)
+    }
+
+    public static encodePatched(
+      message: ICustomOptionsTest,
+      writer?: protobufjs.Writer
+    ): protobufjs.Writer {
+      return CustomOptionsTest.encode(message, writer)
     }
   }
 
@@ -313,10 +387,23 @@ export namespace Foo {
       return this
     }
 
+    public static fromInterface(
+      value: IRequiredPropertiesTest
+    ): RequiredPropertiesTest {
+      return RequiredPropertiesTest.fromObject(value)
+    }
+
     public static decodePatched(
       reader: protobufjs.Reader | Uint8Array
     ): IRequiredPropertiesTest {
       return RequiredPropertiesTest.decode(reader)
+    }
+
+    public static encodePatched(
+      message: IRequiredPropertiesTest,
+      writer?: protobufjs.Writer
+    ): protobufjs.Writer {
+      return RequiredPropertiesTest.encode(message, writer)
     }
   }
 }

@@ -5,6 +5,10 @@
 import * as protobufjs from 'protobufjs/light'
 
 export namespace Common {
+  interface ConvertibleTo<T> {
+    asInterface(): T
+  }
+
   export interface IOtherPkgMessage {
     firstName?: string
     latsName?: string
@@ -13,11 +17,15 @@ export namespace Common {
   @protobufjs.Type.d('OtherPkgMessage')
   export class OtherPkgMessage
     extends protobufjs.Message<OtherPkgMessage>
-    implements IOtherPkgMessage {
+    implements ConvertibleTo<IOtherPkgMessage> {
     @protobufjs.Field.d(1, 'string')
     public firstName?: string
 
     @protobufjs.Field.d(2, 'string')
     public latsName?: string
+
+    public asInterface(): IOtherPkgMessage {
+      return this
+    }
   }
 }

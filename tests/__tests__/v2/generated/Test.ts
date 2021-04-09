@@ -9,18 +9,22 @@ import { Common as Common_Common } from './common/Common'
 import { Common as Common_Extra } from './common/Extra'
 
 export namespace Foo {
-  export type EnumType = 'UNKNOWN' | 'ADMIN' | 'USER'
+  interface ConvertibleTo<T> {
+    asInterface(): T
+  }
+
   export enum EnumType_Enum {
     UNKNOWN = 0,
     ADMIN = 1,
     USER = 2,
   }
+  export type EnumType = keyof typeof EnumType_Enum
 
-  export type Role = 'VIEW' | 'EDIT'
   export enum Role_Enum {
     VIEW = 0,
     EDIT = 1,
   }
+  export type Role = keyof typeof Role_Enum
 
   export interface IRequest {
     id?: number
@@ -87,22 +91,36 @@ export namespace Foo {
   }
 
   @protobufjs.Type.d('Request')
-  export class Request extends protobufjs.Message<Request> implements IRequest {
+  export class Request
+    extends protobufjs.Message<Request>
+    implements ConvertibleTo<IRequest> {
     @protobufjs.Field.d(1, 'int32')
     public id?: number
+
+    public asInterface(): IRequest {
+      return this
+    }
   }
 
   /**
    * @deprecated
    */
   @protobufjs.Type.d('Nested')
-  export class Nested extends protobufjs.Message<Nested> implements INested {
+  export class Nested
+    extends protobufjs.Message<Nested>
+    implements ConvertibleTo<INested> {
     @protobufjs.Field.d(1, 'string')
     public title?: string
+
+    public asInterface(): INested {
+      return this
+    }
   }
 
   @protobufjs.Type.d('Test')
-  export class Test extends protobufjs.Message<Test> implements ITest {
+  export class Test
+    extends protobufjs.Message<Test>
+    implements ConvertibleTo<ITest> {
     @protobufjs.Field.d(1, 'int32')
     public fieldInt32?: number
 
@@ -188,54 +206,107 @@ export namespace Foo {
     public fieldBytesRepeated?: Uint8Array[]
 
     @protobufjs.Field.d(29, EnumType_Enum)
-    public fieldEnum?: EnumType
+    public fieldEnum?: EnumType_Enum
 
     @protobufjs.Field.d(30, Role_Enum, 'repeated')
-    public fieldEnumRepeated?: Role[]
+    public fieldEnumRepeated?: Role_Enum[]
 
     @protobufjs.Field.d(33, Nested)
-    public message?: INested
+    public message?: Nested
 
     @protobufjs.Field.d(34, Nested, 'repeated')
-    public messageRepeated?: INested[]
+    public messageRepeated?: Nested[]
 
     @protobufjs.Field.d(35, GoogleProtobuf.Timestamp)
-    public timestamp?: GoogleProtobuf.ITimestamp
+    public timestamp?: GoogleProtobuf.Timestamp
 
     @protobufjs.Field.d(36, GoogleProtobuf.Timestamp, 'repeated')
-    public timestampRepeated?: GoogleProtobuf.ITimestamp[]
+    public timestampRepeated?: GoogleProtobuf.Timestamp[]
 
     @protobufjs.Field.d(37, Common_Common.OtherPkgMessage)
-    public otherPkgMessage?: Common_Common.IOtherPkgMessage
+    public otherPkgMessage?: Common_Common.OtherPkgMessage
 
     @protobufjs.Field.d(38, Common_Common.OtherPkgMessage, 'repeated')
-    public otherPkgMessageRepeated?: Common_Common.IOtherPkgMessage[]
+    public otherPkgMessageRepeated?: Common_Common.OtherPkgMessage[]
 
     @protobufjs.Field.d(39, 'int64')
     public fieldInt64?: number
 
     @protobufjs.Field.d(40, 'int64', 'repeated')
     public fieldInt64Repeated?: number[]
+
+    public asInterface(): ITest {
+      return {
+        fieldInt32: this.fieldInt32,
+        fieldInt32Repeated: this.fieldInt32Repeated,
+        fieldDouble: this.fieldDouble,
+        fieldDoubleRepeated: this.fieldDoubleRepeated,
+        fieldFloat: this.fieldFloat,
+        fieldFloatRepeated: this.fieldFloatRepeated,
+        fieldUint32: this.fieldUint32,
+        fieldUint32Repeated: this.fieldUint32Repeated,
+        fieldUint64: this.fieldUint64,
+        fieldUint64Repeated: this.fieldUint64Repeated,
+        fieldSint32: this.fieldSint32,
+        fieldSint32Repeated: this.fieldSint32Repeated,
+        fieldSint64: this.fieldSint64,
+        fieldSint64Repeated: this.fieldSint64Repeated,
+        fieldFixed32: this.fieldFixed32,
+        fieldFixed32Repeated: this.fieldFixed32Repeated,
+        fieldFixed64: this.fieldFixed64,
+        fieldFixed64Repeated: this.fieldFixed64Repeated,
+        fieldSfixed32: this.fieldSfixed32,
+        fieldSfixed32Repeated: this.fieldSfixed32Repeated,
+        fieldSfixed64: this.fieldSfixed64,
+        fieldSfixed64Repeated: this.fieldSfixed64Repeated,
+        fieldBool: this.fieldBool,
+        fieldBoolRepeated: this.fieldBoolRepeated,
+        fieldString: this.fieldString,
+        fieldStringRepeated: this.fieldStringRepeated,
+        fieldBytes: this.fieldBytes,
+        fieldBytesRepeated: this.fieldBytesRepeated,
+        fieldEnum: (this.fieldEnum !== undefined
+          ? EnumType_Enum[this.fieldEnum]!
+          : undefined) as EnumType | undefined,
+        fieldEnumRepeated: this.fieldEnumRepeated?.map(
+          (e) => Role_Enum[e]! as Role
+        ),
+        message: this.message?.asInterface(),
+        messageRepeated: this.messageRepeated?.map((o) => o.asInterface()),
+        timestamp: this.timestamp?.asInterface(),
+        timestampRepeated: this.timestampRepeated?.map((o) => o.asInterface()),
+        otherPkgMessage: this.otherPkgMessage?.asInterface(),
+        otherPkgMessageRepeated: this.otherPkgMessageRepeated?.map((o) =>
+          o.asInterface()
+        ),
+        fieldInt64: this.fieldInt64,
+        fieldInt64Repeated: this.fieldInt64Repeated,
+      }
+    }
   }
 
   @protobufjs.Type.d('CustomOptionsTest')
   export class CustomOptionsTest
     extends protobufjs.Message<CustomOptionsTest>
-    implements ICustomOptionsTest {
+    implements ConvertibleTo<ICustomOptionsTest> {
     @protobufjs.Field.d(1, Common_Extra.ExtraPkgMessage)
-    public requiredField!: Common_Extra.IExtraPkgMessage
+    public requiredField!: Common_Extra.ExtraPkgMessage
 
     @protobufjs.Field.d(2, 'int32')
     public typicalOptionalField?: number
 
     @protobufjs.Field.d(3, 'int32')
     public customOptionalField?: number
+
+    public asInterface(): ICustomOptionsTest {
+      return this
+    }
   }
 
   @protobufjs.Type.d('RequiredPropertiesTest')
   export class RequiredPropertiesTest
     extends protobufjs.Message<RequiredPropertiesTest>
-    implements IRequiredPropertiesTest {
+    implements ConvertibleTo<IRequiredPropertiesTest> {
     @protobufjs.Field.d(1, 'int32')
     public requiredField!: number
 
@@ -244,5 +315,9 @@ export namespace Foo {
 
     @protobufjs.Field.d(3, 'int32')
     public optionalField?: number
+
+    public asInterface(): IRequiredPropertiesTest {
+      return this
+    }
   }
 }

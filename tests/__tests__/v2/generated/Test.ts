@@ -272,14 +272,14 @@ export namespace Foo {
     public asInterface(): ITest {
       return {
         ...this,
-        fieldEnum: (this.fieldEnum !== undefined
+        fieldEnum: (this.fieldEnum != null
           ? EnumType_Enum[this.fieldEnum]!
           : undefined) as EnumType | undefined,
         fieldEnumRepeated: this.fieldEnumRepeated?.map(
           (e) => Role_Enum[e]! as Role
         ),
         timestamp:
-          this.timestamp !== undefined
+          this.timestamp != null
             ? new Date(
                 (this.timestamp.seconds ?? 0) * 1000 +
                   (this.timestamp.nanos ?? 0) / 1000000
@@ -294,12 +294,12 @@ export namespace Foo {
     public static fromInterface(value: ITest): Test {
       const patchedValue = {
         ...value,
-        fieldEnum: (value.fieldEnum !== undefined
+        fieldEnum: (value.fieldEnum != null
           ? EnumType_Enum[value.fieldEnum]!
           : undefined) as EnumType_Enum | undefined,
         fieldEnumRepeated: value.fieldEnumRepeated?.map((e) => Role_Enum[e]!),
         timestamp:
-          value.timestamp !== undefined
+          value.timestamp != null
             ? GoogleProtobuf.Timestamp.fromInterface({
                 seconds: Math.floor(value.timestamp.getTime() / 1000),
                 nanos: value.timestamp.getMilliseconds() * 1000000,

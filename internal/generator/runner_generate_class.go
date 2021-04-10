@@ -216,7 +216,7 @@ func (r *Runner) generatePatchedInterfaceField(
 			if isRepeated {
 				value += "?.map((e) => " + enumTypeName + "[e]! as " + unionTypeName + "),"
 			} else {
-				value = "((" + value + " !== undefined) ? (" + enumTypeName + "[" + value + "]!) : undefined) as " + unionTypeName + " | undefined,"
+				value = "((" + value + " != null) ? (" + enumTypeName + "[" + value + "]!) : undefined) as " + unionTypeName + " | undefined,"
 			}
 		}
 	} else {
@@ -248,7 +248,7 @@ func (r *Runner) generatePatchedInterfaceField(
 				if isRepeated {
 					value += "?.map((ts) => new Date((ts.seconds ?? 0) * 1000 + (ts.nanos ?? 0) / 1000000)),"
 				} else {
-					value = value + " !== undefined ? new Date((" + value + ".seconds ?? 0) * 1000 + (" + value + ".nanos ?? 0) / 1000000) : undefined,"
+					value = value + " != null ? new Date((" + value + ".seconds ?? 0) * 1000 + (" + value + ".nanos ?? 0) / 1000000) : undefined,"
 				}
 			} else {
 				if isRepeated {
@@ -303,7 +303,7 @@ func (r *Runner) generateUnpatchedInterfaceField(
 			if isRepeated {
 				value += "?.map((e) => " + enumTypeName + "[e]!),"
 			} else {
-				value = "((" + value + " !== undefined) ? (" + enumTypeName + "[" + value + "]!) : undefined) as " + enumTypeName + " | undefined,"
+				value = "((" + value + " != null) ? (" + enumTypeName + "[" + value + "]!) : undefined) as " + enumTypeName + " | undefined,"
 			}
 		}
 	} else {
@@ -336,13 +336,13 @@ func (r *Runner) generateUnpatchedInterfaceField(
 				if isRepeated {
 					value += "?.map((d) => " + className + ".fromInterface({ seconds: Math.floor(d.getTime() / 1000), nanos: d.getMilliseconds() * 1000000 })),"
 				} else {
-					value = "(" + value + " !== undefined) ? " + className + ".fromInterface({ seconds: Math.floor(" + value + ".getTime() / 1000), nanos: " + value + ".getMilliseconds() * 1000000 }) : undefined,"
+					value = "(" + value + " != null) ? " + className + ".fromInterface({ seconds: Math.floor(" + value + ".getTime() / 1000), nanos: " + value + ".getMilliseconds() * 1000000 }) : undefined,"
 				}
 			} else {
 				if isRepeated {
 					value += "?.map((o) => " + className + ".fromInterface(o)),"
 				} else {
-					value = "(" + value + " !== undefined) ? " + className + ".fromInterface(" + value + ") : undefined,"
+					value = "(" + value + " != null) ? " + className + ".fromInterface(" + value + ") : undefined,"
 				}
 			}
 		}

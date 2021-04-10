@@ -278,14 +278,6 @@ export namespace Foo {
         fieldEnumRepeated: this.fieldEnumRepeated?.map(
           (e) => Role_Enum[e]! as Role
         ),
-        message: this.message?.asInterface(),
-        messageRepeated: this.messageRepeated?.map((o) => o.asInterface()),
-        timestamp: this.timestamp?.asInterface(),
-        timestampRepeated: this.timestampRepeated?.map((o) => o.asInterface()),
-        otherPkgMessage: this.otherPkgMessage?.asInterface(),
-        otherPkgMessageRepeated: this.otherPkgMessageRepeated?.map((o) =>
-          o.asInterface()
-        ),
       }
     }
 

@@ -54,8 +54,10 @@ func (r *Runner) collectExportedSymbols(packageName string, proto *descriptorpb.
 	}
 
 	// Collect Messages
+	currentPackageName := "." + r.packagesByFile[r.currentProtoFilePath]
 	for _, messageSpec := range proto.GetMessageType() {
 		symbolsMap[strcase.ToCamel(messageSpec.GetName())] = r.currentProtoFilePath
+		r.messageSpecsByFQN[currentPackageName + "." + messageSpec.GetName()] = messageSpec
 	}
 
 	// TODO?: Services

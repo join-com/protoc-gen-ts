@@ -220,6 +220,14 @@ func (r *Runner) generatePatchedInterfaceField(
 			}
 		}
 	} else {
+		nestedMessageSpec, ok := r.messageSpecsByFQN[fieldSpec.GetTypeName()]
+		if !ok || nestedMessageSpec == nil {
+			utils.LogError("Unable to retrieve message spec for " + fieldSpec.GetTypeName())
+		}
+		if !messageHasEnums(nestedMessageSpec) {
+			return
+		}
+
 		if confirmRequired {
 			if isRepeated {
 				value += ".map((o) => o.asInterface()),"
@@ -285,18 +293,36 @@ func (r *Runner) generateUnpatchedInterfaceField(
 		className := r.getEnumOrMessageTypeName(fieldSpec.GetTypeName(), false)
 		if confirmRequired {
 			if isRepeated {
-				value += ".map((o) => "+className+".fromInterface(o)),"
+				value += ".map((o) => " + className + ".fromInterface(o)),"
 			} else {
-				value = className+".fromInterface("+value+")),"
+				value = className + ".fromInterface(" + value + ")),"
 			}
 		} else {
 			if isRepeated {
-				value += "?.map((o) => "+className+".fromInterface(o)),"
+				value += "?.map((o) => " + className + ".fromInterface(o)),"
 			} else {
-				value = "("+value+" !== undefined) ? "+className+".fromInterface("+value+") : undefined,"
+				value = "(" + value + " !== undefined) ? " + className + ".fromInterface(" + value + ") : undefined,"
 			}
 		}
 	}
 
 	r.P(generatedFileStream, fieldSpec.GetJsonName()+separator+value)
+}
+
+func messageHasEnums(messageSpec *descriptorpb.DescriptorProto) bool {
+	for _, fieldSpec := range messageSpec.GetField() {
+		switch t := fieldSpec.GetType(); t {
+		case descriptorpb.FieldDescriptorProto_TYPE_ENUM:
+			return true
+		}
+	}
+
+	for _, nestedMessageSpec := range messageSpec.GetNestedType() {
+		hasEnums := messageHasEnums(nestedMessageSpec)
+		if hasEnums {
+			return true
+		}
+	}
+
+	return false
 }

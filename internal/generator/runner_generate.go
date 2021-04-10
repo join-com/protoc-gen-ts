@@ -190,21 +190,3 @@ func (r *Runner) generateTypescriptInterfaceField(
 
 	r.P(generatedFileStream, fieldSpec.GetJsonName()+separator+r.getInterfaceFieldType(fieldSpec))
 }
-
-func messageHasEnums(messageSpec *descriptorpb.DescriptorProto) bool {
-	for _, fieldSpec := range messageSpec.GetField() {
-		switch t := fieldSpec.GetType(); t {
-		case descriptorpb.FieldDescriptorProto_TYPE_ENUM:
-			return true
-		}
-	}
-
-	for _, nestedMessageSpec := range messageSpec.GetNestedType() {
-		hasEnums := messageHasEnums(nestedMessageSpec)
-		if hasEnums {
-			return true
-		}
-	}
-
-	return false
-}

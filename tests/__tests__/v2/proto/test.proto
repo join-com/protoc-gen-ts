@@ -105,15 +105,15 @@ message Test {
 }
 
 message CustomOptionsTest {
-  common.ExtraPkgMessage requiredField = 1 [(join.protobuf.typescript_required) = true];
-  int32 typicalOptionalField = 2;
-  int32 customOptionalField = 3 [(join.protobuf.typescript_optional) = true]; // This should not make a difference
+  common.ExtraPkgMessage required_field = 1 [(join.protobuf.typescript_required) = true];
+  int32 typical_optional_field = 2;
+  int32 custom_optional_field = 3 [(join.protobuf.typescript_optional) = true]; // This should not make a difference
 }
 
 message RequiredPropertiesTest {
   option (join.protobuf.typescript_required_fields) = true;
 
-  int32 requiredField = 1;
-  int32 customRequiredField = 2 [(join.protobuf.typescript_required) = true]; // This should not make a difference
-  int32 optionalField = 3 [(join.protobuf.typescript_optional) = true];
+  int32 required_field = 1;
+  int32 custom_required_field = 2 [(join.protobuf.typescript_required) = true]; // This should not make a difference
+  int32 optional_field = 3 [(join.protobuf.typescript_optional) = true];
 }

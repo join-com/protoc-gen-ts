@@ -1,5 +1,4 @@
 import { Foo } from './generated/Test'
-import { Foo as LegacyFoo } from '../legacy/generated/Test'
 
 describe('(v2) classes', () => {
   const request: Foo.IRequest = { id: 42 }
@@ -27,21 +26,5 @@ describe('(v2) classes', () => {
     // The reconstructed object will have some "extra" fields (with undefined value,
     // and defined in the interface).
     expect(reconstructedComplex).toMatchObject(complex)
-  })
-
-  it('encode generates same buffers as legacy generator', () => {
-    const requestBuffer = Foo.Request.encodePatched(request).finish()
-    const legacyRequestBuffer = new LegacyFoo.Request(request).encode().finish()
-    expect(requestBuffer).toStrictEqual(legacyRequestBuffer)
-
-    const nestedBuffer = Foo.Nested.encodePatched(nested).finish()
-    const legacyNestedBuffer = new LegacyFoo.Nested(nested).encode().finish()
-    expect(nestedBuffer).toStrictEqual(legacyNestedBuffer)
-
-    // TODO: Fix ITimestamp -> Date conversion
-    // TODO: Check why serialization is different
-    // const complexBuffer = Foo.Test.encodePatched(complex).finish()
-    // const legacyComplexBuffer = new LegacyFoo.Test(complex as LegacyFoo.ITest).encode().finish()
-    // expect(complexBuffer).toStrictEqual(legacyComplexBuffer)
   })
 })

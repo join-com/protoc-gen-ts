@@ -10,6 +10,7 @@ import (
 	"github.com/join-com/protoc-gen-ts/internal/join_proto"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/reflect/protoregistry"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 // Sort of a global state for the generator's runner
@@ -18,11 +19,12 @@ type Runner struct {
 	currentProtoFilePath           string
 	currentNamespace               string
 	indentLevel                    int
-	packagesByFile                 map[string]string
-	filesForExportedPackageSymbols map[string]map[string]string // pkg_name -> symbol -> source file path
-	alternativeImportNames         map[string]map[string]string // "current" source file path -> imported source file path -> alternative import name
-	generateCodeOptions            map[string]bool              // source file path -> (should we generate .ts file for it)
-	importCodeOptions              map[string]bool              // source file path -> (should we generate imports on .ts files when imported in .proto files)
+	packagesByFile                 map[string]string                        // source file path -> package name
+	filesForExportedPackageSymbols map[string]map[string]string             // pkg_name -> symbol -> source file path
+	alternativeImportNames         map[string]map[string]string             // "current" source file path -> imported source file path -> alternative import name
+	generateCodeOptions            map[string]bool                          // source file path -> (should we generate .ts file for it)
+	importCodeOptions              map[string]bool                          // source file path -> (should we generate imports on .ts files when imported in .proto files)
+	messageSpecsByFQN              map[string]*descriptorpb.DescriptorProto // message fully qualified name -> message "spec"
 }
 
 func NewRunner() Runner {
@@ -36,6 +38,7 @@ func NewRunner() Runner {
 		alternativeImportNames:         make(map[string]map[string]string),
 		generateCodeOptions:            make(map[string]bool),
 		importCodeOptions:              make(map[string]bool),
+		messageSpecsByFQN:              make(map[string]*descriptorpb.DescriptorProto),
 	}
 }
 

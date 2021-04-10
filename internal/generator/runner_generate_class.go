@@ -29,7 +29,7 @@ func (r *Runner) generateTypescriptMessageClass(generatedFileStream *protogen.Ge
 	}
 
 	className := strcase.ToCamel(messageSpec.GetName())
-	hasEnums := messageHasEnums(messageSpec)
+	hasEnums := messageHasEnumsOrDates(messageSpec)
 	implementedInterfaces := "ConvertibleTo<I" + className + ">"
 	if !hasEnums {
 		implementedInterfaces += ", I" + className
@@ -220,25 +220,42 @@ func (r *Runner) generatePatchedInterfaceField(
 			}
 		}
 	} else {
-		nestedMessageSpec, ok := r.messageSpecsByFQN[fieldSpec.GetTypeName()]
+		fieldTypeName := fieldSpec.GetTypeName()
+		nestedMessageSpec, ok := r.messageSpecsByFQN[fieldTypeName]
 		if !ok || nestedMessageSpec == nil {
-			utils.LogError("Unable to retrieve message spec for " + fieldSpec.GetTypeName())
+			utils.LogError("Unable to retrieve message spec for " + fieldTypeName)
 		}
-		if !messageHasEnums(nestedMessageSpec) {
+		if fieldTypeName != ".google.protobuf.Timestamp" && !messageHasEnumsOrDates(nestedMessageSpec) {
 			return
 		}
 
 		if confirmRequired {
-			if isRepeated {
-				value += ".map((o) => o.asInterface()),"
+			if fieldTypeName == ".google.protobuf.Timestamp" {
+				if isRepeated {
+					value += ".map((ts) => new Date((ts.seconds ?? 0) * 1000 + (ts.nanos ?? 0) / 1000000)),"
+				} else {
+					value = "new Date((" + value + ".seconds ?? 0) * 1000 + (" + value + ".nanos ?? 0) / 1000000),"
+				}
 			} else {
-				value += ".asInterface(),"
+				if isRepeated {
+					value += ".map((o) => o.asInterface()),"
+				} else {
+					value += ".asInterface(),"
+				}
 			}
 		} else {
-			if isRepeated {
-				value += "?.map((o) => o.asInterface()),"
+			if fieldTypeName == ".google.protobuf.Timestamp" {
+				if isRepeated {
+					value += "?.map((ts) => new Date((ts.seconds ?? 0) * 1000 + (ts.nanos ?? 0) / 1000000)),"
+				} else {
+					value = value + " !== undefined ? new Date((" + value + ".seconds ?? 0) * 1000 + (" + value + ".nanos ?? 0) / 1000000) : undefined,"
+				}
 			} else {
-				value += "?.asInterface(),"
+				if isRepeated {
+					value += "?.map((o) => o.asInterface()),"
+				} else {
+					value += "?.asInterface(),"
+				}
 			}
 		}
 	}
@@ -290,26 +307,43 @@ func (r *Runner) generateUnpatchedInterfaceField(
 			}
 		}
 	} else {
-		nestedMessageSpec, ok := r.messageSpecsByFQN[fieldSpec.GetTypeName()]
+		fieldTypeName := fieldSpec.GetTypeName()
+		nestedMessageSpec, ok := r.messageSpecsByFQN[fieldTypeName]
 		if !ok || nestedMessageSpec == nil {
-			utils.LogError("Unable to retrieve message spec for " + fieldSpec.GetTypeName())
+			utils.LogError("Unable to retrieve message spec for " + fieldTypeName)
 		}
-		if !messageHasEnums(nestedMessageSpec) {
+		if fieldTypeName != ".google.protobuf.Timestamp" && !messageHasEnumsOrDates(nestedMessageSpec) {
 			return
 		}
 
-		className := r.getEnumOrMessageTypeName(fieldSpec.GetTypeName(), false)
+		className := r.getEnumOrMessageTypeName(fieldTypeName, false)
 		if confirmRequired {
-			if isRepeated {
-				value += ".map((o) => " + className + ".fromInterface(o)),"
+			if fieldTypeName == ".google.protobuf.Timestamp" {
+				if isRepeated {
+					value += ".map((d) => " + className + ".fromInterface({ seconds: Math.floor(d.getTime() / 1000), nanos: d.getMilliseconds() * 1000000 })),"
+				} else {
+					value = className + ".fromInterface({ seconds: Math.floor(" + value + ".getTime() / 1000), nanos: " + value + ".getMilliseconds() * 1000000 }),"
+				}
 			} else {
-				value = className + ".fromInterface(" + value + ")),"
+				if isRepeated {
+					value += ".map((o) => " + className + ".fromInterface(o)),"
+				} else {
+					value = className + ".fromInterface(" + value + ")),"
+				}
 			}
 		} else {
-			if isRepeated {
-				value += "?.map((o) => " + className + ".fromInterface(o)),"
+			if fieldTypeName == ".google.protobuf.Timestamp" {
+				if isRepeated {
+					value += "?.map((d) => " + className + ".fromInterface({ seconds: Math.floor(d.getTime() / 1000), nanos: d.getMilliseconds() * 1000000 })),"
+				} else {
+					value = "(" + value + " !== undefined) ? " + className + ".fromInterface({ seconds: Math.floor(" + value + ".getTime() / 1000), nanos: " + value + ".getMilliseconds() * 1000000 }) : undefined,"
+				}
 			} else {
-				value = "(" + value + " !== undefined) ? " + className + ".fromInterface(" + value + ") : undefined,"
+				if isRepeated {
+					value += "?.map((o) => " + className + ".fromInterface(o)),"
+				} else {
+					value = "(" + value + " !== undefined) ? " + className + ".fromInterface(" + value + ") : undefined,"
+				}
 			}
 		}
 	}
@@ -317,16 +351,20 @@ func (r *Runner) generateUnpatchedInterfaceField(
 	r.P(generatedFileStream, fieldSpec.GetJsonName()+separator+value)
 }
 
-func messageHasEnums(messageSpec *descriptorpb.DescriptorProto) bool {
+func messageHasEnumsOrDates(messageSpec *descriptorpb.DescriptorProto) bool {
 	for _, fieldSpec := range messageSpec.GetField() {
 		switch t := fieldSpec.GetType(); t {
 		case descriptorpb.FieldDescriptorProto_TYPE_ENUM:
 			return true
+		case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE:
+			if fieldSpec.GetTypeName() == ".google.protobuf.Timestamp" {
+				return true
+			}
 		}
 	}
 
 	for _, nestedMessageSpec := range messageSpec.GetNestedType() {
-		hasEnums := messageHasEnums(nestedMessageSpec)
+		hasEnums := messageHasEnumsOrDates(nestedMessageSpec)
 		if hasEnums {
 			return true
 		}

@@ -97,7 +97,12 @@ func (r *Runner) getInterfaceFieldType(fieldSpec *descriptorpb.FieldDescriptorPr
 	case descriptorpb.FieldDescriptorProto_TYPE_ENUM:
 		baseType = r.getEnumOrMessageTypeName(fieldSpec.GetTypeName(), false)
 	case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE:
-		baseType = r.getEnumOrMessageTypeName(fieldSpec.GetTypeName(), true)
+		fieldTypeName := fieldSpec.GetTypeName()
+		if fieldTypeName == ".google.protobuf.Timestamp" {
+			baseType = "Date"
+		} else {
+			baseType = r.getEnumOrMessageTypeName(fieldTypeName, true)
+		}
 	}
 
 	if fieldSpec.GetLabel() == descriptorpb.FieldDescriptorProto_LABEL_REPEATED {

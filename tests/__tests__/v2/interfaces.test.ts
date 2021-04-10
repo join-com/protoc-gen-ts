@@ -202,10 +202,10 @@ describe('(v2) interfaces', () => {
     expect(tOtherPkgMessageR_Ok).toBe(true)
 
     // timestamps
-    // const tTimestamp_Ok: IsOk<'timestamp'> = true
-    // expect(tTimestamp_Ok).toBe(true)
+    const tTimestamp_Ok: IsOk<'timestamp'> = true
+    expect(tTimestamp_Ok).toBe(true)
 
-    // const tTimestampR_Ok: IsOk<'timestampRepeated'> = true
-    // expect(tTimestampR_Ok).toBe(true)
+    const tTimestampR_Ok: IsOk<'timestampRepeated'> = true
+    expect(tTimestampR_Ok).toBe(true)
   })
 })

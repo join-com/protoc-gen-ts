@@ -70,8 +70,8 @@ export namespace Foo {
     fieldEnumRepeated?: Role[]
     message?: INested
     messageRepeated?: INested[]
-    timestamp?: GoogleProtobuf.ITimestamp
-    timestampRepeated?: GoogleProtobuf.ITimestamp[]
+    timestamp?: Date
+    timestampRepeated?: Date[]
     otherPkgMessage?: Common_Common.IOtherPkgMessage
     otherPkgMessageRepeated?: Common_Common.IOtherPkgMessage[]
     fieldInt64?: number
@@ -278,6 +278,16 @@ export namespace Foo {
         fieldEnumRepeated: this.fieldEnumRepeated?.map(
           (e) => Role_Enum[e]! as Role
         ),
+        timestamp:
+          this.timestamp !== undefined
+            ? new Date(
+                (this.timestamp.seconds ?? 0) * 1000 +
+                  (this.timestamp.nanos ?? 0) / 1000000
+              )
+            : undefined,
+        timestampRepeated: this.timestampRepeated?.map(
+          (ts) => new Date((ts.seconds ?? 0) * 1000 + (ts.nanos ?? 0) / 1000000)
+        ),
       }
     }
 
@@ -288,6 +298,19 @@ export namespace Foo {
           ? EnumType_Enum[value.fieldEnum]!
           : undefined) as EnumType_Enum | undefined,
         fieldEnumRepeated: value.fieldEnumRepeated?.map((e) => Role_Enum[e]!),
+        timestamp:
+          value.timestamp !== undefined
+            ? GoogleProtobuf.Timestamp.fromInterface({
+                seconds: Math.floor(value.timestamp.getTime() / 1000),
+                nanos: value.timestamp.getMilliseconds() * 1000000,
+              })
+            : undefined,
+        timestampRepeated: value.timestampRepeated?.map((d) =>
+          GoogleProtobuf.Timestamp.fromInterface({
+            seconds: Math.floor(d.getTime() / 1000),
+            nanos: d.getMilliseconds() * 1000000,
+          })
+        ),
       }
 
       return Test.fromObject(patchedValue)

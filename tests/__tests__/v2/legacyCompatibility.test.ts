@@ -14,7 +14,24 @@ describe('(v2) legacy compatibility', () => {
     const legacyNestedBuffer = new LegacyFoo.Nested(nested).encode().finish()
     expect(nestedBuffer).toStrictEqual(legacyNestedBuffer)
 
-    // TODO: Fix ITimestamp -> Date conversion
     // TODO: Check why serialization is different
+  })
+
+  it('generates interfaces compatible with the legacy ones', () => {
+    type ITest_extends_LegacyITest = Foo.ITest extends LegacyFoo.ITest
+      ? true
+      : false
+    type LegacyITest_extends_ITest = LegacyFoo.ITest extends Foo.ITest
+      ? true
+      : false
+
+    type GeneratesCompatibleInterfaces = ITest_extends_LegacyITest extends true
+      ? LegacyITest_extends_ITest extends true
+        ? true
+        : false
+      : false
+
+    const generatesCompatibleInterfaces: GeneratesCompatibleInterfaces = true
+    expect(generatesCompatibleInterfaces).toBe(true)
   })
 })

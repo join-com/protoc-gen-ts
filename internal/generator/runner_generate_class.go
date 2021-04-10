@@ -290,6 +290,14 @@ func (r *Runner) generateUnpatchedInterfaceField(
 			}
 		}
 	} else {
+		nestedMessageSpec, ok := r.messageSpecsByFQN[fieldSpec.GetTypeName()]
+		if !ok || nestedMessageSpec == nil {
+			utils.LogError("Unable to retrieve message spec for " + fieldSpec.GetTypeName())
+		}
+		if !messageHasEnums(nestedMessageSpec) {
+			return
+		}
+
 		className := r.getEnumOrMessageTypeName(fieldSpec.GetTypeName(), false)
 		if confirmRequired {
 			if isRepeated {

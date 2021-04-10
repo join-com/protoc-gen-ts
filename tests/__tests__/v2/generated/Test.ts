@@ -288,27 +288,6 @@ export namespace Foo {
           ? EnumType_Enum[value.fieldEnum]!
           : undefined) as EnumType_Enum | undefined,
         fieldEnumRepeated: value.fieldEnumRepeated?.map((e) => Role_Enum[e]!),
-        message:
-          value.message !== undefined
-            ? Nested.fromInterface(value.message)
-            : undefined,
-        messageRepeated: value.messageRepeated?.map((o) =>
-          Nested.fromInterface(o)
-        ),
-        timestamp:
-          value.timestamp !== undefined
-            ? GoogleProtobuf.Timestamp.fromInterface(value.timestamp)
-            : undefined,
-        timestampRepeated: value.timestampRepeated?.map((o) =>
-          GoogleProtobuf.Timestamp.fromInterface(o)
-        ),
-        otherPkgMessage:
-          value.otherPkgMessage !== undefined
-            ? Common_Common.OtherPkgMessage.fromInterface(value.otherPkgMessage)
-            : undefined,
-        otherPkgMessageRepeated: value.otherPkgMessageRepeated?.map((o) =>
-          Common_Common.OtherPkgMessage.fromInterface(o)
-        ),
       }
 
       return Test.fromObject(patchedValue)

@@ -61,6 +61,10 @@ type TypesMap = {
   // message/interfaces (different namespace)
   otherPkgMessage?: Common.IOtherPkgMessage
   otherPkgMessageRepeated?: Common.IOtherPkgMessage[]
+
+  // timestamps
+  timestamp?: Date
+  timestampRepeated?: Date[]
 }
 
 describe('(v2) interfaces', () => {
@@ -196,5 +200,12 @@ describe('(v2) interfaces', () => {
 
     const tOtherPkgMessageR_Ok: IsOk<'otherPkgMessageRepeated'> = true
     expect(tOtherPkgMessageR_Ok).toBe(true)
+
+    // timestamps
+    const tTimestamp_Ok: IsOk<'timestamp'> = true
+    expect(tTimestamp_Ok).toBe(true)
+
+    const tTimestampR_Ok: IsOk<'timestampRepeated'> = true
+    expect(tTimestampR_Ok).toBe(true)
   })
 })

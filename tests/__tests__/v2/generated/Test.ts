@@ -70,8 +70,8 @@ export namespace Foo {
     fieldEnumRepeated?: Role[]
     message?: INested
     messageRepeated?: INested[]
-    timestamp?: GoogleProtobuf.ITimestamp
-    timestampRepeated?: GoogleProtobuf.ITimestamp[]
+    timestamp?: Date
+    timestampRepeated?: Date[]
     otherPkgMessage?: Common_Common.IOtherPkgMessage
     otherPkgMessageRepeated?: Common_Common.IOtherPkgMessage[]
     fieldInt64?: number
@@ -93,12 +93,29 @@ export namespace Foo {
   @protobufjs.Type.d('Request')
   export class Request
     extends protobufjs.Message<Request>
-    implements ConvertibleTo<IRequest> {
+    implements ConvertibleTo<IRequest>, IRequest {
     @protobufjs.Field.d(1, 'int32')
     public id?: number
 
     public asInterface(): IRequest {
       return this
+    }
+
+    public static fromInterface(value: IRequest): Request {
+      return Request.fromObject(value)
+    }
+
+    public static decodePatched(
+      reader: protobufjs.Reader | Uint8Array
+    ): IRequest {
+      return Request.decode(reader)
+    }
+
+    public static encodePatched(
+      message: IRequest,
+      writer?: protobufjs.Writer
+    ): protobufjs.Writer {
+      return Request.encode(message, writer)
     }
   }
 
@@ -108,12 +125,29 @@ export namespace Foo {
   @protobufjs.Type.d('Nested')
   export class Nested
     extends protobufjs.Message<Nested>
-    implements ConvertibleTo<INested> {
+    implements ConvertibleTo<INested>, INested {
     @protobufjs.Field.d(1, 'string')
     public title?: string
 
     public asInterface(): INested {
       return this
+    }
+
+    public static fromInterface(value: INested): Nested {
+      return Nested.fromObject(value)
+    }
+
+    public static decodePatched(
+      reader: protobufjs.Reader | Uint8Array
+    ): INested {
+      return Nested.decode(reader)
+    }
+
+    public static encodePatched(
+      message: INested,
+      writer?: protobufjs.Writer
+    ): protobufjs.Writer {
+      return Nested.encode(message, writer)
     }
   }
 
@@ -237,58 +271,68 @@ export namespace Foo {
 
     public asInterface(): ITest {
       return {
-        fieldInt32: this.fieldInt32,
-        fieldInt32Repeated: this.fieldInt32Repeated,
-        fieldDouble: this.fieldDouble,
-        fieldDoubleRepeated: this.fieldDoubleRepeated,
-        fieldFloat: this.fieldFloat,
-        fieldFloatRepeated: this.fieldFloatRepeated,
-        fieldUint32: this.fieldUint32,
-        fieldUint32Repeated: this.fieldUint32Repeated,
-        fieldUint64: this.fieldUint64,
-        fieldUint64Repeated: this.fieldUint64Repeated,
-        fieldSint32: this.fieldSint32,
-        fieldSint32Repeated: this.fieldSint32Repeated,
-        fieldSint64: this.fieldSint64,
-        fieldSint64Repeated: this.fieldSint64Repeated,
-        fieldFixed32: this.fieldFixed32,
-        fieldFixed32Repeated: this.fieldFixed32Repeated,
-        fieldFixed64: this.fieldFixed64,
-        fieldFixed64Repeated: this.fieldFixed64Repeated,
-        fieldSfixed32: this.fieldSfixed32,
-        fieldSfixed32Repeated: this.fieldSfixed32Repeated,
-        fieldSfixed64: this.fieldSfixed64,
-        fieldSfixed64Repeated: this.fieldSfixed64Repeated,
-        fieldBool: this.fieldBool,
-        fieldBoolRepeated: this.fieldBoolRepeated,
-        fieldString: this.fieldString,
-        fieldStringRepeated: this.fieldStringRepeated,
-        fieldBytes: this.fieldBytes,
-        fieldBytesRepeated: this.fieldBytesRepeated,
-        fieldEnum: (this.fieldEnum !== undefined
+        ...this,
+        fieldEnum: (this.fieldEnum != null
           ? EnumType_Enum[this.fieldEnum]!
           : undefined) as EnumType | undefined,
         fieldEnumRepeated: this.fieldEnumRepeated?.map(
           (e) => Role_Enum[e]! as Role
         ),
-        message: this.message?.asInterface(),
-        messageRepeated: this.messageRepeated?.map((o) => o.asInterface()),
-        timestamp: this.timestamp?.asInterface(),
-        timestampRepeated: this.timestampRepeated?.map((o) => o.asInterface()),
-        otherPkgMessage: this.otherPkgMessage?.asInterface(),
-        otherPkgMessageRepeated: this.otherPkgMessageRepeated?.map((o) =>
-          o.asInterface()
+        timestamp:
+          this.timestamp != null
+            ? new Date(
+                (this.timestamp.seconds ?? 0) * 1000 +
+                  (this.timestamp.nanos ?? 0) / 1000000
+              )
+            : undefined,
+        timestampRepeated: this.timestampRepeated?.map(
+          (ts) => new Date((ts.seconds ?? 0) * 1000 + (ts.nanos ?? 0) / 1000000)
         ),
-        fieldInt64: this.fieldInt64,
-        fieldInt64Repeated: this.fieldInt64Repeated,
       }
+    }
+
+    public static fromInterface(value: ITest): Test {
+      const patchedValue = {
+        ...value,
+        fieldEnum: (value.fieldEnum != null
+          ? EnumType_Enum[value.fieldEnum]!
+          : undefined) as EnumType_Enum | undefined,
+        fieldEnumRepeated: value.fieldEnumRepeated?.map((e) => Role_Enum[e]!),
+        timestamp:
+          value.timestamp != null
+            ? GoogleProtobuf.Timestamp.fromInterface({
+                seconds: Math.floor(value.timestamp.getTime() / 1000),
+                nanos: value.timestamp.getMilliseconds() * 1000000,
+              })
+            : undefined,
+        timestampRepeated: value.timestampRepeated?.map((d) =>
+          GoogleProtobuf.Timestamp.fromInterface({
+            seconds: Math.floor(d.getTime() / 1000),
+            nanos: d.getMilliseconds() * 1000000,
+          })
+        ),
+      }
+
+      return Test.fromObject(patchedValue)
+    }
+
+    public static decodePatched(reader: protobufjs.Reader | Uint8Array): ITest {
+      return Test.decode(reader).asInterface()
+    }
+
+    public static encodePatched(
+      message: ITest,
+      writer?: protobufjs.Writer
+    ): protobufjs.Writer {
+      const transformedMessage = Test.fromInterface(message)
+      return Test.encode(transformedMessage, writer)
     }
   }
 
   @protobufjs.Type.d('CustomOptionsTest')
   export class CustomOptionsTest
     extends protobufjs.Message<CustomOptionsTest>
-    implements ConvertibleTo<ICustomOptionsTest> {
+    implements ConvertibleTo<ICustomOptionsTest>, ICustomOptionsTest {
     @protobufjs.Field.d(1, Common_Extra.ExtraPkgMessage)
     public requiredField!: Common_Extra.ExtraPkgMessage
 
@@ -301,12 +345,29 @@ export namespace Foo {
     public asInterface(): ICustomOptionsTest {
       return this
     }
+
+    public static fromInterface(value: ICustomOptionsTest): CustomOptionsTest {
+      return CustomOptionsTest.fromObject(value)
+    }
+
+    public static decodePatched(
+      reader: protobufjs.Reader | Uint8Array
+    ): ICustomOptionsTest {
+      return CustomOptionsTest.decode(reader)
+    }
+
+    public static encodePatched(
+      message: ICustomOptionsTest,
+      writer?: protobufjs.Writer
+    ): protobufjs.Writer {
+      return CustomOptionsTest.encode(message, writer)
+    }
   }
 
   @protobufjs.Type.d('RequiredPropertiesTest')
   export class RequiredPropertiesTest
     extends protobufjs.Message<RequiredPropertiesTest>
-    implements ConvertibleTo<IRequiredPropertiesTest> {
+    implements ConvertibleTo<IRequiredPropertiesTest>, IRequiredPropertiesTest {
     @protobufjs.Field.d(1, 'int32')
     public requiredField!: number
 
@@ -318,6 +379,25 @@ export namespace Foo {
 
     public asInterface(): IRequiredPropertiesTest {
       return this
+    }
+
+    public static fromInterface(
+      value: IRequiredPropertiesTest
+    ): RequiredPropertiesTest {
+      return RequiredPropertiesTest.fromObject(value)
+    }
+
+    public static decodePatched(
+      reader: protobufjs.Reader | Uint8Array
+    ): IRequiredPropertiesTest {
+      return RequiredPropertiesTest.decode(reader)
+    }
+
+    public static encodePatched(
+      message: IRequiredPropertiesTest,
+      writer?: protobufjs.Writer
+    ): protobufjs.Writer {
+      return RequiredPropertiesTest.encode(message, writer)
     }
   }
 }

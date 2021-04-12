@@ -17,7 +17,7 @@ export namespace Common {
   @protobufjs.Type.d('OtherPkgMessage')
   export class OtherPkgMessage
     extends protobufjs.Message<OtherPkgMessage>
-    implements ConvertibleTo<IOtherPkgMessage> {
+    implements ConvertibleTo<IOtherPkgMessage>, IOtherPkgMessage {
     @protobufjs.Field.d(1, 'string')
     public firstName?: string
 
@@ -26,6 +26,23 @@ export namespace Common {
 
     public asInterface(): IOtherPkgMessage {
       return this
+    }
+
+    public static fromInterface(value: IOtherPkgMessage): OtherPkgMessage {
+      return OtherPkgMessage.fromObject(value)
+    }
+
+    public static decodePatched(
+      reader: protobufjs.Reader | Uint8Array
+    ): IOtherPkgMessage {
+      return OtherPkgMessage.decode(reader)
+    }
+
+    public static encodePatched(
+      message: IOtherPkgMessage,
+      writer?: protobufjs.Writer
+    ): protobufjs.Writer {
+      return OtherPkgMessage.encode(message, writer)
     }
   }
 }

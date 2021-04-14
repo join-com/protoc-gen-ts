@@ -15,7 +15,7 @@ func (r *Runner) generateTypescriptServiceDefinitions(generatedFileStream *proto
 }
 
 func (r *Runner) generateTypescriptServiceDefinition(generatedFileStream *protogen.GeneratedFile, serviceSpec *descriptorpb.ServiceDescriptorProto) {
-	r.P(generatedFileStream, "export const "+strcase.ToLowerCamel(serviceSpec.GetName())+"ServiceDefinition = {")
+	r.P(generatedFileStream, "export const "+strcase.ToLowerCamel(serviceSpec.GetName())+"ServiceDefinition: grpc.ServiceDefinition = {")
 	r.indentLevel += 2
 
 	for _, methodSpec := range serviceSpec.GetMethod() {
@@ -42,14 +42,14 @@ func (r *Runner) generateTypescriptServiceMethod(generatedFileStream *protogen.G
 	inputClass := r.getEnumOrMessageTypeName(inputTypeName, false)
 	r.P(
 		generatedFileStream,
-		"requestSerialize: (request: "+inputInterface+") => "+inputClass+".encodePatched(request).finish(),",
+		"requestSerialize: (request: "+inputInterface+") => "+inputClass+".encodePatched(request).finish() as Buffer,",
 	)
 	r.P(generatedFileStream, "requestDeserialize: "+inputClass+".decodePatched,")
 
 	outputTypeName := methodSpec.GetOutputType()
 	outputInterface := r.getEnumOrMessageTypeName(outputTypeName, true)
 	outputClass := r.getEnumOrMessageTypeName(outputTypeName, false)
-	r.P(generatedFileStream, "responseSerialize: (response: "+outputInterface+") => "+outputClass+".encodePatched(response).finish(),")
+	r.P(generatedFileStream, "responseSerialize: (response: "+outputInterface+") => "+outputClass+".encodePatched(response).finish() as Buffer,")
 	r.P(generatedFileStream, "responseDeserialize: "+outputClass+".decodePatched,")
 
 	r.indentLevel -= 2

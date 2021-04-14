@@ -2,6 +2,7 @@
 
 // import * as joinGRPC from '@join-com/grpc'
 // import * as nodeTrace from '@join-com/node-trace'
+import * as grpc from '@grpc/grpc-js'
 import * as protobufjs from 'protobufjs/light'
 
 import { GoogleProtobuf } from './google/protobuf/Timestamp'
@@ -413,16 +414,18 @@ export namespace Foo {
     }
   }
 
-  export const usersServiceDefinition = {
+  export const usersServiceDefinition: grpc.ServiceDefinition = {
     Find: {
       path: '/foo.Users/Find',
       requestStream: false,
       responseStream: false,
       requestSerialize: (request: IRequest) =>
-        Request.encodePatched(request).finish(),
+        Request.encodePatched(request).finish() as Buffer,
       requestDeserialize: Request.decodePatched,
       responseSerialize: (response: Common_Common.IOtherPkgMessage) =>
-        Common_Common.OtherPkgMessage.encodePatched(response).finish(),
+        Common_Common.OtherPkgMessage.encodePatched(
+          response
+        ).finish() as Buffer,
       responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
     },
     FindClientStream: {
@@ -430,10 +433,12 @@ export namespace Foo {
       requestStream: true,
       responseStream: false,
       requestSerialize: (request: IRequest) =>
-        Request.encodePatched(request).finish(),
+        Request.encodePatched(request).finish() as Buffer,
       requestDeserialize: Request.decodePatched,
       responseSerialize: (response: Common_Common.IOtherPkgMessage) =>
-        Common_Common.OtherPkgMessage.encodePatched(response).finish(),
+        Common_Common.OtherPkgMessage.encodePatched(
+          response
+        ).finish() as Buffer,
       responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
     },
     FindServerStream: {
@@ -441,10 +446,12 @@ export namespace Foo {
       requestStream: false,
       responseStream: true,
       requestSerialize: (request: IRequest) =>
-        Request.encodePatched(request).finish(),
+        Request.encodePatched(request).finish() as Buffer,
       requestDeserialize: Request.decodePatched,
       responseSerialize: (response: Common_Common.IOtherPkgMessage) =>
-        Common_Common.OtherPkgMessage.encodePatched(response).finish(),
+        Common_Common.OtherPkgMessage.encodePatched(
+          response
+        ).finish() as Buffer,
       responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
     },
     FindBidiStream: {
@@ -452,10 +459,12 @@ export namespace Foo {
       requestStream: true,
       responseStream: true,
       requestSerialize: (request: IRequest) =>
-        Request.encodePatched(request).finish(),
+        Request.encodePatched(request).finish() as Buffer,
       requestDeserialize: Request.decodePatched,
       responseSerialize: (response: Common_Common.IOtherPkgMessage) =>
-        Common_Common.OtherPkgMessage.encodePatched(response).finish(),
+        Common_Common.OtherPkgMessage.encodePatched(
+          response
+        ).finish() as Buffer,
       responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
     },
   }

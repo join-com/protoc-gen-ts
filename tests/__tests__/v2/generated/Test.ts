@@ -414,7 +414,14 @@ export namespace Foo {
     }
   }
 
-  export const usersServiceDefinition: grpc.ServiceDefinition = {
+  export interface IUsersServiceImplementation {
+    Find: null
+    FindClientStream: null
+    FindServerStream: null
+    FindBidiStream: null
+  }
+
+  export const usersServiceDefinition: grpc.ServiceDefinition<IUsersServiceImplementation> = {
     Find: {
       path: '/foo.Users/Find',
       requestStream: false,

@@ -10,23 +10,36 @@ import (
 
 func (r *Runner) generateTypescriptServiceDefinitions(generatedFileStream *protogen.GeneratedFile, protoFile *protogen.File) {
 	for _, serviceSpec := range protoFile.Proto.GetService() {
+		r.generateTypescriptServiceImplementationInterface(generatedFileStream, serviceSpec)
 		r.generateTypescriptServiceDefinition(generatedFileStream, serviceSpec)
 	}
 }
 
-func (r *Runner) generateTypescriptServiceDefinition(generatedFileStream *protogen.GeneratedFile, serviceSpec *descriptorpb.ServiceDescriptorProto) {
-	r.P(generatedFileStream, "export const "+strcase.ToLowerCamel(serviceSpec.GetName())+"ServiceDefinition: grpc.ServiceDefinition = {")
+func (r *Runner) generateTypescriptServiceImplementationInterface(generatedFileStream *protogen.GeneratedFile, serviceSpec *descriptorpb.ServiceDescriptorProto) {
+	r.P(generatedFileStream, "export interface I"+strcase.ToCamel(serviceSpec.GetName())+"ServiceImplementation {")
 	r.indentLevel += 2
 
 	for _, methodSpec := range serviceSpec.GetMethod() {
-		r.generateTypescriptServiceMethod(generatedFileStream, serviceSpec, methodSpec)
+		r.P(generatedFileStream, methodSpec.GetName()+": null,")
 	}
 
 	r.indentLevel -= 2
 	r.P(generatedFileStream, "}\n")
 }
 
-func (r *Runner) generateTypescriptServiceMethod(generatedFileStream *protogen.GeneratedFile, serviceSpec *descriptorpb.ServiceDescriptorProto, methodSpec *descriptorpb.MethodDescriptorProto) {
+func (r *Runner) generateTypescriptServiceDefinition(generatedFileStream *protogen.GeneratedFile, serviceSpec *descriptorpb.ServiceDescriptorProto) {
+	r.P(generatedFileStream, "export const "+strcase.ToLowerCamel(serviceSpec.GetName())+"ServiceDefinition: grpc.ServiceDefinition<I"+strcase.ToCamel(serviceSpec.GetName())+"ServiceImplementation> = {")
+	r.indentLevel += 2
+
+	for _, methodSpec := range serviceSpec.GetMethod() {
+		r.generateTypescriptServiceDefinitionMethod(generatedFileStream, serviceSpec, methodSpec)
+	}
+
+	r.indentLevel -= 2
+	r.P(generatedFileStream, "}\n")
+}
+
+func (r *Runner) generateTypescriptServiceDefinitionMethod(generatedFileStream *protogen.GeneratedFile, serviceSpec *descriptorpb.ServiceDescriptorProto, methodSpec *descriptorpb.MethodDescriptorProto) {
 	methodName := methodSpec.GetName()
 
 	r.P(generatedFileStream, methodName+": {")

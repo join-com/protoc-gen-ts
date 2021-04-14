@@ -37,9 +37,9 @@ func (r *Runner) generateTypescriptImports(currentSourcePath string, importSourc
 		}
 
 		generatedFileStream.P(fmt.Sprintf(
-			"import { %s } from './%s'",
+			"import { %s } from '%s'",
 			r.generateImportName(currentSourcePath, importSourcePath),
-			fromProtoPathToGeneratedPath(importSourcePath),
+			fromProtoPathToGeneratedPath(importSourcePath, currentSourcePath),
 		))
 	}
 	generatedFileStream.P("")
@@ -72,7 +72,11 @@ func (r *Runner) generateImportName(currentSourcePath string, importSourcePath s
 
 func (r *Runner) generateTypescriptNamespace(generatedFileStream *protogen.GeneratedFile, protoFile *protogen.File) {
 	namespace := getNamespaceFromProtoPackage(protoFile.Proto.GetPackage())
-	r.P(generatedFileStream, "export namespace "+namespace+" {\n")
+	r.P(
+		generatedFileStream,
+		"// eslint-disable-next-line @typescript-eslint/no-namespace",
+		"export namespace "+namespace+" {\n",
+	)
 	r.indentLevel += 2
 	r.currentNamespace = namespace
 

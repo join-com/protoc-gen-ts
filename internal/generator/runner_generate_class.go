@@ -29,7 +29,7 @@ func (r *Runner) generateTypescriptMessageClass(generatedFileStream *protogen.Ge
 	}
 
 	className := strcase.ToCamel(messageSpec.GetName())
-	hasEnums := messageHasEnumsOrDates(messageSpec)
+	hasEnums := r.messageHasEnumsOrDates(messageSpec)
 	implementedInterfaces := "ConvertibleTo<I" + className + ">"
 	if !hasEnums {
 		implementedInterfaces += ", I" + className
@@ -188,18 +188,13 @@ func (r *Runner) generatePatchedInterfaceField(
 	}
 
 	fieldOptions := fieldSpec.GetOptions()
-	separator := "?: "
 	requiredField, foundRequired := join_proto.GetBooleanCustomFieldOption("typescript_required", fieldOptions, r.extensionTypes)
 	optionalField, foundOptional := join_proto.GetBooleanCustomFieldOption("typescript_optional", fieldOptions, r.extensionTypes)
 	if foundRequired && requiredField && foundOptional && optionalField {
 		utils.LogError("incompatible options for field " + fieldSpec.GetName() + " in " + messageSpec.GetName())
 	}
-	confirmRequired := false
-	if requiredFields && !(foundOptional && optionalField) || foundRequired && requiredField {
-		confirmRequired = true
-		separator = ": "
-	}
 
+	confirmRequired := requiredFields && !(foundOptional && optionalField) || foundRequired && requiredField
 	isRepeated := fieldSpec.GetLabel() == descriptorpb.FieldDescriptorProto_LABEL_REPEATED
 
 	value := "this." + fieldSpec.GetJsonName()
@@ -225,7 +220,7 @@ func (r *Runner) generatePatchedInterfaceField(
 		if !ok || nestedMessageSpec == nil {
 			utils.LogError("Unable to retrieve message spec for " + fieldTypeName)
 		}
-		if fieldTypeName != ".google.protobuf.Timestamp" && !messageHasEnumsOrDates(nestedMessageSpec) {
+		if fieldTypeName != ".google.protobuf.Timestamp" && !r.messageHasEnumsOrDates(nestedMessageSpec) {
 			return
 		}
 
@@ -260,7 +255,7 @@ func (r *Runner) generatePatchedInterfaceField(
 		}
 	}
 
-	r.P(generatedFileStream, fieldSpec.GetJsonName()+separator+value)
+	r.P(generatedFileStream, fieldSpec.GetJsonName()+": "+value)
 }
 
 func (r *Runner) generateUnpatchedInterfaceField(
@@ -275,18 +270,13 @@ func (r *Runner) generateUnpatchedInterfaceField(
 	}
 
 	fieldOptions := fieldSpec.GetOptions()
-	separator := "?: "
 	requiredField, foundRequired := join_proto.GetBooleanCustomFieldOption("typescript_required", fieldOptions, r.extensionTypes)
 	optionalField, foundOptional := join_proto.GetBooleanCustomFieldOption("typescript_optional", fieldOptions, r.extensionTypes)
 	if foundRequired && requiredField && foundOptional && optionalField {
 		utils.LogError("incompatible options for field " + fieldSpec.GetName() + " in " + messageSpec.GetName())
 	}
-	confirmRequired := false
-	if requiredFields && !(foundOptional && optionalField) || foundRequired && requiredField {
-		confirmRequired = true
-		separator = ": "
-	}
 
+	confirmRequired := requiredFields && !(foundOptional && optionalField) || foundRequired && requiredField
 	isRepeated := fieldSpec.GetLabel() == descriptorpb.FieldDescriptorProto_LABEL_REPEATED
 
 	value := "value." + fieldSpec.GetJsonName()
@@ -312,7 +302,7 @@ func (r *Runner) generateUnpatchedInterfaceField(
 		if !ok || nestedMessageSpec == nil {
 			utils.LogError("Unable to retrieve message spec for " + fieldTypeName)
 		}
-		if fieldTypeName != ".google.protobuf.Timestamp" && !messageHasEnumsOrDates(nestedMessageSpec) {
+		if fieldTypeName != ".google.protobuf.Timestamp" && !r.messageHasEnumsOrDates(nestedMessageSpec) {
 			return
 		}
 
@@ -328,7 +318,7 @@ func (r *Runner) generateUnpatchedInterfaceField(
 				if isRepeated {
 					value += ".map((o) => " + className + ".fromInterface(o)),"
 				} else {
-					value = className + ".fromInterface(" + value + ")),"
+					value = className + ".fromInterface(" + value + "),"
 				}
 			}
 		} else {
@@ -348,25 +338,28 @@ func (r *Runner) generateUnpatchedInterfaceField(
 		}
 	}
 
-	r.P(generatedFileStream, fieldSpec.GetJsonName()+separator+value)
+	r.P(generatedFileStream, fieldSpec.GetJsonName()+": "+value)
 }
 
-func messageHasEnumsOrDates(messageSpec *descriptorpb.DescriptorProto) bool {
+func (r *Runner) messageHasEnumsOrDates(messageSpec *descriptorpb.DescriptorProto) bool {
 	for _, fieldSpec := range messageSpec.GetField() {
 		switch t := fieldSpec.GetType(); t {
 		case descriptorpb.FieldDescriptorProto_TYPE_ENUM:
 			return true
 		case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE:
-			if fieldSpec.GetTypeName() == ".google.protobuf.Timestamp" {
+			fieldTypeName := fieldSpec.GetTypeName()
+			if fieldTypeName == ".google.protobuf.Timestamp" {
 				return true
 			}
-		}
-	}
 
-	for _, nestedMessageSpec := range messageSpec.GetNestedType() {
-		hasEnums := messageHasEnumsOrDates(nestedMessageSpec)
-		if hasEnums {
-			return true
+			nestedMessageSpec, ok := r.messageSpecsByFQN[fieldTypeName]
+			if !ok || nestedMessageSpec == nil {
+				utils.LogError("Unable to retrieve message spec for " + fieldTypeName)
+			}
+
+			if r.messageHasEnumsOrDates(nestedMessageSpec) {
+				return true
+			}
 		}
 	}
 

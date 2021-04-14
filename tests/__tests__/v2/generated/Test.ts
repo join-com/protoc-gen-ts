@@ -8,6 +8,7 @@ import { GoogleProtobuf } from './google/protobuf/Timestamp'
 import { Common as Common_Common } from './common/Common'
 import { Common as Common_Extra } from './common/Extra'
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Foo {
   interface ConvertibleTo<T> {
     asInterface(): T
@@ -332,7 +333,7 @@ export namespace Foo {
   @protobufjs.Type.d('CustomOptionsTest')
   export class CustomOptionsTest
     extends protobufjs.Message<CustomOptionsTest>
-    implements ConvertibleTo<ICustomOptionsTest>, ICustomOptionsTest {
+    implements ConvertibleTo<ICustomOptionsTest> {
     @protobufjs.Field.d(1, Common_Extra.ExtraPkgMessage)
     public requiredField!: Common_Extra.ExtraPkgMessage
 
@@ -343,24 +344,35 @@ export namespace Foo {
     public customOptionalField?: number
 
     public asInterface(): ICustomOptionsTest {
-      return this
+      return {
+        ...this,
+        requiredField: this.requiredField.asInterface(),
+      }
     }
 
     public static fromInterface(value: ICustomOptionsTest): CustomOptionsTest {
-      return CustomOptionsTest.fromObject(value)
+      const patchedValue = {
+        ...value,
+        requiredField: Common_Extra.ExtraPkgMessage.fromInterface(
+          value.requiredField
+        ),
+      }
+
+      return CustomOptionsTest.fromObject(patchedValue)
     }
 
     public static decodePatched(
       reader: protobufjs.Reader | Uint8Array
     ): ICustomOptionsTest {
-      return CustomOptionsTest.decode(reader)
+      return CustomOptionsTest.decode(reader).asInterface()
     }
 
     public static encodePatched(
       message: ICustomOptionsTest,
       writer?: protobufjs.Writer
     ): protobufjs.Writer {
-      return CustomOptionsTest.encode(message, writer)
+      const transformedMessage = CustomOptionsTest.fromInterface(message)
+      return CustomOptionsTest.encode(transformedMessage, writer)
     }
   }
 

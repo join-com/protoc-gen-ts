@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-// "Dummy" option to make protoc happy (useful for Golang code generation, not for TS)
+// Makes protoc happy (useful for Golang code generation, not for TS)
 option go_package = "github.com/join-com/protoc-gen-ts/foo/common";
 
 package common;

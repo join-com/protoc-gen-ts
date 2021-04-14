@@ -412,4 +412,51 @@ export namespace Foo {
       return RequiredPropertiesTest.encode(message, writer)
     }
   }
+
+  export const usersServiceDefinition = {
+    Find: {
+      path: '/foo.Users/Find',
+      requestStream: false,
+      responseStream: false,
+      requestSerialize: (request: IRequest) =>
+        Request.encodePatched(request).finish(),
+      requestDeserialize: Request.decodePatched,
+      responseSerialize: (response: Common_Common.IOtherPkgMessage) =>
+        Common_Common.OtherPkgMessage.encodePatched(response).finish(),
+      responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
+    },
+    FindClientStream: {
+      path: '/foo.Users/FindClientStream',
+      requestStream: true,
+      responseStream: false,
+      requestSerialize: (request: IRequest) =>
+        Request.encodePatched(request).finish(),
+      requestDeserialize: Request.decodePatched,
+      responseSerialize: (response: Common_Common.IOtherPkgMessage) =>
+        Common_Common.OtherPkgMessage.encodePatched(response).finish(),
+      responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
+    },
+    FindServerStream: {
+      path: '/foo.Users/FindServerStream',
+      requestStream: false,
+      responseStream: true,
+      requestSerialize: (request: IRequest) =>
+        Request.encodePatched(request).finish(),
+      requestDeserialize: Request.decodePatched,
+      responseSerialize: (response: Common_Common.IOtherPkgMessage) =>
+        Common_Common.OtherPkgMessage.encodePatched(response).finish(),
+      responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
+    },
+    FindBidiStream: {
+      path: '/foo.Users/FindBidiStream',
+      requestStream: true,
+      responseStream: true,
+      requestSerialize: (request: IRequest) =>
+        Request.encodePatched(request).finish(),
+      requestDeserialize: Request.decodePatched,
+      responseSerialize: (response: Common_Common.IOtherPkgMessage) =>
+        Common_Common.OtherPkgMessage.encodePatched(response).finish(),
+      responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
+    },
+  }
 }

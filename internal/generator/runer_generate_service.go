@@ -2,7 +2,6 @@ package generator
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/iancoleman/strcase"
 	"google.golang.org/protobuf/compiler/protogen"
@@ -16,8 +15,6 @@ func (r *Runner) generateTypescriptServiceDefinitions(generatedFileStream *proto
 }
 
 func (r *Runner) generateTypescriptServiceDefinition(generatedFileStream *protogen.GeneratedFile, serviceSpec *descriptorpb.ServiceDescriptorProto) {
-	log.Print(serviceSpec)
-
 	r.P(generatedFileStream, "export const "+strcase.ToLowerCamel(serviceSpec.GetName())+"ServiceDefinition = {")
 	r.indentLevel += 2
 

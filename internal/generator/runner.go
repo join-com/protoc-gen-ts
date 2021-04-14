@@ -18,6 +18,7 @@ type Runner struct {
 	extensionTypes                 *protoregistry.Types // used to parse custom options
 	currentProtoFilePath           string
 	currentNamespace               string
+	currentPackage                 string
 	indentLevel                    int
 	packagesByFile                 map[string]string                        // source file path -> package name
 	filesForExportedPackageSymbols map[string]map[string]string             // pkg_name -> symbol -> source file path
@@ -32,6 +33,7 @@ func NewRunner() Runner {
 		extensionTypes:                 new(protoregistry.Types),
 		currentProtoFilePath:           "",
 		currentNamespace:               "",
+		currentPackage:                 "",
 		indentLevel:                    0,
 		packagesByFile:                 make(map[string]string),
 		filesForExportedPackageSymbols: make(map[string]map[string]string),

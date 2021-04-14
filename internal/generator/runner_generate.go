@@ -71,14 +71,14 @@ func (r *Runner) generateImportName(currentSourcePath string, importSourcePath s
 }
 
 func (r *Runner) generateTypescriptNamespace(generatedFileStream *protogen.GeneratedFile, protoFile *protogen.File) {
-	namespace := getNamespaceFromProtoPackage(protoFile.Proto.GetPackage())
+	r.currentPackage = protoFile.Proto.GetPackage()
+	r.currentNamespace = getNamespaceFromProtoPackage(r.currentPackage)
 	r.P(
 		generatedFileStream,
 		"// eslint-disable-next-line @typescript-eslint/no-namespace",
-		"export namespace "+namespace+" {\n",
+		"export namespace "+r.currentNamespace+" {\n",
 	)
 	r.indentLevel += 2
-	r.currentNamespace = namespace
 
 	// This interface is namespace-private, as it's being replicated for every generated file
 	r.P(
@@ -91,8 +91,10 @@ func (r *Runner) generateTypescriptNamespace(generatedFileStream *protogen.Gener
 	r.generateTypescriptEnums(generatedFileStream, protoFile)
 	r.generateTypescriptMessageInterfaces(generatedFileStream, protoFile)
 	r.generateTypescriptMessageClasses(generatedFileStream, protoFile)
+	r.generateTypescriptServiceDefinitions(generatedFileStream, protoFile)
 
 	r.currentNamespace = ""
+	r.currentPackage = ""
 	r.indentLevel -= 2
 	r.P(generatedFileStream, "\n}")
 }

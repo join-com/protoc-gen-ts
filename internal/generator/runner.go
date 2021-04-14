@@ -68,7 +68,7 @@ func (r *Runner) Run(plugin *protogen.Plugin) error {
 			continue
 		}
 
-		outputPath := fromProtoPathToGeneratedPath(file.Desc.Path()) + ".ts"
+		outputPath := fromProtoPathToGeneratedPath(file.Desc.Path(), ".") + ".ts"
 		generatedFileStream := plugin.NewGeneratedFile(outputPath, "")
 		r.generateTypescriptFile(file, generatedFileStream)
 	}

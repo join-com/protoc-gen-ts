@@ -414,8 +414,7 @@ export namespace Foo {
     }
   }
 
-  export interface IUsersServiceImplementation
-    extends grpc.UntypedServiceImplementation {
+  export interface IUsersServiceImplementation {
     Find: grpc.handleUnaryCall<IRequest, Common_Common.IOtherPkgMessage>
     FindClientStream: grpc.handleClientStreamingCall<
       IRequest,
@@ -425,7 +424,7 @@ export namespace Foo {
       IRequest,
       Common_Common.IOtherPkgMessage
     >
-    FindBidiStream: grpc.handleClientStreamingCall<
+    FindBidiStream: grpc.handleBidiStreamingCall<
       IRequest,
       Common_Common.IOtherPkgMessage
     >
@@ -484,5 +483,44 @@ export namespace Foo {
         ).finish() as Buffer,
       responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
     },
+  }
+
+  export class UsersClient
+    extends joinGRPC.Client<grpc.ServiceDefinition<IUsersServiceImplementation>>
+    implements joinGRPC.IExtendedClient<IUsersServiceImplementation> {
+    public Find(
+      request: IRequest,
+      metadata?: Record<string, string>,
+      options?: grpc.CallOptions
+    ): joinGRPC.IUnaryRequest<Common_Common.IOtherPkgMessage> {
+      return this.makeUnaryRequest('Find', request, metadata, options)
+    }
+
+    public FindClientStream(
+      metadata?: Record<string, string>,
+      options?: grpc.CallOptions
+    ): joinGRPC.IClientStreamRequest<IRequest, Common_Common.IOtherPkgMessage> {
+      return this.makeClientStreamRequest('FindClientStream', metadata, options)
+    }
+
+    public FindServerStream(
+      request: IRequest,
+      metadata?: Record<string, string>,
+      options?: grpc.CallOptions
+    ): grpc.ClientReadableStream<Common_Common.IOtherPkgMessage> {
+      return this.makeServerStreamRequest(
+        'FindServerStream',
+        request,
+        metadata,
+        options
+      )
+    }
+
+    public FindBidiStream(
+      metadata?: Record<string, string>,
+      options?: grpc.CallOptions
+    ): grpc.ClientDuplexStream<IRequest, Common_Common.IOtherPkgMessage> {
+      return this.makeBidiStreamRequest('FindBidiStream', metadata, options)
+    }
   }
 }

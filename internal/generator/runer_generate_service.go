@@ -16,11 +16,28 @@ func (r *Runner) generateTypescriptServiceDefinitions(generatedFileStream *proto
 }
 
 func (r *Runner) generateTypescriptServiceImplementationInterface(generatedFileStream *protogen.GeneratedFile, serviceSpec *descriptorpb.ServiceDescriptorProto) {
-	r.P(generatedFileStream, "export interface I"+strcase.ToCamel(serviceSpec.GetName())+"ServiceImplementation {")
+	r.P(generatedFileStream, "export interface I"+strcase.ToCamel(serviceSpec.GetName())+"ServiceImplementation extends grpc.UntypedServiceImplementation {")
 	r.indentLevel += 2
 
 	for _, methodSpec := range serviceSpec.GetMethod() {
-		r.P(generatedFileStream, methodSpec.GetName()+": null,")
+		clientStream := methodSpec.GetClientStreaming()
+		serverStream := methodSpec.GetServerStreaming()
+
+		inputTypeName := methodSpec.GetInputType()
+		inputInterface := r.getEnumOrMessageTypeName(inputTypeName, true)
+
+		outputTypeName := methodSpec.GetOutputType()
+		outputInterface := r.getEnumOrMessageTypeName(outputTypeName, true)
+
+		if !clientStream && !serverStream {
+			r.P(generatedFileStream, methodSpec.GetName()+": grpc.handleUnaryCall<"+inputInterface+", "+outputInterface+">")
+		} else if clientStream {
+			r.P(generatedFileStream, methodSpec.GetName()+": grpc.handleClientStreamingCall<"+inputInterface+", "+outputInterface+">")
+		} else if serverStream {
+			r.P(generatedFileStream, methodSpec.GetName()+": grpc.handleServerStreamingCall<"+inputInterface+", "+outputInterface+">")
+		} else {
+			r.P(generatedFileStream, methodSpec.GetName()+": grpc.handleBidiStreamingCall<"+inputInterface+", "+outputInterface+">")
+		}
 	}
 
 	r.indentLevel -= 2

@@ -28,11 +28,10 @@ func (r *Runner) generateTypescriptImports(protoFile *protogen.File, generatedFi
 	importSourcePaths := protoFile.Proto.GetDependency()
 
 	// Generic imports
-	generatedFileStream.P("// import * as joinGRPC from '@join-com/grpc'")        // TODO: Remove comment when import is used
-	generatedFileStream.P("// import * as nodeTrace from '@join-com/node-trace'") // TODO: Remove comment when import is used
-
 	if len(protoFile.Proto.GetService()) > 0 {
-		generatedFileStream.P("import * as grpc from '@grpc/grpc-js'") // TODO: Maybe re-export some stuff through @join-com/grpc
+		generatedFileStream.P("// import * as nodeTrace from '@join-com/node-trace'") // TODO: Remove comment when import is used
+		generatedFileStream.P("import * as joinGRPC from '@join-com/grpc'")
+		generatedFileStream.P("import { grpc } from '@join-com/grpc'")
 	}
 	generatedFileStream.P("import * as protobufjs from 'protobufjs/light'")
 	generatedFileStream.P("")

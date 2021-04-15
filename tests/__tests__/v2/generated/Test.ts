@@ -1,8 +1,8 @@
 // GENERATED CODE -- DO NOT EDIT!
 
-// import * as joinGRPC from '@join-com/grpc'
 // import * as nodeTrace from '@join-com/node-trace'
-import * as grpc from '@grpc/grpc-js'
+import * as joinGRPC from '@join-com/grpc'
+import { grpc } from '@join-com/grpc'
 import * as protobufjs from 'protobufjs/light'
 
 import { GoogleProtobuf } from './google/protobuf/Timestamp'
@@ -414,11 +414,21 @@ export namespace Foo {
     }
   }
 
-  export interface IUsersServiceImplementation {
-    Find: null
-    FindClientStream: null
-    FindServerStream: null
-    FindBidiStream: null
+  export interface IUsersServiceImplementation
+    extends grpc.UntypedServiceImplementation {
+    Find: grpc.handleUnaryCall<IRequest, Common_Common.IOtherPkgMessage>
+    FindClientStream: grpc.handleClientStreamingCall<
+      IRequest,
+      Common_Common.IOtherPkgMessage
+    >
+    FindServerStream: grpc.handleServerStreamingCall<
+      IRequest,
+      Common_Common.IOtherPkgMessage
+    >
+    FindBidiStream: grpc.handleClientStreamingCall<
+      IRequest,
+      Common_Common.IOtherPkgMessage
+    >
   }
 
   export const usersServiceDefinition: grpc.ServiceDefinition<IUsersServiceImplementation> = {

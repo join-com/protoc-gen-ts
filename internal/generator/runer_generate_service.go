@@ -10,23 +10,54 @@ import (
 
 func (r *Runner) generateTypescriptServiceDefinitions(generatedFileStream *protogen.GeneratedFile, protoFile *protogen.File) {
 	for _, serviceSpec := range protoFile.Proto.GetService() {
+		r.generateTypescriptServiceImplementationInterface(generatedFileStream, serviceSpec)
 		r.generateTypescriptServiceDefinition(generatedFileStream, serviceSpec)
+		r.generateTypescriptClient(generatedFileStream, serviceSpec)
 	}
 }
 
-func (r *Runner) generateTypescriptServiceDefinition(generatedFileStream *protogen.GeneratedFile, serviceSpec *descriptorpb.ServiceDescriptorProto) {
-	r.P(generatedFileStream, "export const "+strcase.ToLowerCamel(serviceSpec.GetName())+"ServiceDefinition = {")
+func (r *Runner) generateTypescriptServiceImplementationInterface(generatedFileStream *protogen.GeneratedFile, serviceSpec *descriptorpb.ServiceDescriptorProto) {
+	r.P(generatedFileStream, "export interface I"+strcase.ToCamel(serviceSpec.GetName())+"ServiceImplementation {")
 	r.indentLevel += 2
 
 	for _, methodSpec := range serviceSpec.GetMethod() {
-		r.generateTypescriptServiceMethod(generatedFileStream, serviceSpec, methodSpec)
+		clientStream := methodSpec.GetClientStreaming()
+		serverStream := methodSpec.GetServerStreaming()
+
+		inputTypeName := methodSpec.GetInputType()
+		inputInterface := r.getEnumOrMessageTypeName(inputTypeName, true)
+
+		outputTypeName := methodSpec.GetOutputType()
+		outputInterface := r.getEnumOrMessageTypeName(outputTypeName, true)
+
+		if !clientStream && !serverStream {
+			r.P(generatedFileStream, methodSpec.GetName()+": grpc.handleUnaryCall<"+inputInterface+", "+outputInterface+">")
+		} else if clientStream && serverStream {
+			r.P(generatedFileStream, methodSpec.GetName()+": grpc.handleBidiStreamingCall<"+inputInterface+", "+outputInterface+">")
+		} else if clientStream {
+			r.P(generatedFileStream, methodSpec.GetName()+": grpc.handleClientStreamingCall<"+inputInterface+", "+outputInterface+">")
+		} else { //if serverStream {
+			r.P(generatedFileStream, methodSpec.GetName()+": grpc.handleServerStreamingCall<"+inputInterface+", "+outputInterface+">")
+		}
 	}
 
 	r.indentLevel -= 2
 	r.P(generatedFileStream, "}\n")
 }
 
-func (r *Runner) generateTypescriptServiceMethod(generatedFileStream *protogen.GeneratedFile, serviceSpec *descriptorpb.ServiceDescriptorProto, methodSpec *descriptorpb.MethodDescriptorProto) {
+func (r *Runner) generateTypescriptServiceDefinition(generatedFileStream *protogen.GeneratedFile, serviceSpec *descriptorpb.ServiceDescriptorProto) {
+	r.P(generatedFileStream, "export const "+strcase.ToLowerCamel(serviceSpec.GetName())+"ServiceDefinition: grpc.ServiceDefinition<I"+strcase.ToCamel(serviceSpec.GetName())+"ServiceImplementation> = {")
+	r.indentLevel += 2
+
+	for _, methodSpec := range serviceSpec.GetMethod() {
+		r.generateTypescriptServiceDefinitionMethod(generatedFileStream, serviceSpec, methodSpec)
+	}
+
+	r.indentLevel -= 2
+	r.P(generatedFileStream, "}\n")
+}
+
+func (r *Runner) generateTypescriptServiceDefinitionMethod(generatedFileStream *protogen.GeneratedFile, serviceSpec *descriptorpb.ServiceDescriptorProto, methodSpec *descriptorpb.MethodDescriptorProto) {
 	methodName := methodSpec.GetName()
 
 	r.P(generatedFileStream, methodName+": {")
@@ -42,16 +73,85 @@ func (r *Runner) generateTypescriptServiceMethod(generatedFileStream *protogen.G
 	inputClass := r.getEnumOrMessageTypeName(inputTypeName, false)
 	r.P(
 		generatedFileStream,
-		"requestSerialize: (request: "+inputInterface+") => "+inputClass+".encodePatched(request).finish(),",
+		"requestSerialize: (request: "+inputInterface+") => "+inputClass+".encodePatched(request).finish() as Buffer,",
 	)
 	r.P(generatedFileStream, "requestDeserialize: "+inputClass+".decodePatched,")
 
 	outputTypeName := methodSpec.GetOutputType()
 	outputInterface := r.getEnumOrMessageTypeName(outputTypeName, true)
 	outputClass := r.getEnumOrMessageTypeName(outputTypeName, false)
-	r.P(generatedFileStream, "responseSerialize: (response: "+outputInterface+") => "+outputClass+".encodePatched(response).finish(),")
+	r.P(generatedFileStream, "responseSerialize: (response: "+outputInterface+") => "+outputClass+".encodePatched(response).finish() as Buffer,")
 	r.P(generatedFileStream, "responseDeserialize: "+outputClass+".decodePatched,")
 
 	r.indentLevel -= 2
 	r.P(generatedFileStream, "},")
+}
+
+func (r *Runner) generateTypescriptClient(generatedFileStream *protogen.GeneratedFile, serviceSpec *descriptorpb.ServiceDescriptorProto) {
+	r.P(
+		generatedFileStream,
+		"export class "+strcase.ToCamel(serviceSpec.GetName())+"Client",
+		"extends joinGRPC.Client<grpc.ServiceDefinition<I"+strcase.ToCamel(serviceSpec.GetName())+"ServiceImplementation>> ",
+		"implements joinGRPC.IExtendedClient<I"+strcase.ToCamel(serviceSpec.GetName())+"ServiceImplementation> {",
+	)
+	r.indentLevel += 2
+
+	for _, methodSpec := range serviceSpec.GetMethod() {
+		r.generateTypescriptClientMethod(generatedFileStream, serviceSpec, methodSpec)
+	}
+
+	r.indentLevel -= 2
+	r.P(generatedFileStream, "}\n")
+}
+
+func (r *Runner) generateTypescriptClientMethod(generatedFileStream *protogen.GeneratedFile, serviceSpec *descriptorpb.ServiceDescriptorProto, methodSpec *descriptorpb.MethodDescriptorProto) {
+	// Function's Signature
+	methodName := strcase.ToCamel(methodSpec.GetName())
+	r.P(generatedFileStream, "public "+methodName+"(")
+	r.indentLevel += 2
+
+	inputTypeName := methodSpec.GetInputType()
+	inputInterface := r.getEnumOrMessageTypeName(inputTypeName, true)
+	outputTypeName := methodSpec.GetOutputType()
+	outputInterface := r.getEnumOrMessageTypeName(outputTypeName, true)
+
+	clientStream := methodSpec.GetClientStreaming()
+	serverStrean := methodSpec.GetServerStreaming()
+
+	if !clientStream {
+		r.P(generatedFileStream, "request: "+inputInterface+",")
+	}
+
+	r.P(generatedFileStream,
+		"metadata?: Record<string, string>,",
+		"options?: grpc.CallOptions,",
+	)
+
+	var returnType string
+	if clientStream && serverStrean {
+		returnType = "grpc.ClientDuplexStream<" + inputInterface + ", " + outputInterface + ">"
+	} else if !clientStream && !serverStrean {
+		returnType = "joinGRPC.IUnaryRequest<" + outputInterface + ">"
+	} else if clientStream {
+		returnType = "joinGRPC.IClientStreamRequest<" + inputInterface + ", " + outputInterface + ">"
+	} else { // if serverStream
+		returnType = "grpc.ClientReadableStream<" + outputInterface + ">"
+	}
+
+	r.indentLevel -= 2
+	r.P(generatedFileStream, "): "+returnType+" {")
+	r.indentLevel += 2
+
+	if clientStream && serverStrean {
+		r.P(generatedFileStream, "return this.makeBidiStreamRequest('"+methodName+"', metadata, options)")
+	} else if !clientStream && !serverStrean {
+		r.P(generatedFileStream, "return this.makeUnaryRequest('"+methodName+"', request, metadata, options)")
+	} else if clientStream {
+		r.P(generatedFileStream, "return this.makeClientStreamRequest('"+methodName+"', metadata, options)")
+	} else { // if serverStream
+		r.P(generatedFileStream, "return this.makeServerStreamRequest('"+methodName+"', request, metadata, options)")
+	}
+
+	r.indentLevel -= 2
+	r.P(generatedFileStream, "}\n")
 }

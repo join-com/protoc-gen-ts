@@ -19,14 +19,20 @@ func (r *Runner) generateTypescriptFile(protoFile *protogen.File, generatedFileS
 	// TODO: Generate comment with version, in order to improve traceability & debugging experience
 	generatedFileStream.P("// GENERATED CODE -- DO NOT EDIT!\n")
 
-	r.generateTypescriptImports(protoFile.Desc.Path(), protoFile.Proto.GetDependency(), generatedFileStream)
+	r.generateTypescriptImports(protoFile, generatedFileStream)
 	r.generateTypescriptNamespace(generatedFileStream, protoFile)
 }
 
-func (r *Runner) generateTypescriptImports(currentSourcePath string, importSourcePaths []string, generatedFileStream *protogen.GeneratedFile) {
+func (r *Runner) generateTypescriptImports(protoFile *protogen.File, generatedFileStream *protogen.GeneratedFile) {
+	currentSourcePath := protoFile.Desc.Path()
+	importSourcePaths := protoFile.Proto.GetDependency()
+
 	// Generic imports
-	generatedFileStream.P("// import * as joinGRPC from '@join-com/grpc'")        // TODO: Remove comment when import is used
-	generatedFileStream.P("// import * as nodeTrace from '@join-com/node-trace'") // TODO: Remove comment when import is used
+	if len(protoFile.Proto.GetService()) > 0 {
+		generatedFileStream.P("// import * as nodeTrace from '@join-com/node-trace'") // TODO: Remove comment when import is used
+		generatedFileStream.P("import * as joinGRPC from '@join-com/grpc'")
+		generatedFileStream.P("import { grpc } from '@join-com/grpc'")
+	}
 	generatedFileStream.P("import * as protobufjs from 'protobufjs/light'")
 	generatedFileStream.P("")
 

@@ -1,7 +1,8 @@
 // GENERATED CODE -- DO NOT EDIT!
 
-// import * as joinGRPC from '@join-com/grpc'
 // import * as nodeTrace from '@join-com/node-trace'
+import * as joinGRPC from '@join-com/grpc'
+import { grpc } from '@join-com/grpc'
 import * as protobufjs from 'protobufjs/light'
 
 import { GoogleProtobuf } from './google/protobuf/Timestamp'
@@ -413,16 +414,34 @@ export namespace Foo {
     }
   }
 
-  export const usersServiceDefinition = {
+  export interface IUsersServiceImplementation {
+    Find: grpc.handleUnaryCall<IRequest, Common_Common.IOtherPkgMessage>
+    FindClientStream: grpc.handleClientStreamingCall<
+      IRequest,
+      Common_Common.IOtherPkgMessage
+    >
+    FindServerStream: grpc.handleServerStreamingCall<
+      IRequest,
+      Common_Common.IOtherPkgMessage
+    >
+    FindBidiStream: grpc.handleBidiStreamingCall<
+      IRequest,
+      Common_Common.IOtherPkgMessage
+    >
+  }
+
+  export const usersServiceDefinition: grpc.ServiceDefinition<IUsersServiceImplementation> = {
     Find: {
       path: '/foo.Users/Find',
       requestStream: false,
       responseStream: false,
       requestSerialize: (request: IRequest) =>
-        Request.encodePatched(request).finish(),
+        Request.encodePatched(request).finish() as Buffer,
       requestDeserialize: Request.decodePatched,
       responseSerialize: (response: Common_Common.IOtherPkgMessage) =>
-        Common_Common.OtherPkgMessage.encodePatched(response).finish(),
+        Common_Common.OtherPkgMessage.encodePatched(
+          response
+        ).finish() as Buffer,
       responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
     },
     FindClientStream: {
@@ -430,10 +449,12 @@ export namespace Foo {
       requestStream: true,
       responseStream: false,
       requestSerialize: (request: IRequest) =>
-        Request.encodePatched(request).finish(),
+        Request.encodePatched(request).finish() as Buffer,
       requestDeserialize: Request.decodePatched,
       responseSerialize: (response: Common_Common.IOtherPkgMessage) =>
-        Common_Common.OtherPkgMessage.encodePatched(response).finish(),
+        Common_Common.OtherPkgMessage.encodePatched(
+          response
+        ).finish() as Buffer,
       responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
     },
     FindServerStream: {
@@ -441,10 +462,12 @@ export namespace Foo {
       requestStream: false,
       responseStream: true,
       requestSerialize: (request: IRequest) =>
-        Request.encodePatched(request).finish(),
+        Request.encodePatched(request).finish() as Buffer,
       requestDeserialize: Request.decodePatched,
       responseSerialize: (response: Common_Common.IOtherPkgMessage) =>
-        Common_Common.OtherPkgMessage.encodePatched(response).finish(),
+        Common_Common.OtherPkgMessage.encodePatched(
+          response
+        ).finish() as Buffer,
       responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
     },
     FindBidiStream: {
@@ -452,11 +475,52 @@ export namespace Foo {
       requestStream: true,
       responseStream: true,
       requestSerialize: (request: IRequest) =>
-        Request.encodePatched(request).finish(),
+        Request.encodePatched(request).finish() as Buffer,
       requestDeserialize: Request.decodePatched,
       responseSerialize: (response: Common_Common.IOtherPkgMessage) =>
-        Common_Common.OtherPkgMessage.encodePatched(response).finish(),
+        Common_Common.OtherPkgMessage.encodePatched(
+          response
+        ).finish() as Buffer,
       responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
     },
+  }
+
+  export class UsersClient
+    extends joinGRPC.Client<grpc.ServiceDefinition<IUsersServiceImplementation>>
+    implements joinGRPC.IExtendedClient<IUsersServiceImplementation> {
+    public Find(
+      request: IRequest,
+      metadata?: Record<string, string>,
+      options?: grpc.CallOptions
+    ): joinGRPC.IUnaryRequest<Common_Common.IOtherPkgMessage> {
+      return this.makeUnaryRequest('Find', request, metadata, options)
+    }
+
+    public FindClientStream(
+      metadata?: Record<string, string>,
+      options?: grpc.CallOptions
+    ): joinGRPC.IClientStreamRequest<IRequest, Common_Common.IOtherPkgMessage> {
+      return this.makeClientStreamRequest('FindClientStream', metadata, options)
+    }
+
+    public FindServerStream(
+      request: IRequest,
+      metadata?: Record<string, string>,
+      options?: grpc.CallOptions
+    ): grpc.ClientReadableStream<Common_Common.IOtherPkgMessage> {
+      return this.makeServerStreamRequest(
+        'FindServerStream',
+        request,
+        metadata,
+        options
+      )
+    }
+
+    public FindBidiStream(
+      metadata?: Record<string, string>,
+      options?: grpc.CallOptions
+    ): grpc.ClientDuplexStream<IRequest, Common_Common.IOtherPkgMessage> {
+      return this.makeBidiStreamRequest('FindBidiStream', metadata, options)
+    }
   }
 }

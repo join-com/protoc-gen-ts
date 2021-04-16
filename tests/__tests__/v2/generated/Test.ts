@@ -485,9 +485,34 @@ export namespace Foo {
     },
   }
 
+  export interface IUsersClient
+    extends joinGRPC.IClient<
+        grpc.ServiceDefinition<IUsersServiceImplementation>
+      >,
+      joinGRPC.IExtendedClient<IUsersServiceImplementation> {
+    Find(
+      request: IRequest,
+      metadata?: Record<string, string>,
+      options?: grpc.CallOptions
+    ): joinGRPC.IUnaryRequest<Common_Common.IOtherPkgMessage>
+    FindClientStream(
+      metadata?: Record<string, string>,
+      options?: grpc.CallOptions
+    ): joinGRPC.IClientStreamRequest<IRequest, Common_Common.IOtherPkgMessage>
+    FindServerStream(
+      request: IRequest,
+      metadata?: Record<string, string>,
+      options?: grpc.CallOptions
+    ): grpc.ClientReadableStream<Common_Common.IOtherPkgMessage>
+    FindBidiStream(
+      metadata?: Record<string, string>,
+      options?: grpc.CallOptions
+    ): grpc.ClientDuplexStream<IRequest, Common_Common.IOtherPkgMessage>
+  }
+
   export class UsersClient
     extends joinGRPC.Client<grpc.ServiceDefinition<IUsersServiceImplementation>>
-    implements joinGRPC.IExtendedClient<IUsersServiceImplementation> {
+    implements IUsersClient {
     public Find(
       request: IRequest,
       metadata?: Record<string, string>,

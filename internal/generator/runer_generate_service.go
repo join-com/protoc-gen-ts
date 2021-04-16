@@ -12,6 +12,7 @@ func (r *Runner) generateTypescriptServiceDefinitions(generatedFileStream *proto
 	for _, serviceSpec := range protoFile.Proto.GetService() {
 		r.generateTypescriptServiceImplementationInterface(generatedFileStream, serviceSpec)
 		r.generateTypescriptServiceDefinition(generatedFileStream, serviceSpec)
+		r.generateTypescriptClientInterface(generatedFileStream, serviceSpec)
 		r.generateTypescriptClient(generatedFileStream, serviceSpec)
 	}
 }
@@ -87,12 +88,67 @@ func (r *Runner) generateTypescriptServiceDefinitionMethod(generatedFileStream *
 	r.P(generatedFileStream, "},")
 }
 
+func (r *Runner) generateTypescriptClientInterface(generatedFileStream *protogen.GeneratedFile, serviceSpec *descriptorpb.ServiceDescriptorProto) {
+	r.P(
+		generatedFileStream,
+		"export interface I"+strcase.ToCamel(serviceSpec.GetName())+"Client",
+		"extends joinGRPC.IClient<grpc.ServiceDefinition<I"+strcase.ToCamel(serviceSpec.GetName())+"ServiceImplementation>> ",
+		", joinGRPC.IExtendedClient<I"+strcase.ToCamel(serviceSpec.GetName())+"ServiceImplementation> {",
+	)
+	r.indentLevel += 2
+
+	for _, methodSpec := range serviceSpec.GetMethod() {
+		r.generateTypescriptClientInterfaceMethod(generatedFileStream, serviceSpec, methodSpec)
+	}
+
+	r.indentLevel -= 2
+	r.P(generatedFileStream, "}\n")
+}
+
+func (r *Runner) generateTypescriptClientInterfaceMethod(generatedFileStream *protogen.GeneratedFile, serviceSpec *descriptorpb.ServiceDescriptorProto, methodSpec *descriptorpb.MethodDescriptorProto) {
+	// Function's Signature
+	methodName := strcase.ToCamel(methodSpec.GetName())
+	r.P(generatedFileStream, methodName+"(")
+	r.indentLevel += 2
+
+	inputTypeName := methodSpec.GetInputType()
+	inputInterface := r.getEnumOrMessageTypeName(inputTypeName, true)
+	outputTypeName := methodSpec.GetOutputType()
+	outputInterface := r.getEnumOrMessageTypeName(outputTypeName, true)
+
+	clientStream := methodSpec.GetClientStreaming()
+	serverStrean := methodSpec.GetServerStreaming()
+
+	if !clientStream {
+		r.P(generatedFileStream, "request: "+inputInterface+",")
+	}
+
+	r.P(generatedFileStream,
+		"metadata?: Record<string, string>,",
+		"options?: grpc.CallOptions,",
+	)
+
+	var returnType string
+	if clientStream && serverStrean {
+		returnType = "grpc.ClientDuplexStream<" + inputInterface + ", " + outputInterface + ">"
+	} else if !clientStream && !serverStrean {
+		returnType = "joinGRPC.IUnaryRequest<" + outputInterface + ">"
+	} else if clientStream {
+		returnType = "joinGRPC.IClientStreamRequest<" + inputInterface + ", " + outputInterface + ">"
+	} else { // if serverStream
+		returnType = "grpc.ClientReadableStream<" + outputInterface + ">"
+	}
+
+	r.indentLevel -= 2
+	r.P(generatedFileStream, "): "+returnType)
+}
+
 func (r *Runner) generateTypescriptClient(generatedFileStream *protogen.GeneratedFile, serviceSpec *descriptorpb.ServiceDescriptorProto) {
 	r.P(
 		generatedFileStream,
 		"export class "+strcase.ToCamel(serviceSpec.GetName())+"Client",
 		"extends joinGRPC.Client<grpc.ServiceDefinition<I"+strcase.ToCamel(serviceSpec.GetName())+"ServiceImplementation>> ",
-		"implements joinGRPC.IExtendedClient<I"+strcase.ToCamel(serviceSpec.GetName())+"ServiceImplementation> {",
+		"implements I"+strcase.ToCamel(serviceSpec.GetName())+"Client {",
 	)
 	r.indentLevel += 2
 

@@ -486,9 +486,7 @@ export namespace Foo {
   }
 
   export interface IUsersClient
-    extends joinGRPC.IClient<
-        grpc.ServiceDefinition<IUsersServiceImplementation>
-      >,
+    extends joinGRPC.IClient<IUsersServiceImplementation>,
       joinGRPC.IExtendedClient<IUsersServiceImplementation> {
     Find(
       request: IRequest,
@@ -511,8 +509,14 @@ export namespace Foo {
   }
 
   export class UsersClient
-    extends joinGRPC.Client<grpc.ServiceDefinition<IUsersServiceImplementation>>
+    extends joinGRPC.Client<IUsersServiceImplementation>
     implements IUsersClient {
+    constructor(
+      public readonly config: joinGRPC.IClientConfig<IUsersServiceImplementation>
+    ) {
+      super(config, 'foo.Users')
+    }
+
     public Find(
       request: IRequest,
       metadata?: Record<string, string>,

@@ -521,23 +521,14 @@ export namespace Foo {
       metadata?: Record<string, string>,
       options?: grpc.CallOptions
     ): joinGRPC.IUnaryRequest<Common_Common.IOtherPkgMessage> {
-      return this.makeUnaryRequest(
-        '/foo.Users/Find',
-        request,
-        metadata,
-        options
-      )
+      return this.makeUnaryRequest('Find', request, metadata, options)
     }
 
     public FindClientStream(
       metadata?: Record<string, string>,
       options?: grpc.CallOptions
     ): joinGRPC.IClientStreamRequest<IRequest, Common_Common.IOtherPkgMessage> {
-      return this.makeClientStreamRequest(
-        '/foo.Users/FindClientStream',
-        metadata,
-        options
-      )
+      return this.makeClientStreamRequest('FindClientStream', metadata, options)
     }
 
     public FindServerStream(
@@ -546,7 +537,7 @@ export namespace Foo {
       options?: grpc.CallOptions
     ): grpc.ClientReadableStream<Common_Common.IOtherPkgMessage> {
       return this.makeServerStreamRequest(
-        '/foo.Users/FindServerStream',
+        'FindServerStream',
         request,
         metadata,
         options
@@ -557,11 +548,7 @@ export namespace Foo {
       metadata?: Record<string, string>,
       options?: grpc.CallOptions
     ): grpc.ClientDuplexStream<IRequest, Common_Common.IOtherPkgMessage> {
-      return this.makeBidiStreamRequest(
-        '/foo.Users/FindBidiStream',
-        metadata,
-        options
-      )
+      return this.makeBidiStreamRequest('FindBidiStream', metadata, options)
     }
   }
 }

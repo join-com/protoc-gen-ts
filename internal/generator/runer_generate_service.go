@@ -205,15 +205,14 @@ func (r *Runner) generateTypescriptClientMethod(generatedFileStream *protogen.Ge
 	r.P(generatedFileStream, "): "+returnType+" {")
 	r.indentLevel += 2
 
-	methodPath := "/" + r.currentPackage + "." + serviceSpec.GetName() + "/" + methodName
 	if clientStream && serverStrean {
-		r.P(generatedFileStream, "return this.makeBidiStreamRequest('"+methodPath+"', metadata, options)")
+		r.P(generatedFileStream, "return this.makeBidiStreamRequest('"+methodName+"', metadata, options)")
 	} else if !clientStream && !serverStrean {
-		r.P(generatedFileStream, "return this.makeUnaryRequest('"+methodPath+"', request, metadata, options)")
+		r.P(generatedFileStream, "return this.makeUnaryRequest('"+methodName+"', request, metadata, options)")
 	} else if clientStream {
-		r.P(generatedFileStream, "return this.makeClientStreamRequest('"+methodPath+"', metadata, options)")
+		r.P(generatedFileStream, "return this.makeClientStreamRequest('"+methodName+"', metadata, options)")
 	} else { // if serverStream
-		r.P(generatedFileStream, "return this.makeServerStreamRequest('"+methodPath+"', request, metadata, options)")
+		r.P(generatedFileStream, "return this.makeServerStreamRequest('"+methodName+"', request, metadata, options)")
 	}
 
 	r.indentLevel -= 2

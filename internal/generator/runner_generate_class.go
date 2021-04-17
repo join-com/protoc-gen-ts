@@ -116,7 +116,7 @@ func (r *Runner) generateAsInterfaceMethod(generatedFileStream *protogen.Generat
 
 func (r *Runner) generateFromInterfaceMethod(generatedFileStream *protogen.GeneratedFile, messageSpec *descriptorpb.DescriptorProto, requiredFields bool, hasEnums bool) {
 	className := strcase.ToCamel(messageSpec.GetName())
-	r.P(generatedFileStream, "public static fromInterface(value: I"+className+"): "+className+" {")
+	r.P(generatedFileStream, "public static fromInterface(this: void, value: I"+className+"): "+className+" {")
 	r.indentLevel += 2
 
 	if hasEnums {
@@ -142,7 +142,7 @@ func (r *Runner) generateFromInterfaceMethod(generatedFileStream *protogen.Gener
 
 func (r *Runner) generateDecodePatchedMethod(generatedFileStream *protogen.GeneratedFile, messageSpec *descriptorpb.DescriptorProto, requiredFields bool, hasEnums bool) {
 	className := strcase.ToCamel(messageSpec.GetName())
-	r.P(generatedFileStream, "public static decodePatched(reader: protobufjs.Reader | Uint8Array): I"+className+" {")
+	r.P(generatedFileStream, "public static decodePatched(this: void, reader: protobufjs.Reader | Uint8Array): I"+className+" {")
 	r.indentLevel += 2
 
 	if hasEnums {
@@ -158,8 +158,7 @@ func (r *Runner) generateDecodePatchedMethod(generatedFileStream *protogen.Gener
 func (r *Runner) generateEncodePatchedMethod(generatedFileStream *protogen.GeneratedFile, messageSpec *descriptorpb.DescriptorProto, requiredFields bool, hasEnums bool) {
 	className := strcase.ToCamel(messageSpec.GetName())
 
-	// public static encode<T extends Message<T>>(this: Constructor<T>, message: (T|{ [k: string]: any }), writer?: Writer): Writer;
-	r.P(generatedFileStream, "public static encodePatched(message: I"+className+", writer?: protobufjs.Writer): protobufjs.Writer {")
+	r.P(generatedFileStream, "public static encodePatched(this: void, message: I"+className+", writer?: protobufjs.Writer): protobufjs.Writer {")
 	r.indentLevel += 2
 
 	if hasEnums {

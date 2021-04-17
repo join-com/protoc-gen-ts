@@ -8,19 +8,15 @@
     "lint": "yarn lint:tsc && yarn lint:eslint",
     "lint:eslint": "eslint . --ext .ts --max-warnings 0",
     "lint:tsc": "tsc --noEmit && eslint",
-    "proto:build": "yarn proto:clean && yarn proto:generate && yarn proto:prettier",
-    "proto:clean": "find __tests__/legacy/generated ! -name 'tslint.json' ! -name '.prettierrc' -type f -exec rm -f {} +",
-    "proto:generate": "export PATH=\"${PWD}/../dist:${PATH}\" && protoc __tests__/legacy/proto/*.proto -I __tests__/legacy/proto --ts_out=\"${PWD}/__tests__/legacy/generated\"",
-    "proto:prettier": "prettier --write '__tests__/legacy/generated/**/*.ts'",
     "test": "export PATH=\"${PWD}/../dist:${PATH}\" && jest --runInBand --forceExit",
-    "v2:build": "yarn v2:clean && yarn v2:generate && yarn v2:prettier",
-    "v2:clean": "find __tests__/v2/generated ! -name 'tslint.json' ! -name '.prettierrc' -type f -exec rm -f {} +",
-    "v2:generate": "export PROTOC_TS_GENERATOR=V2 && export PATH=\"${PWD}/../dist:${PATH}\" && protoc __tests__/v2/proto/*.proto -I __tests__/v2/proto --ts_out=\"${PWD}/__tests__/v2/generated\"",
-    "v2:prettier": "prettier --write '__tests__/v2/generated/**/*.ts'"
+    "proto:build": "yarn proto:clean && yarn proto:generate && yarn proto:prettier",
+    "proto:clean": "find __tests__/generated ! -name 'tslint.json' ! -name '.prettierrc' -type f -exec rm -f {} +",
+    "proto:generate": "export PATH=\"${PWD}/../dist:${PATH}\" && protoc __tests__/proto/*.proto -I __tests__/proto --tsx_out=\"${PWD}/__tests__/generated\"",
+    "proto:prettier": "prettier --write '__tests__/generated/**/*.ts'"
   },
   "dependencies": {
     "@join-com/gcloud-logger-trace": "^0.1.17",
-    "@join-com/grpc": "^0.1.1",
+    "@join-com/grpc": "^0.2.0",
     "@join-com/grpc-ts": "^2.0.2",
     "grpc": "^1.24.6",
     "protobufjs": "^6.10.2"

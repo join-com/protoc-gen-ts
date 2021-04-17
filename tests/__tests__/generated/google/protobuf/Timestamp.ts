@@ -27,17 +27,19 @@ export namespace GoogleProtobuf {
       return this
     }
 
-    public static fromInterface(value: ITimestamp): Timestamp {
+    public static fromInterface(this: void, value: ITimestamp): Timestamp {
       return Timestamp.fromObject(value)
     }
 
     public static decodePatched(
+      this: void,
       reader: protobufjs.Reader | Uint8Array
     ): ITimestamp {
       return Timestamp.decode(reader)
     }
 
     public static encodePatched(
+      this: void,
       message: ITimestamp,
       writer?: protobufjs.Writer
     ): protobufjs.Writer {

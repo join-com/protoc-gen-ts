@@ -92,8 +92,7 @@ func (r *Runner) generateTypescriptClientInterface(generatedFileStream *protogen
 	r.P(
 		generatedFileStream,
 		"export interface I"+strcase.ToCamel(serviceSpec.GetName())+"Client",
-		"extends joinGRPC.IClient<I"+strcase.ToCamel(serviceSpec.GetName())+"ServiceImplementation> ",
-		", joinGRPC.IExtendedClient<I"+strcase.ToCamel(serviceSpec.GetName())+"ServiceImplementation> {",
+		"extends joinGRPC.IExtendedClient<I"+strcase.ToCamel(serviceSpec.GetName())+"ServiceImplementation, '"+r.currentPackage+"."+serviceSpec.GetName()+"'> {",
 	)
 	r.indentLevel += 2
 
@@ -147,7 +146,7 @@ func (r *Runner) generateTypescriptClient(generatedFileStream *protogen.Generate
 	r.P(
 		generatedFileStream,
 		"export class "+strcase.ToCamel(serviceSpec.GetName())+"Client",
-		"extends joinGRPC.Client<I"+strcase.ToCamel(serviceSpec.GetName())+"ServiceImplementation> ",
+		"extends joinGRPC.Client<I"+strcase.ToCamel(serviceSpec.GetName())+"ServiceImplementation, '"+r.currentPackage+"."+serviceSpec.GetName()+"'> ",
 		"implements I"+strcase.ToCamel(serviceSpec.GetName())+"Client {",
 	)
 	r.indentLevel += 2
@@ -206,14 +205,15 @@ func (r *Runner) generateTypescriptClientMethod(generatedFileStream *protogen.Ge
 	r.P(generatedFileStream, "): "+returnType+" {")
 	r.indentLevel += 2
 
+	methodPath := "/" + r.currentPackage + "." + serviceSpec.GetName() + "/" + methodName
 	if clientStream && serverStrean {
-		r.P(generatedFileStream, "return this.makeBidiStreamRequest('"+methodName+"', metadata, options)")
+		r.P(generatedFileStream, "return this.makeBidiStreamRequest('"+methodPath+"', metadata, options)")
 	} else if !clientStream && !serverStrean {
-		r.P(generatedFileStream, "return this.makeUnaryRequest('"+methodName+"', request, metadata, options)")
+		r.P(generatedFileStream, "return this.makeUnaryRequest('"+methodPath+"', request, metadata, options)")
 	} else if clientStream {
-		r.P(generatedFileStream, "return this.makeClientStreamRequest('"+methodName+"', metadata, options)")
+		r.P(generatedFileStream, "return this.makeClientStreamRequest('"+methodPath+"', metadata, options)")
 	} else { // if serverStream
-		r.P(generatedFileStream, "return this.makeServerStreamRequest('"+methodName+"', request, metadata, options)")
+		r.P(generatedFileStream, "return this.makeServerStreamRequest('"+methodPath+"', request, metadata, options)")
 	}
 
 	r.indentLevel -= 2

@@ -56,5 +56,5 @@ module.exports = {
       },
     },
   ],
-  ignorePatterns: ['*.js', 'generated/**/*.ts'],
+  ignorePatterns: ['*.js'],
 }

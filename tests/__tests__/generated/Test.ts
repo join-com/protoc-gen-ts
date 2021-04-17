@@ -103,17 +103,19 @@ export namespace Foo {
       return this
     }
 
-    public static fromInterface(value: IRequest): Request {
+    public static fromInterface(this: void, value: IRequest): Request {
       return Request.fromObject(value)
     }
 
     public static decodePatched(
+      this: void,
       reader: protobufjs.Reader | Uint8Array
     ): IRequest {
       return Request.decode(reader)
     }
 
     public static encodePatched(
+      this: void,
       message: IRequest,
       writer?: protobufjs.Writer
     ): protobufjs.Writer {
@@ -135,17 +137,19 @@ export namespace Foo {
       return this
     }
 
-    public static fromInterface(value: INested): Nested {
+    public static fromInterface(this: void, value: INested): Nested {
       return Nested.fromObject(value)
     }
 
     public static decodePatched(
+      this: void,
       reader: protobufjs.Reader | Uint8Array
     ): INested {
       return Nested.decode(reader)
     }
 
     public static encodePatched(
+      this: void,
       message: INested,
       writer?: protobufjs.Writer
     ): protobufjs.Writer {
@@ -293,7 +297,7 @@ export namespace Foo {
       }
     }
 
-    public static fromInterface(value: ITest): Test {
+    public static fromInterface(this: void, value: ITest): Test {
       const patchedValue = {
         ...value,
         fieldEnum: (value.fieldEnum != null
@@ -318,11 +322,15 @@ export namespace Foo {
       return Test.fromObject(patchedValue)
     }
 
-    public static decodePatched(reader: protobufjs.Reader | Uint8Array): ITest {
+    public static decodePatched(
+      this: void,
+      reader: protobufjs.Reader | Uint8Array
+    ): ITest {
       return Test.decode(reader).asInterface()
     }
 
     public static encodePatched(
+      this: void,
       message: ITest,
       writer?: protobufjs.Writer
     ): protobufjs.Writer {
@@ -351,7 +359,10 @@ export namespace Foo {
       }
     }
 
-    public static fromInterface(value: ICustomOptionsTest): CustomOptionsTest {
+    public static fromInterface(
+      this: void,
+      value: ICustomOptionsTest
+    ): CustomOptionsTest {
       const patchedValue = {
         ...value,
         requiredField: Common_Extra.ExtraPkgMessage.fromInterface(
@@ -363,12 +374,14 @@ export namespace Foo {
     }
 
     public static decodePatched(
+      this: void,
       reader: protobufjs.Reader | Uint8Array
     ): ICustomOptionsTest {
       return CustomOptionsTest.decode(reader).asInterface()
     }
 
     public static encodePatched(
+      this: void,
       message: ICustomOptionsTest,
       writer?: protobufjs.Writer
     ): protobufjs.Writer {
@@ -395,18 +408,21 @@ export namespace Foo {
     }
 
     public static fromInterface(
+      this: void,
       value: IRequiredPropertiesTest
     ): RequiredPropertiesTest {
       return RequiredPropertiesTest.fromObject(value)
     }
 
     public static decodePatched(
+      this: void,
       reader: protobufjs.Reader | Uint8Array
     ): IRequiredPropertiesTest {
       return RequiredPropertiesTest.decode(reader)
     }
 
     public static encodePatched(
+      this: void,
       message: IRequiredPropertiesTest,
       writer?: protobufjs.Writer
     ): protobufjs.Writer {

@@ -42,7 +42,10 @@ export namespace Common {
       }
     }
 
-    public static fromInterface(value: IExtraPkgMessage): ExtraPkgMessage {
+    public static fromInterface(
+      this: void,
+      value: IExtraPkgMessage
+    ): ExtraPkgMessage {
       const patchedValue = {
         ...value,
         birthDate:
@@ -58,12 +61,14 @@ export namespace Common {
     }
 
     public static decodePatched(
+      this: void,
       reader: protobufjs.Reader | Uint8Array
     ): IExtraPkgMessage {
       return ExtraPkgMessage.decode(reader).asInterface()
     }
 
     public static encodePatched(
+      this: void,
       message: IExtraPkgMessage,
       writer?: protobufjs.Writer
     ): protobufjs.Writer {

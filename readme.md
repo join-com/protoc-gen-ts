@@ -6,7 +6,7 @@ Generates `ts` files from `proto` file definitions.
 
 To install the "new" generator (bear in mind that it could be installed in `${HOME}/.local/bin` too):
 ```
-curl -Lo protoc-gen-ts \
+curl -Lo protoc-gen-tsx \
     https://github.com/join-com/protoc-gen-ts/releases/download/[VERSION]/protoc-gen-tsx.darwin.x86_64 \
 && chmod +x protoc-gen-tsx \
 && sudo mv protoc-gen-tsx /usr/local/bin

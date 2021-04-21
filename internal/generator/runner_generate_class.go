@@ -1,6 +1,8 @@
 package generator
 
 import (
+	"strings"
+
 	"github.com/iancoleman/strcase"
 	"github.com/join-com/protoc-gen-ts/internal/join_proto"
 	"github.com/join-com/protoc-gen-ts/internal/utils"
@@ -9,9 +11,86 @@ import (
 )
 
 func (r *Runner) generateTypescriptMessageClasses(generatedFileStream *protogen.GeneratedFile, protoFile *protogen.File) {
-	for _, messageSpec := range protoFile.Proto.GetMessageType() {
+	for _, messageSpec := range r.getTopologicallySortedMessages(protoFile.Proto.GetMessageType()) {
 		r.generateTypescriptMessageClass(generatedFileStream, messageSpec)
 	}
+}
+
+func (r *Runner) getTopologicallySortedMessages(messageSpecs []*descriptorpb.DescriptorProto) []*descriptorpb.DescriptorProto {
+	//                   referrer class               ->   referred classes
+	refsMap := make(map[*descriptorpb.DescriptorProto]map[*descriptorpb.DescriptorProto]bool)
+
+	// First step: generate the graph
+	// We'll populate the implicit "graph" (represented by a double hashmap)
+	for _, messageSpec := range messageSpecs {
+		messageMap, ok := refsMap[messageSpec]
+		if !ok || messageMap == nil {
+			messageMap = make(map[*descriptorpb.DescriptorProto]bool)
+		}
+
+		for _, fieldSpec := range messageSpec.GetField() {
+			if fieldSpec.GetType() != descriptorpb.FieldDescriptorProto_TYPE_MESSAGE {
+				// We only care about "messages", because we already ensured that enums were generated before
+				continue
+			}
+
+			fieldTypeName := fieldSpec.GetTypeName()
+			fieldTypeNamespace := r.getNamespaceFromTypeName(fieldTypeName)
+
+			if fieldTypeNamespace != r.currentNamespace {
+				// We only care about messages declared in the same package/namespace, the rest have already been
+				// imported, and therefore they are available, so we don't have to worry about topological order.
+				continue
+			}
+
+			nestedMessageSpec, ok := r.messageSpecsByFQN[fieldTypeName]
+			if !ok || nestedMessageSpec == nil {
+				utils.LogError("Unable to retrieve message spec for " + fieldTypeName)
+			}
+
+			messageMap[nestedMessageSpec] = true
+		}
+
+		refsMap[messageSpec] = messageMap
+	}
+
+	processedMessages := make(map[*descriptorpb.DescriptorProto]bool)
+
+	// Second step, iteratively remove items from the graph and add them to our topologically sorted list
+	orderedMessageSpecs := make([]*descriptorpb.DescriptorProto, 0, len(messageSpecs))
+	for len(orderedMessageSpecs) < len(messageSpecs) {
+		for referrer, referredCollection := range refsMap {
+			if len(referredCollection) > 0 || processedMessages[referrer] {
+				continue
+			}
+			orderedMessageSpecs = append(orderedMessageSpecs, referrer)
+			processedMessages[referrer] = true
+
+			// We can safely remote that item for the rest of items' dependencies
+			for _referrer, _referredCollection := range refsMap {
+				if _referrer == referrer {
+					continue
+				}
+
+				_, present := _referredCollection[referrer]
+				if present {
+					delete(_referredCollection, referrer)
+				}
+			}
+		}
+	}
+
+	return orderedMessageSpecs
+}
+
+func (r *Runner) getNamespaceFromTypeName(typeName string) string {
+	typeParts := strings.Split(typeName, ".")
+	lastIndex := len(typeParts) - 1
+
+	protoPackageName := strings.Join(typeParts[0:lastIndex], ".")
+	namespace := getNamespaceFromProtoPackage(protoPackageName)
+
+	return namespace
 }
 
 func (r *Runner) generateTypescriptMessageClass(generatedFileStream *protogen.GeneratedFile, messageSpec *descriptorpb.DescriptorProto) {

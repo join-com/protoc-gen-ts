@@ -38,9 +38,12 @@ func fromProtoPathToGeneratedPath(protoImportPath string, currentSourcePath stri
 
 	numStepsBack := len(currentDirectoryParts)
 	if numStepsBack == 0 {
-		outputDirectory = "./" + strings.Join(importDirectoryParts, "/") + "/"
+		outputDirectory = "./" + strings.Join(importDirectoryParts, "/")
 	} else {
-		outputDirectory = strings.Repeat("../", numStepsBack) + strings.Join(importDirectoryParts, "/") + "/"
+		outputDirectory = strings.Repeat("../", numStepsBack) + strings.Join(importDirectoryParts, "/")
+	}
+	if !strings.HasSuffix(outputDirectory, "/") {
+		outputDirectory += "/"
 	}
 
 	outputFileName := strcase.ToCamel(strings.TrimSuffix(filepath.Base(protoImportPath), filepath.Ext(protoImportPath)))

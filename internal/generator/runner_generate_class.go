@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"sort"
 	"strings"
 
 	"github.com/iancoleman/strcase"
@@ -17,6 +18,10 @@ func (r *Runner) generateTypescriptMessageClasses(generatedFileStream *protogen.
 }
 
 func (r *Runner) getTopologicallySortedMessages(messageSpecs []*descriptorpb.DescriptorProto) []*descriptorpb.DescriptorProto {
+	if len(messageSpecs) <= 1 {
+		return messageSpecs // No need to go to sort in this case
+	}
+
 	//                   referrer class               ->   referred classes
 	refsMap := make(map[*descriptorpb.DescriptorProto]map[*descriptorpb.DescriptorProto]bool)
 
@@ -54,12 +59,24 @@ func (r *Runner) getTopologicallySortedMessages(messageSpecs []*descriptorpb.Des
 		refsMap[messageSpec] = messageMap
 	}
 
+	// We need to presort by name to obtain a stable order, as topological order is not absolute
+	orderedMessageSpecsByName := make([]*descriptorpb.DescriptorProto, len(messageSpecs))
+	copy(orderedMessageSpecsByName, messageSpecs)
+	sort.Slice(orderedMessageSpecsByName, func(i, j int) bool {
+		return orderedMessageSpecsByName[i].GetName() < orderedMessageSpecsByName[j].GetName()
+	})
+
 	processedMessages := make(map[*descriptorpb.DescriptorProto]bool)
 
 	// Second step, iteratively remove items from the graph and add them to our topologically sorted list
 	orderedMessageSpecs := make([]*descriptorpb.DescriptorProto, 0, len(messageSpecs))
 	for len(orderedMessageSpecs) < len(messageSpecs) {
-		for referrer, referredCollection := range refsMap {
+		for _, referrer := range orderedMessageSpecsByName {
+			referredCollection, ok := refsMap[referrer]
+			if !ok || referredCollection == nil {
+				utils.LogError("Unable to retrieve referred collection in topological sort for " + referrer.GetName())
+			}
+
 			if len(referredCollection) > 0 || processedMessages[referrer] {
 				continue
 			}

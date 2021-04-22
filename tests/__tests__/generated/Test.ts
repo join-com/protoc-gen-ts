@@ -92,34 +92,54 @@ export namespace Foo {
     optionalField?: number
   }
 
-  @protobufjs.Type.d('Request')
-  export class Request
-    extends protobufjs.Message<Request>
-    implements ConvertibleTo<IRequest>, IRequest {
-    @protobufjs.Field.d(1, 'int32')
-    public id?: number
+  @protobufjs.Type.d('CustomOptionsTest')
+  export class CustomOptionsTest
+    extends protobufjs.Message<CustomOptionsTest>
+    implements ConvertibleTo<ICustomOptionsTest> {
+    @protobufjs.Field.d(1, Common_Extra.ExtraPkgMessage)
+    public requiredField!: Common_Extra.ExtraPkgMessage
 
-    public asInterface(): IRequest {
-      return this
+    @protobufjs.Field.d(2, 'int32')
+    public typicalOptionalField?: number
+
+    @protobufjs.Field.d(3, 'int32')
+    public customOptionalField?: number
+
+    public asInterface(): ICustomOptionsTest {
+      return {
+        ...this,
+        requiredField: this.requiredField.asInterface(),
+      }
     }
 
-    public static fromInterface(this: void, value: IRequest): Request {
-      return Request.fromObject(value)
+    public static fromInterface(
+      this: void,
+      value: ICustomOptionsTest
+    ): CustomOptionsTest {
+      const patchedValue = {
+        ...value,
+        requiredField: Common_Extra.ExtraPkgMessage.fromInterface(
+          value.requiredField
+        ),
+      }
+
+      return CustomOptionsTest.fromObject(patchedValue)
     }
 
     public static decodePatched(
       this: void,
       reader: protobufjs.Reader | Uint8Array
-    ): IRequest {
-      return Request.decode(reader)
+    ): ICustomOptionsTest {
+      return CustomOptionsTest.decode(reader).asInterface()
     }
 
     public static encodePatched(
       this: void,
-      message: IRequest,
+      message: ICustomOptionsTest,
       writer?: protobufjs.Writer
     ): protobufjs.Writer {
-      return Request.encode(message, writer)
+      const transformedMessage = CustomOptionsTest.fromInterface(message)
+      return CustomOptionsTest.encode(transformedMessage, writer)
     }
   }
 
@@ -154,6 +174,77 @@ export namespace Foo {
       writer?: protobufjs.Writer
     ): protobufjs.Writer {
       return Nested.encode(message, writer)
+    }
+  }
+
+  @protobufjs.Type.d('Request')
+  export class Request
+    extends protobufjs.Message<Request>
+    implements ConvertibleTo<IRequest>, IRequest {
+    @protobufjs.Field.d(1, 'int32')
+    public id?: number
+
+    public asInterface(): IRequest {
+      return this
+    }
+
+    public static fromInterface(this: void, value: IRequest): Request {
+      return Request.fromObject(value)
+    }
+
+    public static decodePatched(
+      this: void,
+      reader: protobufjs.Reader | Uint8Array
+    ): IRequest {
+      return Request.decode(reader)
+    }
+
+    public static encodePatched(
+      this: void,
+      message: IRequest,
+      writer?: protobufjs.Writer
+    ): protobufjs.Writer {
+      return Request.encode(message, writer)
+    }
+  }
+
+  @protobufjs.Type.d('RequiredPropertiesTest')
+  export class RequiredPropertiesTest
+    extends protobufjs.Message<RequiredPropertiesTest>
+    implements ConvertibleTo<IRequiredPropertiesTest>, IRequiredPropertiesTest {
+    @protobufjs.Field.d(1, 'int32')
+    public requiredField!: number
+
+    @protobufjs.Field.d(2, 'int32')
+    public customRequiredField!: number
+
+    @protobufjs.Field.d(3, 'int32')
+    public optionalField?: number
+
+    public asInterface(): IRequiredPropertiesTest {
+      return this
+    }
+
+    public static fromInterface(
+      this: void,
+      value: IRequiredPropertiesTest
+    ): RequiredPropertiesTest {
+      return RequiredPropertiesTest.fromObject(value)
+    }
+
+    public static decodePatched(
+      this: void,
+      reader: protobufjs.Reader | Uint8Array
+    ): IRequiredPropertiesTest {
+      return RequiredPropertiesTest.decode(reader)
+    }
+
+    public static encodePatched(
+      this: void,
+      message: IRequiredPropertiesTest,
+      writer?: protobufjs.Writer
+    ): protobufjs.Writer {
+      return RequiredPropertiesTest.encode(message, writer)
     }
   }
 
@@ -336,97 +427,6 @@ export namespace Foo {
     ): protobufjs.Writer {
       const transformedMessage = Test.fromInterface(message)
       return Test.encode(transformedMessage, writer)
-    }
-  }
-
-  @protobufjs.Type.d('CustomOptionsTest')
-  export class CustomOptionsTest
-    extends protobufjs.Message<CustomOptionsTest>
-    implements ConvertibleTo<ICustomOptionsTest> {
-    @protobufjs.Field.d(1, Common_Extra.ExtraPkgMessage)
-    public requiredField!: Common_Extra.ExtraPkgMessage
-
-    @protobufjs.Field.d(2, 'int32')
-    public typicalOptionalField?: number
-
-    @protobufjs.Field.d(3, 'int32')
-    public customOptionalField?: number
-
-    public asInterface(): ICustomOptionsTest {
-      return {
-        ...this,
-        requiredField: this.requiredField.asInterface(),
-      }
-    }
-
-    public static fromInterface(
-      this: void,
-      value: ICustomOptionsTest
-    ): CustomOptionsTest {
-      const patchedValue = {
-        ...value,
-        requiredField: Common_Extra.ExtraPkgMessage.fromInterface(
-          value.requiredField
-        ),
-      }
-
-      return CustomOptionsTest.fromObject(patchedValue)
-    }
-
-    public static decodePatched(
-      this: void,
-      reader: protobufjs.Reader | Uint8Array
-    ): ICustomOptionsTest {
-      return CustomOptionsTest.decode(reader).asInterface()
-    }
-
-    public static encodePatched(
-      this: void,
-      message: ICustomOptionsTest,
-      writer?: protobufjs.Writer
-    ): protobufjs.Writer {
-      const transformedMessage = CustomOptionsTest.fromInterface(message)
-      return CustomOptionsTest.encode(transformedMessage, writer)
-    }
-  }
-
-  @protobufjs.Type.d('RequiredPropertiesTest')
-  export class RequiredPropertiesTest
-    extends protobufjs.Message<RequiredPropertiesTest>
-    implements ConvertibleTo<IRequiredPropertiesTest>, IRequiredPropertiesTest {
-    @protobufjs.Field.d(1, 'int32')
-    public requiredField!: number
-
-    @protobufjs.Field.d(2, 'int32')
-    public customRequiredField!: number
-
-    @protobufjs.Field.d(3, 'int32')
-    public optionalField?: number
-
-    public asInterface(): IRequiredPropertiesTest {
-      return this
-    }
-
-    public static fromInterface(
-      this: void,
-      value: IRequiredPropertiesTest
-    ): RequiredPropertiesTest {
-      return RequiredPropertiesTest.fromObject(value)
-    }
-
-    public static decodePatched(
-      this: void,
-      reader: protobufjs.Reader | Uint8Array
-    ): IRequiredPropertiesTest {
-      return RequiredPropertiesTest.decode(reader)
-    }
-
-    public static encodePatched(
-      this: void,
-      message: IRequiredPropertiesTest,
-      writer?: protobufjs.Writer
-    ): protobufjs.Writer {
-      return RequiredPropertiesTest.encode(message, writer)
     }
   }
 

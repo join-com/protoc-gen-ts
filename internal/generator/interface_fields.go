@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/join-com/protoc-gen-ts/internal/join_proto"
 	"github.com/join-com/protoc-gen-ts/internal/utils"
 	"google.golang.org/protobuf/types/descriptorpb"
 )
@@ -61,47 +62,56 @@ func (r *Runner) getMessageFieldDecorator(fieldSpec *descriptorpb.FieldDescripto
 }
 
 func (r *Runner) getInterfaceFieldType(fieldSpec *descriptorpb.FieldDescriptorProto) string {
-	baseType := "unknown"
+	fieldOptions := fieldSpec.GetOptions()
+	found, flavorName := false, ""
+	if fieldOptions != nil {
+		flavorName, found = join_proto.GetStringCustomFieldOption("typescript_flavor", fieldOptions, r.extensionTypes)
+	}
 
-	switch fieldSpec.GetType() {
-	case descriptorpb.FieldDescriptorProto_TYPE_BOOL:
-		baseType = "boolean"
-	case descriptorpb.FieldDescriptorProto_TYPE_INT32:
-		baseType = "number"
-	case descriptorpb.FieldDescriptorProto_TYPE_UINT32:
-		baseType = "number"
-	case descriptorpb.FieldDescriptorProto_TYPE_SINT32:
-		baseType = "number"
-	case descriptorpb.FieldDescriptorProto_TYPE_INT64:
-		baseType = "number"
-	case descriptorpb.FieldDescriptorProto_TYPE_UINT64:
-		baseType = "number"
-	case descriptorpb.FieldDescriptorProto_TYPE_SINT64:
-		baseType = "number"
-	case descriptorpb.FieldDescriptorProto_TYPE_FLOAT:
-		baseType = "number"
-	case descriptorpb.FieldDescriptorProto_TYPE_DOUBLE:
-		baseType = "number"
-	case descriptorpb.FieldDescriptorProto_TYPE_FIXED32:
-		baseType = "number"
-	case descriptorpb.FieldDescriptorProto_TYPE_FIXED64:
-		baseType = "number"
-	case descriptorpb.FieldDescriptorProto_TYPE_SFIXED32:
-		baseType = "number"
-	case descriptorpb.FieldDescriptorProto_TYPE_SFIXED64:
-		baseType = "number"
-	case descriptorpb.FieldDescriptorProto_TYPE_STRING:
-		baseType = "string"
-	case descriptorpb.FieldDescriptorProto_TYPE_BYTES:
-		baseType = "Uint8Array"
-	case descriptorpb.FieldDescriptorProto_TYPE_ENUM:
-		baseType = r.getEnumOrMessageTypeName(fieldSpec.GetTypeName(), false)
-	case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE:
-		fieldTypeName := fieldSpec.GetTypeName()
-		if fieldTypeName == ".google.protobuf.Timestamp" {
-			baseType = "Date"
-		} else {
-			baseType = r.getEnumOrMessageTypeName(fieldTypeName, true)
+	baseType := "unknown"
+	if found && flavorName != "" {
+		baseType = flavorName
+	} else {
+		switch fieldSpec.GetType() {
+		case descriptorpb.FieldDescriptorProto_TYPE_BOOL:
+			baseType = "boolean"
+		case descriptorpb.FieldDescriptorProto_TYPE_INT32:
+			baseType = "number"
+		case descriptorpb.FieldDescriptorProto_TYPE_UINT32:
+			baseType = "number"
+		case descriptorpb.FieldDescriptorProto_TYPE_SINT32:
+			baseType = "number"
+		case descriptorpb.FieldDescriptorProto_TYPE_INT64:
+			baseType = "number"
+		case descriptorpb.FieldDescriptorProto_TYPE_UINT64:
+			baseType = "number"
+		case descriptorpb.FieldDescriptorProto_TYPE_SINT64:
+			baseType = "number"
+		case descriptorpb.FieldDescriptorProto_TYPE_FLOAT:
+			baseType = "number"
+		case descriptorpb.FieldDescriptorProto_TYPE_DOUBLE:
+			baseType = "number"
+		case descriptorpb.FieldDescriptorProto_TYPE_FIXED32:
+			baseType = "number"
+		case descriptorpb.FieldDescriptorProto_TYPE_FIXED64:
+			baseType = "number"
+		case descriptorpb.FieldDescriptorProto_TYPE_SFIXED32:
+			baseType = "number"
+		case descriptorpb.FieldDescriptorProto_TYPE_SFIXED64:
+			baseType = "number"
+		case descriptorpb.FieldDescriptorProto_TYPE_STRING:
+			baseType = "string"
+		case descriptorpb.FieldDescriptorProto_TYPE_BYTES:
+			baseType = "Uint8Array"
+		case descriptorpb.FieldDescriptorProto_TYPE_ENUM:
+			baseType = r.getEnumOrMessageTypeName(fieldSpec.GetTypeName(), false)
+		case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE:
+			fieldTypeName := fieldSpec.GetTypeName()
+			if fieldTypeName == ".google.protobuf.Timestamp" {
+				baseType = "Date"
+			} else {
+				baseType = r.getEnumOrMessageTypeName(fieldTypeName, true)
+			}
 		}
 	}
 
@@ -113,43 +123,52 @@ func (r *Runner) getInterfaceFieldType(fieldSpec *descriptorpb.FieldDescriptorPr
 }
 
 func (r *Runner) getClassFieldType(fieldSpec *descriptorpb.FieldDescriptorProto) string {
-	baseType := "unknown"
+	fieldOptions := fieldSpec.GetOptions()
+	found, flavorName := false, ""
+	if fieldOptions != nil {
+		flavorName, found = join_proto.GetStringCustomFieldOption("typescript_flavor", fieldOptions, r.extensionTypes)
+	}
 
-	switch fieldSpec.GetType() {
-	case descriptorpb.FieldDescriptorProto_TYPE_BOOL:
-		baseType = "boolean"
-	case descriptorpb.FieldDescriptorProto_TYPE_INT32:
-		baseType = "number"
-	case descriptorpb.FieldDescriptorProto_TYPE_UINT32:
-		baseType = "number"
-	case descriptorpb.FieldDescriptorProto_TYPE_SINT32:
-		baseType = "number"
-	case descriptorpb.FieldDescriptorProto_TYPE_INT64:
-		baseType = "number"
-	case descriptorpb.FieldDescriptorProto_TYPE_UINT64:
-		baseType = "number"
-	case descriptorpb.FieldDescriptorProto_TYPE_SINT64:
-		baseType = "number"
-	case descriptorpb.FieldDescriptorProto_TYPE_FLOAT:
-		baseType = "number"
-	case descriptorpb.FieldDescriptorProto_TYPE_DOUBLE:
-		baseType = "number"
-	case descriptorpb.FieldDescriptorProto_TYPE_FIXED32:
-		baseType = "number"
-	case descriptorpb.FieldDescriptorProto_TYPE_FIXED64:
-		baseType = "number"
-	case descriptorpb.FieldDescriptorProto_TYPE_SFIXED32:
-		baseType = "number"
-	case descriptorpb.FieldDescriptorProto_TYPE_SFIXED64:
-		baseType = "number"
-	case descriptorpb.FieldDescriptorProto_TYPE_STRING:
-		baseType = "string"
-	case descriptorpb.FieldDescriptorProto_TYPE_BYTES:
-		baseType = "Uint8Array"
-	case descriptorpb.FieldDescriptorProto_TYPE_ENUM:
-		baseType = r.getEnumOrMessageTypeName(fieldSpec.GetTypeName(), false) + "_Enum"
-	case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE:
-		baseType = r.getEnumOrMessageTypeName(fieldSpec.GetTypeName(), false)
+	baseType := "unknown"
+	if found && flavorName != "" {
+		baseType = flavorName
+	} else {
+		switch fieldSpec.GetType() {
+		case descriptorpb.FieldDescriptorProto_TYPE_BOOL:
+			baseType = "boolean"
+		case descriptorpb.FieldDescriptorProto_TYPE_INT32:
+			baseType = "number"
+		case descriptorpb.FieldDescriptorProto_TYPE_UINT32:
+			baseType = "number"
+		case descriptorpb.FieldDescriptorProto_TYPE_SINT32:
+			baseType = "number"
+		case descriptorpb.FieldDescriptorProto_TYPE_INT64:
+			baseType = "number"
+		case descriptorpb.FieldDescriptorProto_TYPE_UINT64:
+			baseType = "number"
+		case descriptorpb.FieldDescriptorProto_TYPE_SINT64:
+			baseType = "number"
+		case descriptorpb.FieldDescriptorProto_TYPE_FLOAT:
+			baseType = "number"
+		case descriptorpb.FieldDescriptorProto_TYPE_DOUBLE:
+			baseType = "number"
+		case descriptorpb.FieldDescriptorProto_TYPE_FIXED32:
+			baseType = "number"
+		case descriptorpb.FieldDescriptorProto_TYPE_FIXED64:
+			baseType = "number"
+		case descriptorpb.FieldDescriptorProto_TYPE_SFIXED32:
+			baseType = "number"
+		case descriptorpb.FieldDescriptorProto_TYPE_SFIXED64:
+			baseType = "number"
+		case descriptorpb.FieldDescriptorProto_TYPE_STRING:
+			baseType = "string"
+		case descriptorpb.FieldDescriptorProto_TYPE_BYTES:
+			baseType = "Uint8Array"
+		case descriptorpb.FieldDescriptorProto_TYPE_ENUM:
+			baseType = r.getEnumOrMessageTypeName(fieldSpec.GetTypeName(), false) + "_Enum"
+		case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE:
+			baseType = r.getEnumOrMessageTypeName(fieldSpec.GetTypeName(), false)
+		}
 	}
 
 	if fieldSpec.GetLabel() == descriptorpb.FieldDescriptorProto_LABEL_REPEATED {

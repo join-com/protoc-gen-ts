@@ -6,6 +6,7 @@ package generator
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 
 	"github.com/iancoleman/strcase"
@@ -17,7 +18,10 @@ import (
 
 func (r *Runner) generateTypescriptFile(protoFile *protogen.File, generatedFileStream *protogen.GeneratedFile) {
 	// TODO: Generate comment with version, in order to improve traceability & debugging experience
-	generatedFileStream.P("// GENERATED CODE -- DO NOT EDIT!\n")
+	generatedFileStream.P(
+		"// GENERATED CODE -- DO NOT EDIT!\n",
+		"/* eslint-disable @typescript-eslint/no-non-null-assertion */\n",
+	)
 
 	r.generateTypescriptImports(protoFile, generatedFileStream)
 	r.generateTypescriptNamespace(generatedFileStream, protoFile)
@@ -29,26 +33,57 @@ func (r *Runner) generateTypescriptImports(protoFile *protogen.File, generatedFi
 
 	// Generic imports
 	if len(protoFile.Proto.GetService()) > 0 {
-		generatedFileStream.P("// import * as nodeTrace from '@join-com/node-trace'") // TODO: Remove comment when import is used
 		generatedFileStream.P("import * as joinGRPC from '@join-com/grpc'")
-		generatedFileStream.P("import { grpc } from '@join-com/grpc'")
 	}
-	generatedFileStream.P("import * as protobufjs from 'protobufjs/light'")
-	generatedFileStream.P("")
+	generatedFileStream.P("import * as protobufjs from 'protobufjs/light'\n")
 
 	// Custom imports
+	importLines := make([]string, 0, len(importSourcePaths))
 	for _, importSourcePath := range importSourcePaths {
 		if !r.importCodeOptions[importSourcePath] {
 			continue
 		}
 
-		generatedFileStream.P(fmt.Sprintf(
+		importLines = append(importLines, fmt.Sprintf(
 			"import { %s } from '%s'",
 			r.generateImportName(currentSourcePath, importSourcePath),
 			fromProtoPathToGeneratedPath(importSourcePath, currentSourcePath),
 		))
 	}
+
+	if r.fileHasFlavors(generatedFileStream, protoFile) {
+		importLines = append(importLines, "import { WithFlavor } from '@coderspirit/nominal'")
+	}
+
+	sort.Slice(importLines, func(i, j int) bool {
+		return importLines[i] < importLines[j]
+	})
+	for _, importLine := range importLines {
+		generatedFileStream.P(importLine)
+	}
 	generatedFileStream.P("")
+
+	if len(protoFile.Proto.GetService()) > 0 {
+		generatedFileStream.P("import { grpc } from '@join-com/grpc'\n")
+	}
+}
+
+func (r *Runner) fileHasFlavors(generatedFileStream *protogen.GeneratedFile, protoFile *protogen.File) bool {
+	for _, messageSpec := range protoFile.Proto.GetMessageType() {
+		for _, fieldSpec := range messageSpec.GetField() {
+			fieldOptions := fieldSpec.GetOptions()
+			if fieldOptions == nil {
+				continue
+			}
+
+			flavorName, found := join_proto.GetStringCustomFieldOption("typescript_flavor", fieldOptions, r.extensionTypes)
+			if found && flavorName != "" {
+				return true
+			}
+		}
+	}
+
+	return false
 }
 
 func (r *Runner) generateImportName(currentSourcePath string, importSourcePath string) string {
@@ -94,6 +129,7 @@ func (r *Runner) generateTypescriptNamespace(generatedFileStream *protogen.Gener
 		"}\n",
 	)
 
+	r.generateTypescriptFlavors(generatedFileStream, protoFile)
 	r.generateTypescriptEnums(generatedFileStream, protoFile)
 	r.generateTypescriptMessageInterfaces(generatedFileStream, protoFile)
 	r.generateTypescriptMessageClasses(generatedFileStream, protoFile)
@@ -103,6 +139,79 @@ func (r *Runner) generateTypescriptNamespace(generatedFileStream *protogen.Gener
 	r.currentPackage = ""
 	r.indentLevel -= 2
 	r.P(generatedFileStream, "\n}")
+}
+
+func (r *Runner) generateTypescriptFlavors(generatedFileStream *protogen.GeneratedFile, protoFile *protogen.File) {
+	flavorBaseTypesMap := make(map[string]string)
+	flavorDeclarations := make([]string, 0)
+
+	for _, messageSpec := range protoFile.Proto.GetMessageType() {
+		for _, fieldSpec := range messageSpec.GetField() {
+			fieldOptions := fieldSpec.GetOptions()
+			if fieldOptions == nil {
+				continue
+			}
+
+			flavorName, found := join_proto.GetStringCustomFieldOption("typescript_flavor", fieldOptions, r.extensionTypes)
+			if !found || flavorName == "" {
+				continue
+			}
+
+			var baseType string
+			switch fieldSpec.GetType() {
+			case descriptorpb.FieldDescriptorProto_TYPE_BOOL:
+				baseType = "boolean"
+			case descriptorpb.FieldDescriptorProto_TYPE_INT32:
+				baseType = "number"
+			case descriptorpb.FieldDescriptorProto_TYPE_UINT32:
+				baseType = "number"
+			case descriptorpb.FieldDescriptorProto_TYPE_SINT32:
+				baseType = "number"
+			case descriptorpb.FieldDescriptorProto_TYPE_INT64:
+				baseType = "number"
+			case descriptorpb.FieldDescriptorProto_TYPE_UINT64:
+				baseType = "number"
+			case descriptorpb.FieldDescriptorProto_TYPE_SINT64:
+				baseType = "number"
+			case descriptorpb.FieldDescriptorProto_TYPE_FLOAT:
+				baseType = "number"
+			case descriptorpb.FieldDescriptorProto_TYPE_DOUBLE:
+				baseType = "number"
+			case descriptorpb.FieldDescriptorProto_TYPE_FIXED32:
+				baseType = "number"
+			case descriptorpb.FieldDescriptorProto_TYPE_FIXED64:
+				baseType = "number"
+			case descriptorpb.FieldDescriptorProto_TYPE_SFIXED32:
+				baseType = "number"
+			case descriptorpb.FieldDescriptorProto_TYPE_SFIXED64:
+				baseType = "number"
+			case descriptorpb.FieldDescriptorProto_TYPE_STRING:
+				baseType = "string"
+			case descriptorpb.FieldDescriptorProto_TYPE_BYTES:
+				baseType = "Uint8Array"
+			default:
+				utils.LogError("Only primitive types can be flavored (" + fieldSpec.GetJsonName() + ")")
+			}
+
+			previousBaseType, ok := flavorBaseTypesMap[flavorName]
+			if ok {
+				if previousBaseType != baseType {
+					utils.LogError("Declared flavor " + flavorName + " multiple times with different base types (" + baseType + ", " + previousBaseType + ")")
+				}
+			} else {
+				flavorBaseTypesMap[flavorName] = baseType
+				flavorDeclarations = append(flavorDeclarations, "export type "+flavorName+" = WithFlavor<"+baseType+", '"+flavorName+"'>")
+			}
+		}
+	}
+
+	sort.Slice(flavorDeclarations, func(i, j int) bool {
+		return flavorDeclarations[i] < flavorDeclarations[j]
+	})
+	for _, flavorDeclaration := range flavorDeclarations {
+		generatedFileStream.P(flavorDeclaration)
+	}
+	generatedFileStream.P("")
 }
 
 func (r *Runner) generateTypescriptEnums(generatedFileStream *protogen.GeneratedFile, protoFile *protogen.File) {

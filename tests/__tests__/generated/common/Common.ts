@@ -1,4 +1,5 @@
 // GENERATED CODE -- DO NOT EDIT!
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import * as protobufjs from 'protobufjs/light'
 

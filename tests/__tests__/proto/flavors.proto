@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package flavors;
+
+// Makes protoc happy (useful for Golang code generation, not for TS)
+option go_package = "github.com/join-com/protoc-gen-ts/flavors";
+
+// Needed to have access to required & flavored fields
+import "options.proto";
+
+service Users {
+  rpc Find(UserRequest) returns (UserProfile) {}
+}
+
+message UserRequest {
+  int32 user_id = 1 [(join.protobuf.typescript_flavor) = "UserId"];
+}
+
+message UserProfile {
+  option (join.protobuf.typescript_required_fields) = true;
+
+  int32 id = 1 [(join.protobuf.typescript_flavor) = "UserId"];
+  string username = 2;
+  repeated string emails = 3 [(join.protobuf.typescript_flavor) = "Email"];
+}

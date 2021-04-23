@@ -15,6 +15,7 @@
     "proto:prettier": "prettier --write '__tests__/generated/**/*.ts'"
   },
   "dependencies": {
+    "@coderspirit/nominal": "^3.0.0",
     "@join-com/gcloud-logger-trace": "^0.1.17",
     "@join-com/grpc": "^0.3.3",
     "@join-com/grpc-ts": "^2.0.2",

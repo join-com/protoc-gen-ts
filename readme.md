@@ -32,6 +32,47 @@ If you want to use the old generator (notice the `tsx_out` -> `ts_out` change):
 protoc proto/*.proto -I proto --ts_out=proto-ts
 ```
 
+## Advanced topics: Required fields & type flavors
+
+In order to enable the "required fields" feature and the "type flavors" feature,
+copy the following files from this repository into your `proto` directory:
+- `google/protobuf/descriptor.proto`
+- `options.proto`
+
+### Required fields
+
+We can mark all fields as required in a message, with a "message custom option":
+```proto
+message ExampleMessage {
+  option (join.protobuf.typescript_required_fields) = true;
+  int32 firstField = 1;
+  int32 secondField = 2;
+  string thirdField = 3 [(join.protobuf.typescript_optional) = true]; // We can mark fields as optional
+}
+```
+
+We can also mark individual fields as required:
+```proto
+message ExampleMessage {
+  int32 firstField = 1;
+  int32 secondField = 2 [(join.protobuf.typescript_required) = true];
+  string thirdField = 3;
+}
+```
+
+### Type flavors
+
+We can also generate flavor nominal types for our fields with primitive types:
+```proto
+message UserProfile {
+  option (join.protobuf.typescript_required_fields) = true;
+
+  int32 id = 1 [(join.protobuf.typescript_flavor) = "UserId"];
+  string username = 2;
+  repeated string emails = 3 [(join.protobuf.typescript_flavor) = "Email"];
+}
+```
+
 ## Develop
 
 1. Follow [instructions](https://golang.org/doc/install) to install Go and add /usr/local/go/bin to the PATH environment variable

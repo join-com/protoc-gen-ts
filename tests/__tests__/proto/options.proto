@@ -24,14 +24,17 @@ extend google.protobuf.FileOptions {
 }
 
 extend google.protobuf.MessageOptions {
-  // WARNING: EXPERIMENTAL. Marks fields as not optional for the whole message.
+  // Marks fields as not optional for the whole message.
   optional bool typescript_required_fields = 50101 [default = false];
 }
 
 extend google.protobuf.FieldOptions {
-  // WARNING: EXPERIMENTAL. Marks field as not optional
+  // Marks field as not optional
   optional bool typescript_required = 50201 [default = false];
 
-  // WARNING: EXPERIMENTAL. Marks field as optional (useful for messages with typescript_required)
+  // Marks field as optional (useful for messages with typescript_required)
   optional bool typescript_optional = 50202 [default = false];
+
+  // Marks field as flavored
+  optional string typescript_flavor = 50203;
 }

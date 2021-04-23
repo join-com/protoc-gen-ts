@@ -119,3 +119,39 @@ func GetBooleanCustomFieldOption(optionName string, options *descriptorpb.FieldO
 
 	return result, found
 }
+
+// Returns: (result, foundOption)
+func GetStringCustomFieldOption(optionName string, options *descriptorpb.FieldOptions, extensionTypes *protoregistry.Types) (string, bool) {
+	// It would be ideal to merge this method with the other ones, and use IOptions instead of *descriptorpb.FieldOptions,
+	// but it seems to cause strange segmentation faults quite difficult to debug
+
+	if options == nil {
+		return "", false
+	}
+
+	buffer, err := proto.Marshal(options)
+	if err != nil {
+		panic(err)
+	}
+
+	options.Reset()
+	err = proto.UnmarshalOptions{Resolver: extensionTypes}.Unmarshal(buffer, options)
+	if err != nil {
+		panic(err)
+	}
+
+	result, found := "", false
+	options.ProtoReflect().Range(func(fd protoreflect.FieldDescriptor, v protoreflect.Value) bool {
+		if !fd.IsExtension() {
+			return true
+		}
+		if fd.Name() == protoreflect.Name(optionName) {
+			found = true
+			result = v.String()
+			return false
+		}
+		return true
+	})
+
+	return result, found
+}

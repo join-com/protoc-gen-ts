@@ -241,14 +241,55 @@ func (r *Runner) generateDecodePatchedMethod(generatedFileStream *protogen.Gener
 	r.P(generatedFileStream, "public static decodePatched(this: void, reader: protobufjs.Reader | Uint8Array): I"+className+" {")
 	r.indentLevel += 2
 
-	if hasEnums {
-		r.P(generatedFileStream, "return "+className+".decode(reader).asInterface()")
+	messageRequiredFields := r.getMessageRequiredFields(messageSpec, requiredFields)
+	if len(messageRequiredFields) > 0 {
+		var keyofPlaceholder string
+		if hasEnums {
+			r.P(generatedFileStream, "const message = "+className+".decode(reader).asInterface()")
+			keyofPlaceholder = "I" + className
+		} else {
+			r.P(generatedFileStream, "const message = "+className+".decode(reader)")
+			keyofPlaceholder = className
+		}
+		r.P(
+			generatedFileStream,
+			"for (const fieldName of ["+strings.Join(messageRequiredFields, ", ")+"] as (keyof "+keyofPlaceholder+")[]) {",
+			"  if (message[fieldName] == null) {",
+			"    throw new Error(`Required field ${fieldName} in "+className+" is null or undefined`)",
+			"  }",
+			"}",
+			"return message",
+		)
 	} else {
-		r.P(generatedFileStream, "return "+className+".decode(reader)")
+		if hasEnums {
+			r.P(generatedFileStream, "return "+className+".decode(reader).asInterface()")
+		} else {
+			r.P(generatedFileStream, "return "+className+".decode(reader)")
+		}
 	}
 
 	r.indentLevel -= 2
 	r.P(generatedFileStream, "}\n")
+}
+
+func (r *Runner) getMessageRequiredFields(messageSpec *descriptorpb.DescriptorProto, requiredFields bool) []string {
+	messageRequiredFields := make([]string, 0)
+
+	for _, fieldSpec := range messageSpec.GetField() {
+		fieldOptions := fieldSpec.GetOptions()
+		requiredField, foundRequired := join_proto.GetBooleanCustomFieldOption("typescript_required", fieldOptions, r.extensionTypes)
+		optionalField, foundOptional := join_proto.GetBooleanCustomFieldOption("typescript_optional", fieldOptions, r.extensionTypes)
+		if foundRequired && requiredField && foundOptional && optionalField {
+			utils.LogError("incompatible options for field " + fieldSpec.GetName() + " in " + messageSpec.GetName())
+		}
+		confirmRequired := requiredFields && !(foundOptional && optionalField) || foundRequired && requiredField
+
+		if confirmRequired {
+			messageRequiredFields = append(messageRequiredFields, "'"+fieldSpec.GetJsonName()+"'") // We add the quotation for convenience
+		}
+	}
+
+	return messageRequiredFields
 }
 
 func (r *Runner) generateEncodePatchedMethod(generatedFileStream *protogen.GeneratedFile, messageSpec *descriptorpb.DescriptorProto, requiredFields bool, hasEnums bool) {

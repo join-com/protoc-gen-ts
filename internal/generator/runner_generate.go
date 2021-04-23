@@ -6,6 +6,7 @@ package generator
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 
 	"github.com/iancoleman/strcase"
@@ -17,7 +18,10 @@ import (
 
 func (r *Runner) generateTypescriptFile(protoFile *protogen.File, generatedFileStream *protogen.GeneratedFile) {
 	// TODO: Generate comment with version, in order to improve traceability & debugging experience
-	generatedFileStream.P("// GENERATED CODE -- DO NOT EDIT!\n")
+	generatedFileStream.P(
+		"// GENERATED CODE -- DO NOT EDIT!\n",
+		"/* eslint-disable @typescript-eslint/no-non-null-assertion */\n",
+	)
 
 	r.generateTypescriptImports(protoFile, generatedFileStream)
 	r.generateTypescriptNamespace(generatedFileStream, protoFile)
@@ -29,26 +33,34 @@ func (r *Runner) generateTypescriptImports(protoFile *protogen.File, generatedFi
 
 	// Generic imports
 	if len(protoFile.Proto.GetService()) > 0 {
-		generatedFileStream.P("// import * as nodeTrace from '@join-com/node-trace'") // TODO: Remove comment when import is used
 		generatedFileStream.P("import * as joinGRPC from '@join-com/grpc'")
-		generatedFileStream.P("import { grpc } from '@join-com/grpc'")
 	}
-	generatedFileStream.P("import * as protobufjs from 'protobufjs/light'")
-	generatedFileStream.P("")
+	generatedFileStream.P("import * as protobufjs from 'protobufjs/light'\n")
 
 	// Custom imports
+	importLines := make([]string, 0, len(importSourcePaths))
 	for _, importSourcePath := range importSourcePaths {
 		if !r.importCodeOptions[importSourcePath] {
 			continue
 		}
 
-		generatedFileStream.P(fmt.Sprintf(
+		importLines = append(importLines, fmt.Sprintf(
 			"import { %s } from '%s'",
 			r.generateImportName(currentSourcePath, importSourcePath),
 			fromProtoPathToGeneratedPath(importSourcePath, currentSourcePath),
 		))
 	}
+	sort.Slice(importLines, func(i, j int) bool {
+		return importLines[i] < importLines[j]
+	})
+	for _, importLine := range importLines {
+		generatedFileStream.P(importLine)
+	}
 	generatedFileStream.P("")
+
+	if len(protoFile.Proto.GetService()) > 0 {
+		generatedFileStream.P("import { grpc } from '@join-com/grpc'\n")
+	}
 }
 
 func (r *Runner) generateImportName(currentSourcePath string, importSourcePath string) string {

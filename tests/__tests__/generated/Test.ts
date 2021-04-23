@@ -1,13 +1,14 @@
 // GENERATED CODE -- DO NOT EDIT!
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-// import * as nodeTrace from '@join-com/node-trace'
 import * as joinGRPC from '@join-com/grpc'
-import { grpc } from '@join-com/grpc'
 import * as protobufjs from 'protobufjs/light'
 
-import { GoogleProtobuf } from './google/protobuf/Timestamp'
 import { Common as Common_Common } from './common/Common'
 import { Common as Common_Extra } from './common/Extra'
+import { GoogleProtobuf } from './google/protobuf/Timestamp'
+
+import { grpc } from '@join-com/grpc'
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Foo {
@@ -130,7 +131,17 @@ export namespace Foo {
       this: void,
       reader: protobufjs.Reader | Uint8Array
     ): ICustomOptionsTest {
-      return CustomOptionsTest.decode(reader).asInterface()
+      const message = CustomOptionsTest.decode(reader).asInterface()
+      for (const fieldName of [
+        'requiredField',
+      ] as (keyof ICustomOptionsTest)[]) {
+        if (message[fieldName] == null) {
+          throw new Error(
+            `Required field ${fieldName} in CustomOptionsTest is null or undefined`
+          )
+        }
+      }
+      return message
     }
 
     public static encodePatched(
@@ -236,7 +247,18 @@ export namespace Foo {
       this: void,
       reader: protobufjs.Reader | Uint8Array
     ): IRequiredPropertiesTest {
-      return RequiredPropertiesTest.decode(reader)
+      const message = RequiredPropertiesTest.decode(reader)
+      for (const fieldName of [
+        'requiredField',
+        'customRequiredField',
+      ] as (keyof RequiredPropertiesTest)[]) {
+        if (message[fieldName] == null) {
+          throw new Error(
+            `Required field ${fieldName} in RequiredPropertiesTest is null or undefined`
+          )
+        }
+      }
+      return message
     }
 
     public static encodePatched(

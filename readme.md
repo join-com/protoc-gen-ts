@@ -65,8 +65,6 @@ message ExampleMessage {
 We can also generate flavor nominal types for our fields with primitive types:
 ```proto
 message UserProfile {
-  option (join.protobuf.typescript_required_fields) = true;
-
   int32 id = 1 [(join.protobuf.typescript_flavor) = "UserId"];
   string username = 2;
   repeated string emails = 3 [(join.protobuf.typescript_flavor) = "Email"];

@@ -503,20 +503,26 @@ export namespace Foo {
 
   export interface IUsersClient
     extends joinGRPC.IExtendedClient<IUsersServiceImplementation, 'foo.Users'> {
+    /**
+     * @deprecated
+     */
     Find(
       request: IRequest,
       metadata?: Record<string, string>,
       options?: grpc.CallOptions
     ): joinGRPC.IUnaryRequest<Common_Common.IOtherPkgMessage>
+
     FindClientStream(
       metadata?: Record<string, string>,
       options?: grpc.CallOptions
     ): joinGRPC.IClientStreamRequest<IRequest, Common_Common.IOtherPkgMessage>
+
     FindServerStream(
       request: IRequest,
       metadata?: Record<string, string>,
       options?: grpc.CallOptions
     ): grpc.ClientReadableStream<Common_Common.IOtherPkgMessage>
+
     FindBidiStream(
       metadata?: Record<string, string>,
       options?: grpc.CallOptions
@@ -532,11 +538,15 @@ export namespace Foo {
       super(config, 'foo.Users')
     }
 
+    /**
+     * @deprecated
+     */
     public Find(
       request: IRequest,
       metadata?: Record<string, string>,
       options?: grpc.CallOptions
     ): joinGRPC.IUnaryRequest<Common_Common.IOtherPkgMessage> {
+      this.logger?.warn("using deprecated service method 'UsersClient.Find'")
       return this.makeUnaryRequest('Find', request, metadata, options)
     }
 

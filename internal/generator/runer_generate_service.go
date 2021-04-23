@@ -89,6 +89,12 @@ func (r *Runner) generateTypescriptServiceDefinitionMethod(generatedFileStream *
 }
 
 func (r *Runner) generateTypescriptClientInterface(generatedFileStream *protogen.GeneratedFile, serviceSpec *descriptorpb.ServiceDescriptorProto) {
+	serviceOptions := serviceSpec.GetOptions()
+	if serviceOptions != nil {
+		if serviceOptions.GetDeprecated() {
+			r.P(generatedFileStream, "/**\n  * @deprecated\n */")
+		}
+	}
 	r.P(
 		generatedFileStream,
 		"export interface I"+strcase.ToCamel(serviceSpec.GetName())+"Client",
@@ -105,6 +111,13 @@ func (r *Runner) generateTypescriptClientInterface(generatedFileStream *protogen
 }
 
 func (r *Runner) generateTypescriptClientInterfaceMethod(generatedFileStream *protogen.GeneratedFile, serviceSpec *descriptorpb.ServiceDescriptorProto, methodSpec *descriptorpb.MethodDescriptorProto) {
+	methodOptions := methodSpec.GetOptions()
+	if methodOptions != nil {
+		if methodOptions.GetDeprecated() {
+			r.P(generatedFileStream, "/**\n  * @deprecated\n */")
+		}
+	}
+
 	// Function's Signature
 	methodName := strcase.ToCamel(methodSpec.GetName())
 	r.P(generatedFileStream, methodName+"(")
@@ -139,10 +152,16 @@ func (r *Runner) generateTypescriptClientInterfaceMethod(generatedFileStream *pr
 	}
 
 	r.indentLevel -= 2
-	r.P(generatedFileStream, "): "+returnType)
+	r.P(generatedFileStream, "): "+returnType+"\n")
 }
 
 func (r *Runner) generateTypescriptClient(generatedFileStream *protogen.GeneratedFile, serviceSpec *descriptorpb.ServiceDescriptorProto) {
+	serviceOptions := serviceSpec.GetOptions()
+	if serviceOptions != nil {
+		if serviceOptions.GetDeprecated() {
+			r.P(generatedFileStream, "/**\n  * @deprecated\n */")
+		}
+	}
 	r.P(
 		generatedFileStream,
 		"export class "+strcase.ToCamel(serviceSpec.GetName())+"Client",
@@ -168,6 +187,13 @@ func (r *Runner) generateTypescriptClient(generatedFileStream *protogen.Generate
 }
 
 func (r *Runner) generateTypescriptClientMethod(generatedFileStream *protogen.GeneratedFile, serviceSpec *descriptorpb.ServiceDescriptorProto, methodSpec *descriptorpb.MethodDescriptorProto) {
+	methodOptions := methodSpec.GetOptions()
+	isDeprecated := methodOptions != nil && methodOptions.GetDeprecated()
+
+	if isDeprecated {
+		r.P(generatedFileStream, "/**\n  * @deprecated\n */")
+	}
+
 	// Function's Signature
 	methodName := strcase.ToCamel(methodSpec.GetName())
 	r.P(generatedFileStream, "public "+methodName+"(")
@@ -204,6 +230,10 @@ func (r *Runner) generateTypescriptClientMethod(generatedFileStream *protogen.Ge
 	r.indentLevel -= 2
 	r.P(generatedFileStream, "): "+returnType+" {")
 	r.indentLevel += 2
+
+	if isDeprecated {
+		r.P(generatedFileStream, "this.logger?.warn('using deprecated service method \\'"+strcase.ToCamel(serviceSpec.GetName())+"Client."+methodName+"\\'')")
+	}
 
 	if clientStream && serverStrean {
 		r.P(generatedFileStream, "return this.makeBidiStreamRequest('"+methodName+"', metadata, options)")

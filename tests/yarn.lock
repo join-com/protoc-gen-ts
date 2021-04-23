@@ -589,10 +589,10 @@
   dependencies:
     grpc "^1.24.5"
 
-"@join-com/grpc@^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@join-com/grpc/-/grpc-0.3.0.tgz#428e021261f39dce874c3976d1b514a2730a829b"
-  integrity sha512-1Oj6i+E8NRVQNMd8ZoyFBtbzvIVz/8rB8q9dHhc4U08vhih3MnYmxRBPGFSwZpCCMlXaXbgfnuxPtDut0x7cmg==
+"@join-com/grpc@^0.3.3":
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/@join-com/grpc/-/grpc-0.3.3.tgz#9efdb8b57d941dc2b9288362b1c21cec3026096d"
+  integrity sha512-LrkOlKH9iH74CN0kpSZ9efScf+xG9tpXU5+4z1YCIe2fKPLlfnQ9Io/lu8eld2iu2cQGVWB2IoXaKDrv8Y8jYQ==
   dependencies:
     "@grpc/grpc-js" "^1.2.12"
     protobufjs "^6.10.2"

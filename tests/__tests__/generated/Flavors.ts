@@ -125,6 +125,26 @@ export namespace Flavors {
     },
   }
 
+  export abstract class AbstractUsersService extends joinGRPC.Service<IUsersServiceImplementation> {
+    constructor(
+      protected readonly logger?: joinGRPC.INoDebugLogger,
+      trace?: joinGRPC.IServiceTrace
+    ) {
+      super(
+        usersServiceDefinition,
+        {
+          Find: (call) => this.Find(call),
+        },
+        logger,
+        trace
+      )
+    }
+
+    protected abstract Find(
+      call: grpc.ServerUnaryCall<IUserRequest, IUserProfile>
+    ): Promise<IUserProfile>
+  }
+
   export interface IUsersClient
     extends joinGRPC.IExtendedClient<
       IUsersServiceImplementation,

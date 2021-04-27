@@ -523,6 +523,38 @@ export namespace Foo {
     },
   }
 
+  export abstract class AbstractUsersService extends joinGRPC.Service<IUsersServiceImplementation> {
+    constructor(
+      protected readonly logger?: joinGRPC.INoDebugLogger,
+      trace?: joinGRPC.IServiceTrace
+    ) {
+      super(
+        usersServiceDefinition,
+        {
+          Find: (call) => this.Find(call),
+          FindClientStream: (call) => this.FindClientStream(call),
+          FindServerStream: (call) => this.FindServerStream(call),
+          FindBidiStream: (call) => this.FindBidiStream(call),
+        },
+        logger,
+        trace
+      )
+    }
+
+    protected abstract Find(
+      call: grpc.ServerUnaryCall<IRequest, Common_Common.IOtherPkgMessage>
+    ): Promise<Common_Common.IOtherPkgMessage>
+    protected abstract FindClientStream(
+      call: grpc.ServerReadableStream<IRequest, Common_Common.IOtherPkgMessage>
+    ): Promise<Common_Common.IOtherPkgMessage>
+    protected abstract FindServerStream(
+      call: grpc.ServerWritableStream<IRequest, Common_Common.IOtherPkgMessage>
+    ): Promise<void>
+    protected abstract FindBidiStream(
+      call: grpc.ServerDuplexStream<IRequest, Common_Common.IOtherPkgMessage>
+    ): Promise<void>
+  }
+
   export interface IUsersClient
     extends joinGRPC.IExtendedClient<IUsersServiceImplementation, 'foo.Users'> {
     /**

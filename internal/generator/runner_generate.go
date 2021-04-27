@@ -134,6 +134,7 @@ func (r *Runner) generateTypescriptNamespace(generatedFileStream *protogen.Gener
 	r.generateTypescriptMessageInterfaces(generatedFileStream, protoFile)
 	r.generateTypescriptMessageClasses(generatedFileStream, protoFile)
 	r.generateTypescriptServiceDefinitions(generatedFileStream, protoFile)
+	r.generateTypescriptClient(generatedFileStream, protoFile)
 
 	r.currentNamespace = ""
 	r.currentPackage = ""

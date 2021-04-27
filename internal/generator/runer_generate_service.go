@@ -12,8 +12,7 @@ func (r *Runner) generateTypescriptServiceDefinitions(generatedFileStream *proto
 	for _, serviceSpec := range protoFile.Proto.GetService() {
 		r.generateTypescriptServiceImplementationInterface(generatedFileStream, serviceSpec)
 		r.generateTypescriptServiceDefinition(generatedFileStream, serviceSpec)
-		r.generateTypescriptClientInterface(generatedFileStream, serviceSpec)
-		r.generateTypescriptClient(generatedFileStream, serviceSpec)
+		r.generateTypescriptServiceAbstractClass(generatedFileStream, serviceSpec)
 	}
 }
 
@@ -88,161 +87,60 @@ func (r *Runner) generateTypescriptServiceDefinitionMethod(generatedFileStream *
 	r.P(generatedFileStream, "},")
 }
 
-func (r *Runner) generateTypescriptClientInterface(generatedFileStream *protogen.GeneratedFile, serviceSpec *descriptorpb.ServiceDescriptorProto) {
-	serviceOptions := serviceSpec.GetOptions()
-	if serviceOptions != nil {
-		if serviceOptions.GetDeprecated() {
-			r.P(generatedFileStream, "/**\n  * @deprecated\n */")
-		}
-	}
+func (r *Runner) generateTypescriptServiceAbstractClass(generatedFileStream *protogen.GeneratedFile, serviceSpec *descriptorpb.ServiceDescriptorProto) {
+	baseName := strcase.ToCamel(serviceSpec.GetName())
+	r.P(generatedFileStream, "export abstract class Abstract"+baseName+"Service extends joinGRPC.Service<I"+baseName+"ServiceImplementation> {\n")
+	r.indentLevel += 2
+
 	r.P(
 		generatedFileStream,
-		"export interface I"+strcase.ToCamel(serviceSpec.GetName())+"Client",
-		"extends joinGRPC.IExtendedClient<I"+strcase.ToCamel(serviceSpec.GetName())+"ServiceImplementation, '"+r.currentPackage+"."+serviceSpec.GetName()+"'> {",
+		"constructor(protected readonly logger?: joinGRPC.INoDebugLogger, trace?: joinGRPC.IServiceTrace) {",
+		"  super(",
+		"    "+strcase.ToLowerCamel(serviceSpec.GetName())+"ServiceDefinition,",
+		"    {",
 	)
-	r.indentLevel += 2
 
 	for _, methodSpec := range serviceSpec.GetMethod() {
-		r.generateTypescriptClientInterfaceMethod(generatedFileStream, serviceSpec, methodSpec)
-	}
-
-	r.indentLevel -= 2
-	r.P(generatedFileStream, "}\n")
-}
-
-func (r *Runner) generateTypescriptClientInterfaceMethod(generatedFileStream *protogen.GeneratedFile, serviceSpec *descriptorpb.ServiceDescriptorProto, methodSpec *descriptorpb.MethodDescriptorProto) {
-	methodOptions := methodSpec.GetOptions()
-	if methodOptions != nil {
-		if methodOptions.GetDeprecated() {
-			r.P(generatedFileStream, "/**\n  * @deprecated\n */")
-		}
-	}
-
-	// Function's Signature
-	methodName := strcase.ToCamel(methodSpec.GetName())
-	r.P(generatedFileStream, methodName+"(")
-	r.indentLevel += 2
-
-	inputTypeName := methodSpec.GetInputType()
-	inputInterface := r.getEnumOrMessageTypeName(inputTypeName, true)
-	outputTypeName := methodSpec.GetOutputType()
-	outputInterface := r.getEnumOrMessageTypeName(outputTypeName, true)
-
-	clientStream := methodSpec.GetClientStreaming()
-	serverStrean := methodSpec.GetServerStreaming()
-
-	if !clientStream {
-		r.P(generatedFileStream, "request: "+inputInterface+",")
+		methodName := methodSpec.GetName()
+		r.P(generatedFileStream, "    "+methodName+": (call) => this."+methodName+"(call),")
 	}
 
 	r.P(generatedFileStream,
-		"metadata?: Record<string, string>,",
-		"options?: grpc.CallOptions,",
+		"    },",
+		"    logger,",
+		"    trace,",
+		"  )",
+		"}\n",
 	)
-
-	var returnType string
-	if clientStream && serverStrean {
-		returnType = "grpc.ClientDuplexStream<" + inputInterface + ", " + outputInterface + ">"
-	} else if !clientStream && !serverStrean {
-		returnType = "joinGRPC.IUnaryRequest<" + outputInterface + ">"
-	} else if clientStream {
-		returnType = "joinGRPC.IClientStreamRequest<" + inputInterface + ", " + outputInterface + ">"
-	} else { // if serverStream
-		returnType = "grpc.ClientReadableStream<" + outputInterface + ">"
-	}
-
-	r.indentLevel -= 2
-	r.P(generatedFileStream, "): "+returnType+"\n")
-}
-
-func (r *Runner) generateTypescriptClient(generatedFileStream *protogen.GeneratedFile, serviceSpec *descriptorpb.ServiceDescriptorProto) {
-	serviceOptions := serviceSpec.GetOptions()
-	if serviceOptions != nil {
-		if serviceOptions.GetDeprecated() {
-			r.P(generatedFileStream, "/**\n  * @deprecated\n */")
-		}
-	}
-	r.P(
-		generatedFileStream,
-		"export class "+strcase.ToCamel(serviceSpec.GetName())+"Client",
-		"extends joinGRPC.Client<I"+strcase.ToCamel(serviceSpec.GetName())+"ServiceImplementation, '"+r.currentPackage+"."+serviceSpec.GetName()+"'> ",
-		"implements I"+strcase.ToCamel(serviceSpec.GetName())+"Client {",
-	)
-	r.indentLevel += 2
-
-	r.P(generatedFileStream, "constructor(public readonly config: joinGRPC.IClientConfig<I"+strcase.ToCamel(serviceSpec.GetName())+"ServiceImplementation>) {")
-	r.indentLevel += 2
-
-	r.P(generatedFileStream, "super(config, '"+r.currentPackage+"."+serviceSpec.GetName()+"')")
-
-	r.indentLevel -= 2
-	r.P(generatedFileStream, "}\n")
 
 	for _, methodSpec := range serviceSpec.GetMethod() {
-		r.generateTypescriptClientMethod(generatedFileStream, serviceSpec, methodSpec)
-	}
+		methodName := methodSpec.GetName()
 
-	r.indentLevel -= 2
-	r.P(generatedFileStream, "}\n")
-}
+		inputTypeName := methodSpec.GetInputType()
+		inputInterface := r.getEnumOrMessageTypeName(inputTypeName, true)
+		outputTypeName := methodSpec.GetOutputType()
+		outputInterface := r.getEnumOrMessageTypeName(outputTypeName, true)
 
-func (r *Runner) generateTypescriptClientMethod(generatedFileStream *protogen.GeneratedFile, serviceSpec *descriptorpb.ServiceDescriptorProto, methodSpec *descriptorpb.MethodDescriptorProto) {
-	methodOptions := methodSpec.GetOptions()
-	isDeprecated := methodOptions != nil && methodOptions.GetDeprecated()
+		clientStream := methodSpec.GetClientStreaming()
+		serverStrean := methodSpec.GetServerStreaming()
 
-	if isDeprecated {
-		r.P(generatedFileStream, "/**\n  * @deprecated\n */")
-	}
+		var callType string
+		var returnType string
+		if !clientStream && !serverStrean {
+			callType = "grpc.ServerUnaryCall<" + inputInterface + ", " + outputInterface + ">"
+			returnType = "Promise<" + outputInterface + ">"
+		} else if clientStream && serverStrean {
+			callType = "grpc.ServerDuplexStream<" + inputInterface + ", " + outputInterface + ">"
+			returnType = "Promise<void>"
+		} else if clientStream {
+			callType = "grpc.ServerReadableStream<" + inputInterface + ", " + outputInterface + ">"
+			returnType = "Promise<" + outputInterface + ">"
+		} else { // if ServerStream
+			callType = "grpc.ServerWritableStream<" + inputInterface + ", " + outputInterface + ">"
+			returnType = "Promise<void>"
+		}
 
-	// Function's Signature
-	methodName := strcase.ToCamel(methodSpec.GetName())
-	r.P(generatedFileStream, "public "+methodName+"(")
-	r.indentLevel += 2
-
-	inputTypeName := methodSpec.GetInputType()
-	inputInterface := r.getEnumOrMessageTypeName(inputTypeName, true)
-	outputTypeName := methodSpec.GetOutputType()
-	outputInterface := r.getEnumOrMessageTypeName(outputTypeName, true)
-
-	clientStream := methodSpec.GetClientStreaming()
-	serverStrean := methodSpec.GetServerStreaming()
-
-	if !clientStream {
-		r.P(generatedFileStream, "request: "+inputInterface+",")
-	}
-
-	r.P(generatedFileStream,
-		"metadata?: Record<string, string>,",
-		"options?: grpc.CallOptions,",
-	)
-
-	var returnType string
-	if clientStream && serverStrean {
-		returnType = "grpc.ClientDuplexStream<" + inputInterface + ", " + outputInterface + ">"
-	} else if !clientStream && !serverStrean {
-		returnType = "joinGRPC.IUnaryRequest<" + outputInterface + ">"
-	} else if clientStream {
-		returnType = "joinGRPC.IClientStreamRequest<" + inputInterface + ", " + outputInterface + ">"
-	} else { // if serverStream
-		returnType = "grpc.ClientReadableStream<" + outputInterface + ">"
-	}
-
-	r.indentLevel -= 2
-	r.P(generatedFileStream, "): "+returnType+" {")
-	r.indentLevel += 2
-
-	if isDeprecated {
-		r.P(generatedFileStream, "this.logger?.warn('using deprecated service method \\'"+strcase.ToCamel(serviceSpec.GetName())+"Client."+methodName+"\\'')")
-	}
-
-	if clientStream && serverStrean {
-		r.P(generatedFileStream, "return this.makeBidiStreamRequest('"+methodName+"', metadata, options)")
-	} else if !clientStream && !serverStrean {
-		r.P(generatedFileStream, "return this.makeUnaryRequest('"+methodName+"', request, metadata, options)")
-	} else if clientStream {
-		r.P(generatedFileStream, "return this.makeClientStreamRequest('"+methodName+"', metadata, options)")
-	} else { // if serverStream
-		r.P(generatedFileStream, "return this.makeServerStreamRequest('"+methodName+"', request, metadata, options)")
+		r.P(generatedFileStream, "protected abstract "+methodName+"(call: "+callType+"): "+returnType)
 	}
 
 	r.indentLevel -= 2

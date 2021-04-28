@@ -14,7 +14,7 @@ export namespace GoogleProtobuf {
     nanos?: number
   }
 
-  @protobufjs.Type.d('Timestamp')
+  @protobufjs.Type.d('google.protobuf.Timestamp')
   export class Timestamp
     extends protobufjs.Message<Timestamp>
     implements ConvertibleTo<ITimestamp>, ITimestamp {

@@ -27,7 +27,7 @@ export namespace Flavors {
     emails: Email[]
   }
 
-  @protobufjs.Type.d('UserProfile')
+  @protobufjs.Type.d('flavors.UserProfile')
   export class UserProfile
     extends protobufjs.Message<UserProfile>
     implements ConvertibleTo<IUserProfile>, IUserProfile {
@@ -76,7 +76,7 @@ export namespace Flavors {
     }
   }
 
-  @protobufjs.Type.d('UserRequest')
+  @protobufjs.Type.d('flavors.UserRequest')
   export class UserRequest
     extends protobufjs.Message<UserRequest>
     implements ConvertibleTo<IUserRequest>, IUserRequest {

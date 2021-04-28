@@ -17,7 +17,7 @@ export namespace Common {
     birthDate?: Date
   }
 
-  @protobufjs.Type.d('ExtraPkgMessage')
+  @protobufjs.Type.d('common.ExtraPkgMessage')
   export class ExtraPkgMessage
     extends protobufjs.Message<ExtraPkgMessage>
     implements ConvertibleTo<IExtraPkgMessage> {

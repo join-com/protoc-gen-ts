@@ -14,7 +14,7 @@ export namespace Common {
     latsName?: string
   }
 
-  @protobufjs.Type.d('common.OtherPkgMessage')
+  @protobufjs.Type.d('common_OtherPkgMessage')
   export class OtherPkgMessage
     extends protobufjs.Message<OtherPkgMessage>
     implements ConvertibleTo<IOtherPkgMessage>, IOtherPkgMessage {

@@ -27,7 +27,7 @@ export namespace Flavors {
     emails: Email[]
   }
 
-  @protobufjs.Type.d('flavors.UserProfile')
+  @protobufjs.Type.d('flavors_UserProfile')
   export class UserProfile
     extends protobufjs.Message<UserProfile>
     implements ConvertibleTo<IUserProfile>, IUserProfile {
@@ -76,7 +76,7 @@ export namespace Flavors {
     }
   }
 
-  @protobufjs.Type.d('flavors.UserRequest')
+  @protobufjs.Type.d('flavors_UserRequest')
   export class UserRequest
     extends protobufjs.Message<UserRequest>
     implements ConvertibleTo<IUserRequest>, IUserRequest {
@@ -161,9 +161,15 @@ export namespace Flavors {
     extends joinGRPC.Client<IUsersServiceImplementation, 'flavors.Users'>
     implements IUsersClient {
     constructor(
-      public readonly config: joinGRPC.IClientConfig<IUsersServiceImplementation>
+      config: Omit<
+        joinGRPC.IClientConfig<IUsersServiceImplementation>,
+        'serviceDefinition'
+      >
     ) {
-      super(config, 'flavors.Users')
+      super(
+        { ...config, serviceDefinition: usersServiceDefinition },
+        'flavors.Users'
+      )
     }
 
     public Find(

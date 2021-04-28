@@ -81,6 +81,8 @@ func (r *Runner) generateTypescriptClientInterfaceMethod(generatedFileStream *pr
 }
 
 func (r *Runner) generateTypescriptClientClass(generatedFileStream *protogen.GeneratedFile, serviceSpec *descriptorpb.ServiceDescriptorProto) {
+	serviceName := serviceSpec.GetName()
+
 	serviceOptions := serviceSpec.GetOptions()
 	if serviceOptions != nil {
 		if serviceOptions.GetDeprecated() {
@@ -89,16 +91,19 @@ func (r *Runner) generateTypescriptClientClass(generatedFileStream *protogen.Gen
 	}
 	r.P(
 		generatedFileStream,
-		"export class "+strcase.ToCamel(serviceSpec.GetName())+"Client",
-		"extends joinGRPC.Client<I"+strcase.ToCamel(serviceSpec.GetName())+"ServiceImplementation, '"+r.currentPackage+"."+serviceSpec.GetName()+"'> ",
-		"implements I"+strcase.ToCamel(serviceSpec.GetName())+"Client {",
+		"export class "+strcase.ToCamel(serviceName)+"Client",
+		"extends joinGRPC.Client<I"+strcase.ToCamel(serviceName)+"ServiceImplementation, '"+r.currentPackage+"."+serviceName+"'> ",
+		"implements I"+strcase.ToCamel(serviceName)+"Client {",
 	)
 	r.indentLevel += 2
 
-	r.P(generatedFileStream, "constructor(public readonly config: joinGRPC.IClientConfig<I"+strcase.ToCamel(serviceSpec.GetName())+"ServiceImplementation>) {")
+	r.P(
+		generatedFileStream,
+		"constructor(config: Omit<joinGRPC.IClientConfig<I"+strcase.ToCamel(serviceName)+"ServiceImplementation>, 'serviceDefinition'>) {",
+	)
 	r.indentLevel += 2
 
-	r.P(generatedFileStream, "super(config, '"+r.currentPackage+"."+serviceSpec.GetName()+"')")
+	r.P(generatedFileStream, "super({ ...config, serviceDefinition: "+strcase.ToLowerCamel(serviceName)+"ServiceDefinition }, '"+r.currentPackage+"."+serviceName+"')")
 
 	r.indentLevel -= 2
 	r.P(generatedFileStream, "}\n")

@@ -93,7 +93,7 @@ export namespace Foo {
     optionalField?: number
   }
 
-  @protobufjs.Type.d('foo.CustomOptionsTest')
+  @protobufjs.Type.d('foo_CustomOptionsTest')
   export class CustomOptionsTest
     extends protobufjs.Message<CustomOptionsTest>
     implements ConvertibleTo<ICustomOptionsTest> {
@@ -157,7 +157,7 @@ export namespace Foo {
   /**
    * @deprecated
    */
-  @protobufjs.Type.d('foo.Nested')
+  @protobufjs.Type.d('foo_Nested')
   export class Nested
     extends protobufjs.Message<Nested>
     implements ConvertibleTo<INested>, INested {
@@ -188,7 +188,7 @@ export namespace Foo {
     }
   }
 
-  @protobufjs.Type.d('foo.Request')
+  @protobufjs.Type.d('foo_Request')
   export class Request
     extends protobufjs.Message<Request>
     implements ConvertibleTo<IRequest>, IRequest {
@@ -219,7 +219,7 @@ export namespace Foo {
     }
   }
 
-  @protobufjs.Type.d('foo.RequiredPropertiesTest')
+  @protobufjs.Type.d('foo_RequiredPropertiesTest')
   export class RequiredPropertiesTest
     extends protobufjs.Message<RequiredPropertiesTest>
     implements ConvertibleTo<IRequiredPropertiesTest>, IRequiredPropertiesTest {
@@ -270,7 +270,7 @@ export namespace Foo {
     }
   }
 
-  @protobufjs.Type.d('foo.Test')
+  @protobufjs.Type.d('foo_Test')
   export class Test
     extends protobufjs.Message<Test>
     implements ConvertibleTo<ITest> {
@@ -587,9 +587,15 @@ export namespace Foo {
     extends joinGRPC.Client<IUsersServiceImplementation, 'foo.Users'>
     implements IUsersClient {
     constructor(
-      public readonly config: joinGRPC.IClientConfig<IUsersServiceImplementation>
+      config: Omit<
+        joinGRPC.IClientConfig<IUsersServiceImplementation>,
+        'serviceDefinition'
+      >
     ) {
-      super(config, 'foo.Users')
+      super(
+        { ...config, serviceDefinition: usersServiceDefinition },
+        'foo.Users'
+      )
     }
 
     /**

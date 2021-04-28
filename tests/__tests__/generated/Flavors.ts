@@ -140,7 +140,7 @@ export namespace Flavors {
       )
     }
 
-    protected abstract Find(
+    public abstract Find(
       call: grpc.ServerUnaryCall<IUserRequest, IUserProfile>
     ): Promise<IUserProfile>
   }

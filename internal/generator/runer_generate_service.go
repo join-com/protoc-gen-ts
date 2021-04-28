@@ -140,7 +140,7 @@ func (r *Runner) generateTypescriptServiceAbstractClass(generatedFileStream *pro
 			returnType = "Promise<void>"
 		}
 
-		r.P(generatedFileStream, "protected abstract "+methodName+"(call: "+callType+"): "+returnType)
+		r.P(generatedFileStream, "public abstract "+methodName+"(call: "+callType+"): "+returnType)
 	}
 
 	r.indentLevel -= 2

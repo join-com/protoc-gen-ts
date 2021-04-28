@@ -541,16 +541,16 @@ export namespace Foo {
       )
     }
 
-    protected abstract Find(
+    public abstract Find(
       call: grpc.ServerUnaryCall<IRequest, Common_Common.IOtherPkgMessage>
     ): Promise<Common_Common.IOtherPkgMessage>
-    protected abstract FindClientStream(
+    public abstract FindClientStream(
       call: grpc.ServerReadableStream<IRequest, Common_Common.IOtherPkgMessage>
     ): Promise<Common_Common.IOtherPkgMessage>
-    protected abstract FindServerStream(
+    public abstract FindServerStream(
       call: grpc.ServerWritableStream<IRequest, Common_Common.IOtherPkgMessage>
     ): Promise<void>
-    protected abstract FindBidiStream(
+    public abstract FindBidiStream(
       call: grpc.ServerDuplexStream<IRequest, Common_Common.IOtherPkgMessage>
     ): Promise<void>
   }

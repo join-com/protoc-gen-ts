@@ -2,6 +2,7 @@ package generator
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/iancoleman/strcase"
 	"google.golang.org/protobuf/compiler/protogen"
@@ -113,7 +114,12 @@ func (r *Runner) generateTypescriptServiceAbstractClass(generatedFileStream *pro
 		"}\n",
 	)
 
-	for _, methodSpec := range serviceSpec.GetMethod() {
+	methods := serviceSpec.GetMethod()
+	sort.Slice(methods, func(i, j int) bool {
+		return methods[i].GetName() < methods[j].GetName()
+	})
+
+	for _, methodSpec := range methods {
 		methodName := methodSpec.GetName()
 
 		inputTypeName := methodSpec.GetInputType()

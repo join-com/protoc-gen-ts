@@ -544,14 +544,14 @@ export namespace Foo {
     public abstract Find(
       call: grpc.ServerUnaryCall<IRequest, Common_Common.IOtherPkgMessage>
     ): Promise<Common_Common.IOtherPkgMessage>
+    public abstract FindBidiStream(
+      call: grpc.ServerDuplexStream<IRequest, Common_Common.IOtherPkgMessage>
+    ): Promise<void>
     public abstract FindClientStream(
       call: grpc.ServerReadableStream<IRequest, Common_Common.IOtherPkgMessage>
     ): Promise<Common_Common.IOtherPkgMessage>
     public abstract FindServerStream(
       call: grpc.ServerWritableStream<IRequest, Common_Common.IOtherPkgMessage>
-    ): Promise<void>
-    public abstract FindBidiStream(
-      call: grpc.ServerDuplexStream<IRequest, Common_Common.IOtherPkgMessage>
     ): Promise<void>
   }
 
@@ -566,6 +566,11 @@ export namespace Foo {
       options?: grpc.CallOptions
     ): joinGRPC.IUnaryRequest<Common_Common.IOtherPkgMessage>
 
+    FindBidiStream(
+      metadata?: Record<string, string>,
+      options?: grpc.CallOptions
+    ): grpc.ClientDuplexStream<IRequest, Common_Common.IOtherPkgMessage>
+
     FindClientStream(
       metadata?: Record<string, string>,
       options?: grpc.CallOptions
@@ -576,11 +581,6 @@ export namespace Foo {
       metadata?: Record<string, string>,
       options?: grpc.CallOptions
     ): grpc.ClientReadableStream<Common_Common.IOtherPkgMessage>
-
-    FindBidiStream(
-      metadata?: Record<string, string>,
-      options?: grpc.CallOptions
-    ): grpc.ClientDuplexStream<IRequest, Common_Common.IOtherPkgMessage>
   }
 
   export class UsersClient
@@ -610,6 +610,13 @@ export namespace Foo {
       return this.makeUnaryRequest('Find', request, metadata, options)
     }
 
+    public FindBidiStream(
+      metadata?: Record<string, string>,
+      options?: grpc.CallOptions
+    ): grpc.ClientDuplexStream<IRequest, Common_Common.IOtherPkgMessage> {
+      return this.makeBidiStreamRequest('FindBidiStream', metadata, options)
+    }
+
     public FindClientStream(
       metadata?: Record<string, string>,
       options?: grpc.CallOptions
@@ -628,13 +635,6 @@ export namespace Foo {
         metadata,
         options
       )
-    }
-
-    public FindBidiStream(
-      metadata?: Record<string, string>,
-      options?: grpc.CallOptions
-    ): grpc.ClientDuplexStream<IRequest, Common_Common.IOtherPkgMessage> {
-      return this.makeBidiStreamRequest('FindBidiStream', metadata, options)
     }
   }
 }

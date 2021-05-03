@@ -149,6 +149,15 @@ export namespace Foo {
       message: ICustomOptionsTest,
       writer?: protobufjs.Writer
     ): protobufjs.Writer {
+      for (const fieldName of [
+        'requiredField',
+      ] as (keyof ICustomOptionsTest)[]) {
+        if (message[fieldName] == null) {
+          throw new Error(
+            `Required field ${fieldName} in CustomOptionsTest is null or undefined`
+          )
+        }
+      }
       const transformedMessage = CustomOptionsTest.fromInterface(message)
       return CustomOptionsTest.encode(transformedMessage, writer)
     }
@@ -266,6 +275,16 @@ export namespace Foo {
       message: IRequiredPropertiesTest,
       writer?: protobufjs.Writer
     ): protobufjs.Writer {
+      for (const fieldName of [
+        'requiredField',
+        'customRequiredField',
+      ] as (keyof IRequiredPropertiesTest)[]) {
+        if (message[fieldName] == null) {
+          throw new Error(
+            `Required field ${fieldName} in RequiredPropertiesTest is null or undefined`
+          )
+        }
+      }
       return RequiredPropertiesTest.encode(message, writer)
     }
   }
@@ -560,23 +579,23 @@ export namespace Foo {
     /**
      * @deprecated
      */
-    Find(
+    find(
       request: IRequest,
       metadata?: Record<string, string>,
       options?: grpc.CallOptions
     ): joinGRPC.IUnaryRequest<Common_Common.IOtherPkgMessage>
 
-    FindBidiStream(
+    findBidiStream(
       metadata?: Record<string, string>,
       options?: grpc.CallOptions
     ): grpc.ClientDuplexStream<IRequest, Common_Common.IOtherPkgMessage>
 
-    FindClientStream(
+    findClientStream(
       metadata?: Record<string, string>,
       options?: grpc.CallOptions
     ): joinGRPC.IClientStreamRequest<IRequest, Common_Common.IOtherPkgMessage>
 
-    FindServerStream(
+    findServerStream(
       request: IRequest,
       metadata?: Record<string, string>,
       options?: grpc.CallOptions
@@ -601,30 +620,30 @@ export namespace Foo {
     /**
      * @deprecated
      */
-    public Find(
+    public find(
       request: IRequest,
       metadata?: Record<string, string>,
       options?: grpc.CallOptions
     ): joinGRPC.IUnaryRequest<Common_Common.IOtherPkgMessage> {
-      this.logger?.warn("using deprecated service method 'UsersClient.Find'")
+      this.logger?.warn("using deprecated service method 'UsersClient.find'")
       return this.makeUnaryRequest('Find', request, metadata, options)
     }
 
-    public FindBidiStream(
+    public findBidiStream(
       metadata?: Record<string, string>,
       options?: grpc.CallOptions
     ): grpc.ClientDuplexStream<IRequest, Common_Common.IOtherPkgMessage> {
       return this.makeBidiStreamRequest('FindBidiStream', metadata, options)
     }
 
-    public FindClientStream(
+    public findClientStream(
       metadata?: Record<string, string>,
       options?: grpc.CallOptions
     ): joinGRPC.IClientStreamRequest<IRequest, Common_Common.IOtherPkgMessage> {
       return this.makeClientStreamRequest('FindClientStream', metadata, options)
     }
 
-    public FindServerStream(
+    public findServerStream(
       request: IRequest,
       metadata?: Record<string, string>,
       options?: grpc.CallOptions

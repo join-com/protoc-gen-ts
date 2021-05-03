@@ -298,6 +298,17 @@ func (r *Runner) generateEncodePatchedMethod(generatedFileStream *protogen.Gener
 	r.P(generatedFileStream, "public static encodePatched(this: void, message: I"+className+", writer?: protobufjs.Writer): protobufjs.Writer {")
 	r.indentLevel += 2
 
+	messageRequiredFields := r.getMessageRequiredFields(messageSpec, requiredFields)
+	if len(messageRequiredFields) > 0 {
+		r.P(
+			generatedFileStream,
+			"for (const fieldName of ["+strings.Join(messageRequiredFields, ", ")+"] as (keyof I"+className+")[]) {",
+			"  if (message[fieldName] == null) {",
+			"    throw new Error(`Required field ${fieldName} in "+className+" is null or undefined`)",
+			"  }",
+			"}",
+		)
+	}
 	if hasEnums {
 		r.P(
 			generatedFileStream,

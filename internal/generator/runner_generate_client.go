@@ -44,7 +44,7 @@ func (r *Runner) generateTypescriptClientInterfaceMethod(generatedFileStream *pr
 	}
 
 	// Function's Signature
-	methodName := strcase.ToCamel(methodSpec.GetName())
+	methodName := strcase.ToLowerCamel(methodSpec.GetName())
 	r.P(generatedFileStream, methodName+"(")
 	r.indentLevel += 2
 
@@ -125,7 +125,7 @@ func (r *Runner) generateTypescriptClientMethod(generatedFileStream *protogen.Ge
 	}
 
 	// Function's Signature
-	methodName := strcase.ToCamel(methodSpec.GetName())
+	methodName := strcase.ToLowerCamel(methodSpec.GetName())
 	r.P(generatedFileStream, "public "+methodName+"(")
 	r.indentLevel += 2
 
@@ -165,6 +165,7 @@ func (r *Runner) generateTypescriptClientMethod(generatedFileStream *protogen.Ge
 		r.P(generatedFileStream, "this.logger?.warn('using deprecated service method \\'"+strcase.ToCamel(serviceSpec.GetName())+"Client."+methodName+"\\'')")
 	}
 
+	methodName = strcase.ToCamel(methodSpec.GetName())
 	if clientStream && serverStrean {
 		r.P(generatedFileStream, "return this.makeBidiStreamRequest('"+methodName+"', metadata, options)")
 	} else if !clientStream && !serverStrean {

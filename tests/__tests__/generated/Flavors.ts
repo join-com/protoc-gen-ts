@@ -72,6 +72,17 @@ export namespace Flavors {
       message: IUserProfile,
       writer?: protobufjs.Writer
     ): protobufjs.Writer {
+      for (const fieldName of [
+        'id',
+        'username',
+        'emails',
+      ] as (keyof IUserProfile)[]) {
+        if (message[fieldName] == null) {
+          throw new Error(
+            `Required field ${fieldName} in UserProfile is null or undefined`
+          )
+        }
+      }
       return UserProfile.encode(message, writer)
     }
   }
@@ -150,7 +161,7 @@ export namespace Flavors {
       IUsersServiceImplementation,
       'flavors.Users'
     > {
-    Find(
+    find(
       request: IUserRequest,
       metadata?: Record<string, string>,
       options?: grpc.CallOptions
@@ -172,7 +183,7 @@ export namespace Flavors {
       )
     }
 
-    public Find(
+    public find(
       request: IUserRequest,
       metadata?: Record<string, string>,
       options?: grpc.CallOptions

@@ -49,16 +49,16 @@ describe('(v2) legacy compatibility', () => {
   it('generates interfaces compatible with the legacy ones', () => {
     type ITest_extends_LegacyITest = Foo.ITest extends LegacyFoo.ITest
       ? true
-      : false
+      : never
     type LegacyITest_extends_ITest = LegacyFoo.ITest extends Foo.ITest
       ? true
-      : false
+      : never
 
     type GeneratesCompatibleInterfaces = ITest_extends_LegacyITest extends true
       ? LegacyITest_extends_ITest extends true
         ? true
-        : false
-      : false
+        : never
+      : never
 
     const generatesCompatibleInterfaces: GeneratesCompatibleInterfaces = true
     expect(generatesCompatibleInterfaces).toBe(true)

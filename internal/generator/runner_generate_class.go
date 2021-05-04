@@ -191,6 +191,11 @@ func (r *Runner) generateAsInterfaceMethod(generatedFileStream *protogen.Generat
 	r.P(generatedFileStream, "public asInterface(): I"+className+" {")
 	r.indentLevel += 2
 
+	hasRepeated := false
+	for _, fieldSpec := range messageSpec.GetField() {
+		hasRepeated = hasRepeated || (fieldSpec.GetLabel() == descriptorpb.FieldDescriptorProto_LABEL_REPEATED)
+	}
+
 	if hasEnums {
 		r.P(generatedFileStream, "const message = {")
 		r.indentLevel += 2
@@ -203,19 +208,34 @@ func (r *Runner) generateAsInterfaceMethod(generatedFileStream *protogen.Generat
 		r.indentLevel -= 2
 		r.P(generatedFileStream, "}")
 	} else {
-		r.P(
-			generatedFileStream,
-			"/* eslint-disable @typescript-eslint/no-this-alias */",
-			"// tslint:disable-next-line: no-this-assignment",
-			"const message = this",
-			"/* eslint-enable @typescript-eslint/no-this-alias */",
-		)
+		if hasRepeated {
+			r.P(generatedFileStream, "const message = { ...this }")
+		} else {
+			r.P(
+				generatedFileStream,
+				"/* eslint-disable @typescript-eslint/no-this-alias */",
+				"// tslint:disable-next-line: no-this-assignment",
+				"const message = this",
+				"/* eslint-enable @typescript-eslint/no-this-alias */",
+			)
+		}
+	}
+
+	var fieldAssignment string
+	var loopInnerIfClause string
+	if hasRepeated {
+		fieldAssignment = "  const field = message[fieldName as keyof I"+className+"]"
+		loopInnerIfClause = "field == null || Array.isArray(field) && field.length === 0"
+	} else {
+		fieldAssignment = ""
+		loopInnerIfClause = "message[fieldName as keyof I"+className+"] == null"
 	}
 
 	r.P(
 		generatedFileStream,
 		"for (const fieldName of Object.keys(message)) {",
-		"  if (message[fieldName as keyof I"+className+"] == null) {",
+		fieldAssignment,
+		"  if ("+loopInnerIfClause+") {",
 		"    // We remove the key to avoid problems with code making too many assumptions",
 		"    delete message[fieldName as keyof I"+className+"]",
 		"  }",
@@ -259,14 +279,24 @@ func (r *Runner) generateDecodePatchedMethod(generatedFileStream *protogen.Gener
 	r.P(generatedFileStream, "public static decodePatched(this: void, reader: protobufjs.Reader | Uint8Array): I"+className+" {")
 	r.indentLevel += 2
 
-	messageRequiredFields := r.getMessageRequiredFields(messageSpec, requiredFields)
+	messageRequiredFields, hasRepeated := r.getMessageRequiredFields(messageSpec, requiredFields)
 	if len(messageRequiredFields) > 0 {
+		var fieldAssignment string
+		var loopInerIfClause string
+		if hasRepeated {
+			fieldAssignment = "  const field = message[fieldName]"
+			loopInerIfClause = "field == null || Array.isArray(field) && field.length === 0"
+		} else {
+			fieldAssignment = ""
+			loopInerIfClause = "message[fieldName] == null"
+		}
 
 		r.P(generatedFileStream, "const message = "+className+".decode(reader).asInterface()")
 		r.P(
 			generatedFileStream,
 			"for (const fieldName of ["+strings.Join(messageRequiredFields, ", ")+"] as (keyof I"+className+")[]) {",
-			"  if (message[fieldName] == null) {",
+			fieldAssignment,
+			"  if ("+loopInerIfClause+") {",
 			"    throw new Error(`Required field ${fieldName} in "+className+" is null or undefined`)",
 			"  }",
 			"}",
@@ -280,7 +310,8 @@ func (r *Runner) generateDecodePatchedMethod(generatedFileStream *protogen.Gener
 	r.P(generatedFileStream, "}\n")
 }
 
-func (r *Runner) getMessageRequiredFields(messageSpec *descriptorpb.DescriptorProto, requiredFields bool) []string {
+func (r *Runner) getMessageRequiredFields(messageSpec *descriptorpb.DescriptorProto, requiredFields bool) ([]string, bool) {
+	hasRepeated := false
 	messageRequiredFields := make([]string, 0)
 
 	for _, fieldSpec := range messageSpec.GetField() {
@@ -295,9 +326,10 @@ func (r *Runner) getMessageRequiredFields(messageSpec *descriptorpb.DescriptorPr
 		if confirmRequired {
 			messageRequiredFields = append(messageRequiredFields, "'"+fieldSpec.GetJsonName()+"'") // We add the quotation for convenience
 		}
+		hasRepeated = hasRepeated || (fieldSpec.GetLabel() == descriptorpb.FieldDescriptorProto_LABEL_REPEATED)
 	}
 
-	return messageRequiredFields
+	return messageRequiredFields, hasRepeated
 }
 
 func (r *Runner) generateEncodePatchedMethod(generatedFileStream *protogen.GeneratedFile, messageSpec *descriptorpb.DescriptorProto, requiredFields bool, hasEnums bool) {
@@ -306,12 +338,23 @@ func (r *Runner) generateEncodePatchedMethod(generatedFileStream *protogen.Gener
 	r.P(generatedFileStream, "public static encodePatched(this: void, message: I"+className+", writer?: protobufjs.Writer): protobufjs.Writer {")
 	r.indentLevel += 2
 
-	messageRequiredFields := r.getMessageRequiredFields(messageSpec, requiredFields)
+	messageRequiredFields, hasRepeated := r.getMessageRequiredFields(messageSpec, requiredFields)
 	if len(messageRequiredFields) > 0 {
+		var fieldAssignment string
+		var loopInerIfClause string
+		if hasRepeated {
+			fieldAssignment = "  const field = message[fieldName]"
+			loopInerIfClause = "field == null || Array.isArray(field) && field.length === 0"
+		} else {
+			fieldAssignment = ""
+			loopInerIfClause = "message[fieldName] == null"
+		}
+
 		r.P(
 			generatedFileStream,
 			"for (const fieldName of ["+strings.Join(messageRequiredFields, ", ")+"] as (keyof I"+className+")[]) {",
-			"  if (message[fieldName] == null) {",
+			fieldAssignment,
+			"  if ("+loopInerIfClause+") {",
 			"    throw new Error(`Required field ${fieldName} in "+className+" is null or undefined`)",
 			"  }",
 			"}",

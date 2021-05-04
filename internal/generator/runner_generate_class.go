@@ -182,7 +182,7 @@ func (r *Runner) generateTypescriptClassPatchedMethods(generatedFileStream *prot
 	r.generateAsInterfaceMethod(generatedFileStream, messageSpec, requiredFields, hasEnums)
 	r.generateFromInterfaceMethod(generatedFileStream, messageSpec, requiredFields, hasEnums)
 
-	r.generateDecodePatchedMethod(generatedFileStream, messageSpec, requiredFields, hasEnums)
+	r.generateDecodePatchedMethod(generatedFileStream, messageSpec, requiredFields)
 	r.generateEncodePatchedMethod(generatedFileStream, messageSpec, requiredFields, hasEnums)
 }
 
@@ -192,7 +192,7 @@ func (r *Runner) generateAsInterfaceMethod(generatedFileStream *protogen.Generat
 	r.indentLevel += 2
 
 	if hasEnums {
-		r.P(generatedFileStream, "return {")
+		r.P(generatedFileStream, "const message = {")
 		r.indentLevel += 2
 
 		r.P(generatedFileStream, "...this,")
@@ -203,8 +203,26 @@ func (r *Runner) generateAsInterfaceMethod(generatedFileStream *protogen.Generat
 		r.indentLevel -= 2
 		r.P(generatedFileStream, "}")
 	} else {
-		r.P(generatedFileStream, "return this")
+		r.P(
+			generatedFileStream,
+			"/* eslint-disable @typescript-eslint/no-this-alias */",
+			"// tslint:disable-next-line: no-this-assignment",
+			"const message = this",
+			"/* eslint-enable @typescript-eslint/no-this-alias */",
+		)
 	}
+
+	r.P(
+		generatedFileStream,
+		"for (const fieldName of Object.keys(message)) {",
+		"  if (message[fieldName as keyof I"+className+"] == null) {",
+		"    // We remove the key to avoid problems with code making too many assumptions",
+		"    delete message[fieldName as keyof I"+className+"]",
+		"  }",
+		"}",
+	)
+
+	r.P(generatedFileStream, "return message")
 
 	r.indentLevel -= 2
 	r.P(generatedFileStream, "}\n")
@@ -236,24 +254,18 @@ func (r *Runner) generateFromInterfaceMethod(generatedFileStream *protogen.Gener
 	r.P(generatedFileStream, "}\n")
 }
 
-func (r *Runner) generateDecodePatchedMethod(generatedFileStream *protogen.GeneratedFile, messageSpec *descriptorpb.DescriptorProto, requiredFields bool, hasEnums bool) {
+func (r *Runner) generateDecodePatchedMethod(generatedFileStream *protogen.GeneratedFile, messageSpec *descriptorpb.DescriptorProto, requiredFields bool) {
 	className := strcase.ToCamel(messageSpec.GetName())
 	r.P(generatedFileStream, "public static decodePatched(this: void, reader: protobufjs.Reader | Uint8Array): I"+className+" {")
 	r.indentLevel += 2
 
 	messageRequiredFields := r.getMessageRequiredFields(messageSpec, requiredFields)
 	if len(messageRequiredFields) > 0 {
-		var keyofPlaceholder string
-		if hasEnums {
-			r.P(generatedFileStream, "const message = "+className+".decode(reader).asInterface()")
-			keyofPlaceholder = "I" + className
-		} else {
-			r.P(generatedFileStream, "const message = "+className+".decode(reader)")
-			keyofPlaceholder = className
-		}
+
+		r.P(generatedFileStream, "const message = "+className+".decode(reader).asInterface()")
 		r.P(
 			generatedFileStream,
-			"for (const fieldName of ["+strings.Join(messageRequiredFields, ", ")+"] as (keyof "+keyofPlaceholder+")[]) {",
+			"for (const fieldName of ["+strings.Join(messageRequiredFields, ", ")+"] as (keyof I"+className+")[]) {",
 			"  if (message[fieldName] == null) {",
 			"    throw new Error(`Required field ${fieldName} in "+className+" is null or undefined`)",
 			"  }",
@@ -261,11 +273,7 @@ func (r *Runner) generateDecodePatchedMethod(generatedFileStream *protogen.Gener
 			"return message",
 		)
 	} else {
-		if hasEnums {
-			r.P(generatedFileStream, "return "+className+".decode(reader).asInterface()")
-		} else {
-			r.P(generatedFileStream, "return "+className+".decode(reader)")
-		}
+		r.P(generatedFileStream, "return "+className+".decode(reader).asInterface()")
 	}
 
 	r.indentLevel -= 2

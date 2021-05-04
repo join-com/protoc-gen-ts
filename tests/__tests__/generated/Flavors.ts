@@ -41,7 +41,17 @@ export namespace Flavors {
     public emails!: Email[]
 
     public asInterface(): IUserProfile {
-      return this
+      /* eslint-disable @typescript-eslint/no-this-alias */
+      // tslint:disable-next-line: no-this-assignment
+      const message = this
+      /* eslint-enable @typescript-eslint/no-this-alias */
+      for (const fieldName of Object.keys(message)) {
+        if (message[fieldName as keyof IUserProfile] == null) {
+          // We remove the key to avoid problems with code making too many assumptions
+          delete message[fieldName as keyof IUserProfile]
+        }
+      }
+      return message
     }
 
     public static fromInterface(this: void, value: IUserProfile): UserProfile {
@@ -52,12 +62,12 @@ export namespace Flavors {
       this: void,
       reader: protobufjs.Reader | Uint8Array
     ): IUserProfile {
-      const message = UserProfile.decode(reader)
+      const message = UserProfile.decode(reader).asInterface()
       for (const fieldName of [
         'id',
         'username',
         'emails',
-      ] as (keyof UserProfile)[]) {
+      ] as (keyof IUserProfile)[]) {
         if (message[fieldName] == null) {
           throw new Error(
             `Required field ${fieldName} in UserProfile is null or undefined`
@@ -95,7 +105,17 @@ export namespace Flavors {
     public userId?: UserId
 
     public asInterface(): IUserRequest {
-      return this
+      /* eslint-disable @typescript-eslint/no-this-alias */
+      // tslint:disable-next-line: no-this-assignment
+      const message = this
+      /* eslint-enable @typescript-eslint/no-this-alias */
+      for (const fieldName of Object.keys(message)) {
+        if (message[fieldName as keyof IUserRequest] == null) {
+          // We remove the key to avoid problems with code making too many assumptions
+          delete message[fieldName as keyof IUserRequest]
+        }
+      }
+      return message
     }
 
     public static fromInterface(this: void, value: IUserRequest): UserRequest {
@@ -106,7 +126,7 @@ export namespace Flavors {
       this: void,
       reader: protobufjs.Reader | Uint8Array
     ): IUserRequest {
-      return UserRequest.decode(reader)
+      return UserRequest.decode(reader).asInterface()
     }
 
     public static encodePatched(

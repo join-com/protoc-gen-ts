@@ -25,7 +25,17 @@ export namespace GoogleProtobuf {
     public nanos?: number
 
     public asInterface(): ITimestamp {
-      return this
+      /* eslint-disable @typescript-eslint/no-this-alias */
+      // tslint:disable-next-line: no-this-assignment
+      const message = this
+      /* eslint-enable @typescript-eslint/no-this-alias */
+      for (const fieldName of Object.keys(message)) {
+        if (message[fieldName as keyof ITimestamp] == null) {
+          // We remove the key to avoid problems with code making too many assumptions
+          delete message[fieldName as keyof ITimestamp]
+        }
+      }
+      return message
     }
 
     public static fromInterface(this: void, value: ITimestamp): Timestamp {
@@ -36,7 +46,7 @@ export namespace GoogleProtobuf {
       this: void,
       reader: protobufjs.Reader | Uint8Array
     ): ITimestamp {
-      return Timestamp.decode(reader)
+      return Timestamp.decode(reader).asInterface()
     }
 
     public static encodePatched(

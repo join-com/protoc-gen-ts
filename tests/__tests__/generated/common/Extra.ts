@@ -31,7 +31,7 @@ export namespace Common {
     public birthDate?: GoogleProtobuf.Timestamp
 
     public asInterface(): IExtraPkgMessage {
-      return {
+      const message = {
         ...this,
         birthDate:
           this.birthDate != null
@@ -41,6 +41,13 @@ export namespace Common {
               )
             : undefined,
       }
+      for (const fieldName of Object.keys(message)) {
+        if (message[fieldName as keyof IExtraPkgMessage] == null) {
+          // We remove the key to avoid problems with code making too many assumptions
+          delete message[fieldName as keyof IExtraPkgMessage]
+        }
+      }
+      return message
     }
 
     public static fromInterface(

@@ -107,10 +107,17 @@ export namespace Foo {
     public customOptionalField?: number
 
     public asInterface(): ICustomOptionsTest {
-      return {
+      const message = {
         ...this,
         requiredField: this.requiredField.asInterface(),
       }
+      for (const fieldName of Object.keys(message)) {
+        if (message[fieldName as keyof ICustomOptionsTest] == null) {
+          // We remove the key to avoid problems with code making too many assumptions
+          delete message[fieldName as keyof ICustomOptionsTest]
+        }
+      }
+      return message
     }
 
     public static fromInterface(
@@ -174,7 +181,17 @@ export namespace Foo {
     public title?: string
 
     public asInterface(): INested {
-      return this
+      /* eslint-disable @typescript-eslint/no-this-alias */
+      // tslint:disable-next-line: no-this-assignment
+      const message = this
+      /* eslint-enable @typescript-eslint/no-this-alias */
+      for (const fieldName of Object.keys(message)) {
+        if (message[fieldName as keyof INested] == null) {
+          // We remove the key to avoid problems with code making too many assumptions
+          delete message[fieldName as keyof INested]
+        }
+      }
+      return message
     }
 
     public static fromInterface(this: void, value: INested): Nested {
@@ -185,7 +202,7 @@ export namespace Foo {
       this: void,
       reader: protobufjs.Reader | Uint8Array
     ): INested {
-      return Nested.decode(reader)
+      return Nested.decode(reader).asInterface()
     }
 
     public static encodePatched(
@@ -205,7 +222,17 @@ export namespace Foo {
     public id?: number
 
     public asInterface(): IRequest {
-      return this
+      /* eslint-disable @typescript-eslint/no-this-alias */
+      // tslint:disable-next-line: no-this-assignment
+      const message = this
+      /* eslint-enable @typescript-eslint/no-this-alias */
+      for (const fieldName of Object.keys(message)) {
+        if (message[fieldName as keyof IRequest] == null) {
+          // We remove the key to avoid problems with code making too many assumptions
+          delete message[fieldName as keyof IRequest]
+        }
+      }
+      return message
     }
 
     public static fromInterface(this: void, value: IRequest): Request {
@@ -216,7 +243,7 @@ export namespace Foo {
       this: void,
       reader: protobufjs.Reader | Uint8Array
     ): IRequest {
-      return Request.decode(reader)
+      return Request.decode(reader).asInterface()
     }
 
     public static encodePatched(
@@ -242,7 +269,17 @@ export namespace Foo {
     public optionalField?: number
 
     public asInterface(): IRequiredPropertiesTest {
-      return this
+      /* eslint-disable @typescript-eslint/no-this-alias */
+      // tslint:disable-next-line: no-this-assignment
+      const message = this
+      /* eslint-enable @typescript-eslint/no-this-alias */
+      for (const fieldName of Object.keys(message)) {
+        if (message[fieldName as keyof IRequiredPropertiesTest] == null) {
+          // We remove the key to avoid problems with code making too many assumptions
+          delete message[fieldName as keyof IRequiredPropertiesTest]
+        }
+      }
+      return message
     }
 
     public static fromInterface(
@@ -256,11 +293,11 @@ export namespace Foo {
       this: void,
       reader: protobufjs.Reader | Uint8Array
     ): IRequiredPropertiesTest {
-      const message = RequiredPropertiesTest.decode(reader)
+      const message = RequiredPropertiesTest.decode(reader).asInterface()
       for (const fieldName of [
         'requiredField',
         'customRequiredField',
-      ] as (keyof RequiredPropertiesTest)[]) {
+      ] as (keyof IRequiredPropertiesTest)[]) {
         if (message[fieldName] == null) {
           throw new Error(
             `Required field ${fieldName} in RequiredPropertiesTest is null or undefined`
@@ -408,7 +445,7 @@ export namespace Foo {
     public fieldInt64Repeated?: number[]
 
     public asInterface(): ITest {
-      return {
+      const message = {
         ...this,
         fieldEnum: (this.fieldEnum != null
           ? EnumType_Enum[this.fieldEnum]!
@@ -427,6 +464,13 @@ export namespace Foo {
           (ts) => new Date((ts.seconds ?? 0) * 1000 + (ts.nanos ?? 0) / 1000000)
         ),
       }
+      for (const fieldName of Object.keys(message)) {
+        if (message[fieldName as keyof ITest] == null) {
+          // We remove the key to avoid problems with code making too many assumptions
+          delete message[fieldName as keyof ITest]
+        }
+      }
+      return message
     }
 
     public static fromInterface(this: void, value: ITest): Test {

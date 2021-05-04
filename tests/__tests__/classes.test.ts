@@ -27,4 +27,19 @@ describe('(v2) classes', () => {
     // and defined in the interface).
     expect(reconstructedComplex).toMatchObject(complex)
   })
+
+  it('is able to deal with timestamps', () => {
+    const testObj: Foo.ITest = {
+      timestamp: new Date('2021-05-05 18:44:00'),
+    }
+
+    const buffer = Foo.Test.encodePatched(testObj).finish()
+    const reconstructed = Foo.Test.decodePatched(buffer)
+
+    expect(reconstructed.timestamp).not.toBeUndefined()
+    expect(reconstructed.timestamp).not.toBeNull()
+    expect(testObj.timestamp?.getTime()).toEqual(
+      reconstructed.timestamp?.getTime()
+    )
+  })
 })

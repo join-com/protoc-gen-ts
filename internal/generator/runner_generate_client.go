@@ -67,13 +67,13 @@ func (r *Runner) generateTypescriptClientInterfaceMethod(generatedFileStream *pr
 
 	var returnType string
 	if clientStream && serverStrean {
-		returnType = "grpc.ClientDuplexStream<" + inputInterface + ", " + outputInterface + ">"
+		returnType = "joinGRPC.IBidiStreamRequest<" + inputInterface + ", " + outputInterface + ">"
 	} else if !clientStream && !serverStrean {
 		returnType = "joinGRPC.IUnaryRequest<" + outputInterface + ">"
 	} else if clientStream {
 		returnType = "joinGRPC.IClientStreamRequest<" + inputInterface + ", " + outputInterface + ">"
 	} else { // if serverStream
-		returnType = "grpc.ClientReadableStream<" + outputInterface + ">"
+		returnType = "joinGRPC.IServerStreamRequest<" + outputInterface + ">"
 	}
 
 	r.indentLevel -= 2
@@ -148,13 +148,13 @@ func (r *Runner) generateTypescriptClientMethod(generatedFileStream *protogen.Ge
 
 	var returnType string
 	if clientStream && serverStrean {
-		returnType = "grpc.ClientDuplexStream<" + inputInterface + ", " + outputInterface + ">"
+		returnType = "joinGRPC.IBidiStreamRequest<" + inputInterface + ", " + outputInterface + ">"
 	} else if !clientStream && !serverStrean {
 		returnType = "joinGRPC.IUnaryRequest<" + outputInterface + ">"
 	} else if clientStream {
 		returnType = "joinGRPC.IClientStreamRequest<" + inputInterface + ", " + outputInterface + ">"
 	} else { // if serverStream
-		returnType = "grpc.ClientReadableStream<" + outputInterface + ">"
+		returnType = "joinGRPC.IServerStreamRequest<" + outputInterface + ">"
 	}
 
 	r.indentLevel -= 2

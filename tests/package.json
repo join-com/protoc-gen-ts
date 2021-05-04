@@ -17,7 +17,7 @@
   "dependencies": {
     "@coderspirit/nominal": "^3.0.0",
     "@join-com/gcloud-logger-trace": "^0.1.17",
-    "@join-com/grpc": "^1.0.0",
+    "@join-com/grpc": "^1.0.3",
     "@join-com/grpc-ts": "^2.0.2",
     "protobufjs": "^6.10.2"
   },

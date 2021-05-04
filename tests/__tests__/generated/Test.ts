@@ -588,7 +588,7 @@ export namespace Foo {
     findBidiStream(
       metadata?: Record<string, string>,
       options?: grpc.CallOptions
-    ): grpc.ClientDuplexStream<IRequest, Common_Common.IOtherPkgMessage>
+    ): joinGRPC.IBidiStreamRequest<IRequest, Common_Common.IOtherPkgMessage>
 
     findClientStream(
       metadata?: Record<string, string>,
@@ -599,7 +599,7 @@ export namespace Foo {
       request: IRequest,
       metadata?: Record<string, string>,
       options?: grpc.CallOptions
-    ): grpc.ClientReadableStream<Common_Common.IOtherPkgMessage>
+    ): joinGRPC.IServerStreamRequest<Common_Common.IOtherPkgMessage>
   }
 
   export class UsersClient
@@ -632,7 +632,7 @@ export namespace Foo {
     public findBidiStream(
       metadata?: Record<string, string>,
       options?: grpc.CallOptions
-    ): grpc.ClientDuplexStream<IRequest, Common_Common.IOtherPkgMessage> {
+    ): joinGRPC.IBidiStreamRequest<IRequest, Common_Common.IOtherPkgMessage> {
       return this.makeBidiStreamRequest('FindBidiStream', metadata, options)
     }
 
@@ -647,7 +647,7 @@ export namespace Foo {
       request: IRequest,
       metadata?: Record<string, string>,
       options?: grpc.CallOptions
-    ): grpc.ClientReadableStream<Common_Common.IOtherPkgMessage> {
+    ): joinGRPC.IServerStreamRequest<Common_Common.IOtherPkgMessage> {
       return this.makeServerStreamRequest(
         'FindServerStream',
         request,

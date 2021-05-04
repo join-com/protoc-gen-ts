@@ -465,7 +465,8 @@ export namespace Foo {
         ),
       }
       for (const fieldName of Object.keys(message)) {
-        if (message[fieldName as keyof ITest] == null) {
+        const field = message[fieldName as keyof ITest]
+        if (field == null || (Array.isArray(field) && field.length === 0)) {
           // We remove the key to avoid problems with code making too many assumptions
           delete message[fieldName as keyof ITest]
         }

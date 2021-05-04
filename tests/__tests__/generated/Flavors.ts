@@ -41,12 +41,10 @@ export namespace Flavors {
     public emails!: Email[]
 
     public asInterface(): IUserProfile {
-      /* eslint-disable @typescript-eslint/no-this-alias */
-      // tslint:disable-next-line: no-this-assignment
-      const message = this
-      /* eslint-enable @typescript-eslint/no-this-alias */
+      const message = { ...this }
       for (const fieldName of Object.keys(message)) {
-        if (message[fieldName as keyof IUserProfile] == null) {
+        const field = message[fieldName as keyof IUserProfile]
+        if (field == null || (Array.isArray(field) && field.length === 0)) {
           // We remove the key to avoid problems with code making too many assumptions
           delete message[fieldName as keyof IUserProfile]
         }
@@ -68,7 +66,8 @@ export namespace Flavors {
         'username',
         'emails',
       ] as (keyof IUserProfile)[]) {
-        if (message[fieldName] == null) {
+        const field = message[fieldName]
+        if (field == null || (Array.isArray(field) && field.length === 0)) {
           throw new Error(
             `Required field ${fieldName} in UserProfile is null or undefined`
           )
@@ -87,7 +86,8 @@ export namespace Flavors {
         'username',
         'emails',
       ] as (keyof IUserProfile)[]) {
-        if (message[fieldName] == null) {
+        const field = message[fieldName]
+        if (field == null || (Array.isArray(field) && field.length === 0)) {
           throw new Error(
             `Required field ${fieldName} in UserProfile is null or undefined`
           )

@@ -105,10 +105,7 @@ export namespace Flavors {
     public userId?: UserId
 
     public asInterface(): IUserRequest {
-      /* eslint-disable @typescript-eslint/no-this-alias */
-      // tslint:disable-next-line: no-this-assignment
-      const message = this
-      /* eslint-enable @typescript-eslint/no-this-alias */
+      const message = { ...this }
       for (const fieldName of Object.keys(message)) {
         if (message[fieldName as keyof IUserRequest] == null) {
           // We remove the key to avoid problems with code making too many assumptions

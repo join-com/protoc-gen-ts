@@ -208,17 +208,7 @@ func (r *Runner) generateAsInterfaceMethod(generatedFileStream *protogen.Generat
 		r.indentLevel -= 2
 		r.P(generatedFileStream, "}")
 	} else {
-		if hasRepeated {
-			r.P(generatedFileStream, "const message = { ...this }")
-		} else {
-			r.P(
-				generatedFileStream,
-				"/* eslint-disable @typescript-eslint/no-this-alias */",
-				"// tslint:disable-next-line: no-this-assignment",
-				"const message = this",
-				"/* eslint-enable @typescript-eslint/no-this-alias */",
-			)
-		}
+		r.P(generatedFileStream, "const message = { ...this }")
 	}
 
 	var fieldAssignment string

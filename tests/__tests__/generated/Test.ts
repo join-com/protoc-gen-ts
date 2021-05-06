@@ -181,10 +181,7 @@ export namespace Foo {
     public title?: string
 
     public asInterface(): INested {
-      /* eslint-disable @typescript-eslint/no-this-alias */
-      // tslint:disable-next-line: no-this-assignment
-      const message = this
-      /* eslint-enable @typescript-eslint/no-this-alias */
+      const message = { ...this }
       for (const fieldName of Object.keys(message)) {
         if (message[fieldName as keyof INested] == null) {
           // We remove the key to avoid problems with code making too many assumptions
@@ -222,10 +219,7 @@ export namespace Foo {
     public id?: number
 
     public asInterface(): IRequest {
-      /* eslint-disable @typescript-eslint/no-this-alias */
-      // tslint:disable-next-line: no-this-assignment
-      const message = this
-      /* eslint-enable @typescript-eslint/no-this-alias */
+      const message = { ...this }
       for (const fieldName of Object.keys(message)) {
         if (message[fieldName as keyof IRequest] == null) {
           // We remove the key to avoid problems with code making too many assumptions
@@ -269,10 +263,7 @@ export namespace Foo {
     public optionalField?: number
 
     public asInterface(): IRequiredPropertiesTest {
-      /* eslint-disable @typescript-eslint/no-this-alias */
-      // tslint:disable-next-line: no-this-assignment
-      const message = this
-      /* eslint-enable @typescript-eslint/no-this-alias */
+      const message = { ...this }
       for (const fieldName of Object.keys(message)) {
         if (message[fieldName as keyof IRequiredPropertiesTest] == null) {
           // We remove the key to avoid problems with code making too many assumptions

@@ -189,13 +189,14 @@ export namespace Flavors {
     extends joinGRPC.Client<IUsersServiceImplementation, 'flavors.Users'>
     implements IUsersClient {
     constructor(
-      config: Omit<
-        joinGRPC.IClientConfig<IUsersServiceImplementation>,
-        'serviceDefinition'
-      >
+      config: joinGRPC.ISimplifiedClientConfig<IUsersServiceImplementation>
     ) {
       super(
-        { ...config, serviceDefinition: usersServiceDefinition },
+        {
+          ...config,
+          serviceDefinition: usersServiceDefinition,
+          credentials: config?.credentials ?? grpc.credentials.createInsecure(),
+        },
         'flavors.Users'
       )
     }

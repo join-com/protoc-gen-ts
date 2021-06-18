@@ -642,13 +642,14 @@ export namespace Foo {
     extends joinGRPC.Client<IUsersServiceImplementation, 'foo.Users'>
     implements IUsersClient {
     constructor(
-      config: Omit<
-        joinGRPC.IClientConfig<IUsersServiceImplementation>,
-        'serviceDefinition'
-      >
+      config: joinGRPC.ISimplifiedClientConfig<IUsersServiceImplementation>
     ) {
       super(
-        { ...config, serviceDefinition: usersServiceDefinition },
+        {
+          ...config,
+          serviceDefinition: usersServiceDefinition,
+          credentials: config?.credentials ?? grpc.credentials.createInsecure(),
+        },
         'foo.Users'
       )
     }

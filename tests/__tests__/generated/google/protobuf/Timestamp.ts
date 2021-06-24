@@ -17,7 +17,8 @@ export namespace GoogleProtobuf {
   @protobufjs.Type.d('google_protobuf_Timestamp')
   export class Timestamp
     extends protobufjs.Message<Timestamp>
-    implements ConvertibleTo<ITimestamp>, ITimestamp {
+    implements ConvertibleTo<ITimestamp>, ITimestamp
+  {
     @protobufjs.Field.d(1, 'int64')
     public seconds?: number
 

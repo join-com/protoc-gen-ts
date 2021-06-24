@@ -96,7 +96,8 @@ export namespace Foo {
   @protobufjs.Type.d('foo_CustomOptionsTest')
   export class CustomOptionsTest
     extends protobufjs.Message<CustomOptionsTest>
-    implements ConvertibleTo<ICustomOptionsTest> {
+    implements ConvertibleTo<ICustomOptionsTest>
+  {
     @protobufjs.Field.d(1, Common_Extra.ExtraPkgMessage)
     public requiredField!: Common_Extra.ExtraPkgMessage
 
@@ -176,7 +177,8 @@ export namespace Foo {
   @protobufjs.Type.d('foo_Nested')
   export class Nested
     extends protobufjs.Message<Nested>
-    implements ConvertibleTo<INested>, INested {
+    implements ConvertibleTo<INested>, INested
+  {
     @protobufjs.Field.d(1, 'string')
     public title?: string
 
@@ -214,7 +216,8 @@ export namespace Foo {
   @protobufjs.Type.d('foo_Request')
   export class Request
     extends protobufjs.Message<Request>
-    implements ConvertibleTo<IRequest>, IRequest {
+    implements ConvertibleTo<IRequest>, IRequest
+  {
     @protobufjs.Field.d(1, 'int32')
     public id?: number
 
@@ -252,7 +255,8 @@ export namespace Foo {
   @protobufjs.Type.d('foo_RequiredPropertiesTest')
   export class RequiredPropertiesTest
     extends protobufjs.Message<RequiredPropertiesTest>
-    implements ConvertibleTo<IRequiredPropertiesTest>, IRequiredPropertiesTest {
+    implements ConvertibleTo<IRequiredPropertiesTest>, IRequiredPropertiesTest
+  {
     @protobufjs.Field.d(1, 'int32')
     public requiredField!: number
 
@@ -320,7 +324,8 @@ export namespace Foo {
   @protobufjs.Type.d('foo_Test')
   export class Test
     extends protobufjs.Message<Test>
-    implements ConvertibleTo<ITest> {
+    implements ConvertibleTo<ITest>
+  {
     @protobufjs.Field.d(1, 'int32')
     public fieldInt32?: number
 
@@ -523,60 +528,61 @@ export namespace Foo {
     >
   }
 
-  export const usersServiceDefinition: grpc.ServiceDefinition<IUsersServiceImplementation> = {
-    Find: {
-      path: '/foo.Users/Find',
-      requestStream: false,
-      responseStream: false,
-      requestSerialize: (request: IRequest) =>
-        Request.encodePatched(request).finish() as Buffer,
-      requestDeserialize: Request.decodePatched,
-      responseSerialize: (response: Common_Common.IOtherPkgMessage) =>
-        Common_Common.OtherPkgMessage.encodePatched(
-          response
-        ).finish() as Buffer,
-      responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
-    },
-    FindClientStream: {
-      path: '/foo.Users/FindClientStream',
-      requestStream: true,
-      responseStream: false,
-      requestSerialize: (request: IRequest) =>
-        Request.encodePatched(request).finish() as Buffer,
-      requestDeserialize: Request.decodePatched,
-      responseSerialize: (response: Common_Common.IOtherPkgMessage) =>
-        Common_Common.OtherPkgMessage.encodePatched(
-          response
-        ).finish() as Buffer,
-      responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
-    },
-    FindServerStream: {
-      path: '/foo.Users/FindServerStream',
-      requestStream: false,
-      responseStream: true,
-      requestSerialize: (request: IRequest) =>
-        Request.encodePatched(request).finish() as Buffer,
-      requestDeserialize: Request.decodePatched,
-      responseSerialize: (response: Common_Common.IOtherPkgMessage) =>
-        Common_Common.OtherPkgMessage.encodePatched(
-          response
-        ).finish() as Buffer,
-      responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
-    },
-    FindBidiStream: {
-      path: '/foo.Users/FindBidiStream',
-      requestStream: true,
-      responseStream: true,
-      requestSerialize: (request: IRequest) =>
-        Request.encodePatched(request).finish() as Buffer,
-      requestDeserialize: Request.decodePatched,
-      responseSerialize: (response: Common_Common.IOtherPkgMessage) =>
-        Common_Common.OtherPkgMessage.encodePatched(
-          response
-        ).finish() as Buffer,
-      responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
-    },
-  }
+  export const usersServiceDefinition: grpc.ServiceDefinition<IUsersServiceImplementation> =
+    {
+      Find: {
+        path: '/foo.Users/Find',
+        requestStream: false,
+        responseStream: false,
+        requestSerialize: (request: IRequest) =>
+          Request.encodePatched(request).finish() as Buffer,
+        requestDeserialize: Request.decodePatched,
+        responseSerialize: (response: Common_Common.IOtherPkgMessage) =>
+          Common_Common.OtherPkgMessage.encodePatched(
+            response
+          ).finish() as Buffer,
+        responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
+      },
+      FindClientStream: {
+        path: '/foo.Users/FindClientStream',
+        requestStream: true,
+        responseStream: false,
+        requestSerialize: (request: IRequest) =>
+          Request.encodePatched(request).finish() as Buffer,
+        requestDeserialize: Request.decodePatched,
+        responseSerialize: (response: Common_Common.IOtherPkgMessage) =>
+          Common_Common.OtherPkgMessage.encodePatched(
+            response
+          ).finish() as Buffer,
+        responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
+      },
+      FindServerStream: {
+        path: '/foo.Users/FindServerStream',
+        requestStream: false,
+        responseStream: true,
+        requestSerialize: (request: IRequest) =>
+          Request.encodePatched(request).finish() as Buffer,
+        requestDeserialize: Request.decodePatched,
+        responseSerialize: (response: Common_Common.IOtherPkgMessage) =>
+          Common_Common.OtherPkgMessage.encodePatched(
+            response
+          ).finish() as Buffer,
+        responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
+      },
+      FindBidiStream: {
+        path: '/foo.Users/FindBidiStream',
+        requestStream: true,
+        responseStream: true,
+        requestSerialize: (request: IRequest) =>
+          Request.encodePatched(request).finish() as Buffer,
+        requestDeserialize: Request.decodePatched,
+        responseSerialize: (response: Common_Common.IOtherPkgMessage) =>
+          Common_Common.OtherPkgMessage.encodePatched(
+            response
+          ).finish() as Buffer,
+        responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
+      },
+    }
 
   export abstract class AbstractUsersService extends joinGRPC.Service<IUsersServiceImplementation> {
     constructor(
@@ -586,10 +592,10 @@ export namespace Foo {
       super(
         usersServiceDefinition,
         {
-          Find: (call) => this.Find(call),
-          FindClientStream: (call) => this.FindClientStream(call),
-          FindServerStream: (call) => this.FindServerStream(call),
-          FindBidiStream: (call) => this.FindBidiStream(call),
+          find: (call) => this.Find(call),
+          findClientStream: (call) => this.FindClientStream(call),
+          findServerStream: (call) => this.FindServerStream(call),
+          findBidiStream: (call) => this.FindBidiStream(call),
         },
         logger,
         trace
@@ -640,7 +646,8 @@ export namespace Foo {
 
   export class UsersClient
     extends joinGRPC.Client<IUsersServiceImplementation, 'foo.Users'>
-    implements IUsersClient {
+    implements IUsersClient
+  {
     constructor(
       config: joinGRPC.ISimplifiedClientConfig<IUsersServiceImplementation>
     ) {

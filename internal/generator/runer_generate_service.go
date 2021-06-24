@@ -103,7 +103,7 @@ func (r *Runner) generateTypescriptServiceAbstractClass(generatedFileStream *pro
 
 	for _, methodSpec := range serviceSpec.GetMethod() {
 		methodName := methodSpec.GetName()
-		r.P(generatedFileStream, "    "+methodName+": (call) => this."+methodName+"(call),")
+		r.P(generatedFileStream, "    "+strcase.ToLowerCamel(methodName)+": (call) => this."+methodName+"(call),")
 	}
 
 	r.P(generatedFileStream,

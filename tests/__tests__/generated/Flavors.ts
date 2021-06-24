@@ -30,7 +30,8 @@ export namespace Flavors {
   @protobufjs.Type.d('flavors_UserProfile')
   export class UserProfile
     extends protobufjs.Message<UserProfile>
-    implements ConvertibleTo<IUserProfile>, IUserProfile {
+    implements ConvertibleTo<IUserProfile>, IUserProfile
+  {
     @protobufjs.Field.d(1, 'int32')
     public id!: UserId
 
@@ -100,7 +101,8 @@ export namespace Flavors {
   @protobufjs.Type.d('flavors_UserRequest')
   export class UserRequest
     extends protobufjs.Message<UserRequest>
-    implements ConvertibleTo<IUserRequest>, IUserRequest {
+    implements ConvertibleTo<IUserRequest>, IUserRequest
+  {
     @protobufjs.Field.d(1, 'int32')
     public userId?: UserId
 
@@ -139,19 +141,20 @@ export namespace Flavors {
     Find: grpc.handleUnaryCall<IUserRequest, IUserProfile>
   }
 
-  export const usersServiceDefinition: grpc.ServiceDefinition<IUsersServiceImplementation> = {
-    Find: {
-      path: '/flavors.Users/Find',
-      requestStream: false,
-      responseStream: false,
-      requestSerialize: (request: IUserRequest) =>
-        UserRequest.encodePatched(request).finish() as Buffer,
-      requestDeserialize: UserRequest.decodePatched,
-      responseSerialize: (response: IUserProfile) =>
-        UserProfile.encodePatched(response).finish() as Buffer,
-      responseDeserialize: UserProfile.decodePatched,
-    },
-  }
+  export const usersServiceDefinition: grpc.ServiceDefinition<IUsersServiceImplementation> =
+    {
+      Find: {
+        path: '/flavors.Users/Find',
+        requestStream: false,
+        responseStream: false,
+        requestSerialize: (request: IUserRequest) =>
+          UserRequest.encodePatched(request).finish() as Buffer,
+        requestDeserialize: UserRequest.decodePatched,
+        responseSerialize: (response: IUserProfile) =>
+          UserProfile.encodePatched(response).finish() as Buffer,
+        responseDeserialize: UserProfile.decodePatched,
+      },
+    }
 
   export abstract class AbstractUsersService extends joinGRPC.Service<IUsersServiceImplementation> {
     constructor(
@@ -161,7 +164,7 @@ export namespace Flavors {
       super(
         usersServiceDefinition,
         {
-          Find: (call) => this.Find(call),
+          find: (call) => this.Find(call),
         },
         logger,
         trace
@@ -187,15 +190,17 @@ export namespace Flavors {
 
   export class UsersClient
     extends joinGRPC.Client<IUsersServiceImplementation, 'flavors.Users'>
-    implements IUsersClient {
+    implements IUsersClient
+  {
     constructor(
-      config: Omit<
-        joinGRPC.IClientConfig<IUsersServiceImplementation>,
-        'serviceDefinition'
-      >
+      config: joinGRPC.ISimplifiedClientConfig<IUsersServiceImplementation>
     ) {
       super(
-        { ...config, serviceDefinition: usersServiceDefinition },
+        {
+          ...config,
+          serviceDefinition: usersServiceDefinition,
+          credentials: config?.credentials ?? grpc.credentials.createInsecure(),
+        },
         'flavors.Users'
       )
     }

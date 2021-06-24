@@ -99,11 +99,21 @@ func (r *Runner) generateTypescriptClientClass(generatedFileStream *protogen.Gen
 
 	r.P(
 		generatedFileStream,
-		"constructor(config: Omit<joinGRPC.IClientConfig<I"+strcase.ToCamel(serviceName)+"ServiceImplementation>, 'serviceDefinition'>) {",
+		"constructor(",
+		"  config: joinGRPC.ISimplifiedClientConfig<I"+strcase.ToCamel(serviceName)+"ServiceImplementation>",
+		") {",
 	)
 	r.indentLevel += 2
 
-	r.P(generatedFileStream, "super({ ...config, serviceDefinition: "+strcase.ToLowerCamel(serviceName)+"ServiceDefinition }, '"+r.currentPackage+"."+serviceName+"')")
+	r.P(
+		generatedFileStream,
+		"super({",
+		"  ...config,",
+		"  serviceDefinition: "+strcase.ToLowerCamel(serviceName)+"ServiceDefinition,",
+		"  credentials: config?.credentials ?? grpc.credentials.createInsecure()",
+		"},",
+		"'"+r.currentPackage+"."+serviceName+"')",
+	)
 
 	r.indentLevel -= 2
 	r.P(generatedFileStream, "}\n")

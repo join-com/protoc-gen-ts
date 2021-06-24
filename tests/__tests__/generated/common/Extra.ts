@@ -20,7 +20,8 @@ export namespace Common {
   @protobufjs.Type.d('common_ExtraPkgMessage')
   export class ExtraPkgMessage
     extends protobufjs.Message<ExtraPkgMessage>
-    implements ConvertibleTo<IExtraPkgMessage> {
+    implements ConvertibleTo<IExtraPkgMessage>
+  {
     @protobufjs.Field.d(1, 'string')
     public firstName?: string
 

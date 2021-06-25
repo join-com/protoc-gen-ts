@@ -6,19 +6,19 @@ env GOOS=darwin GOARCH=arm64 go build -o ./dist/protoc-gen-tsx.darwin.arm64
 env GOOS=linux GOARCH=amd64 go build -o ./dist/protoc-gen-tsx.linux.amd64
 env GOOS=linux GOARCH=arm64 go build -o ./dist/protoc-gen-tsx.linux.arm64
 
-if [ ! -f ./dist/protoc-gen-tsx ] && [ ! -L ./dist/protoc-gen-tsx ]; then
-  if test "$(uname)" = "Darwin" ; then
-    if test "$(uname -m)" = "x86_64"; then
-        ln -s ./dist/protoc-gen-tsx.darwin.amd64 ./dist/protoc-gen-tsx
-    else
-        ln -s ./dist/protoc-gen-tsx.darwin.arm64 ./dist/protoc-gen-tsx ## Best effort guess
-    fi
-  elif test "$(uname)" = "Linux" ; then
-    if test "$(uname -m)" = "x86_64"; then
-        ln -s ./dist/protoc-gen-tsx.linux.amd64 ./dist/protoc-gen-tsx
-    else
-        ln -s ./dist/protoc-gen-tsx.linux.arm64 ./dist/protoc-gen-tsx ## Best effort guess
-    fi
+rm -f ./dist/protoc-gen-tsx;
+
+if test "$(uname)" = "Darwin" ; then
+  if test "$(uname -m)" = "x86_64"; then
+      ln -s ./dist/protoc-gen-tsx.darwin.amd64 ./dist/protoc-gen-tsx
+  else
+      ln -s ./dist/protoc-gen-tsx.darwin.arm64 ./dist/protoc-gen-tsx ## Best effort guess
+  fi
+elif test "$(uname)" = "Linux" ; then
+  if test "$(uname -m)" = "x86_64"; then
+      ln -s ./dist/protoc-gen-tsx.linux.amd64 ./dist/protoc-gen-tsx
+  else
+      ln -s ./dist/protoc-gen-tsx.linux.arm64 ./dist/protoc-gen-tsx ## Best effort guess
   fi
 fi
 

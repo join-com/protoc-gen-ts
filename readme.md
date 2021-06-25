@@ -7,7 +7,7 @@ Generates `ts` files from `proto` file definitions.
 To install the "new" generator (bear in mind that it could be installed in `${HOME}/.local/bin` too):
 ```
 curl -Lo protoc-gen-tsx \
-    https://github.com/join-com/protoc-gen-ts/releases/download/[VERSION]/protoc-gen-tsx.darwin.x86_64 \
+    https://github.com/join-com/protoc-gen-ts/releases/download/[VERSION]/protoc-gen-tsx.darwin.amd64 \
 && chmod +x protoc-gen-tsx \
 && sudo mv protoc-gen-tsx /usr/local/bin
 ```
@@ -19,6 +19,9 @@ curl -Lo protoc-gen-ts \
 && chmod +x protoc-gen-ts \
 && sudo mv protoc-gen-ts /usr/local/bin
 ```
+
+- If you need a binary for Linux, you can change the word "darwin" in the url by "linux".
+- If you need support for the M1 processor, or any other ARM processor, change "amd64" by "arm64".
 
 ## Usage
 

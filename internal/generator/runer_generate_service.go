@@ -21,7 +21,12 @@ func (r *Runner) generateTypescriptServiceImplementationInterface(generatedFileS
 	r.P(generatedFileStream, "export interface I"+strcase.ToCamel(serviceSpec.GetName())+"ServiceImplementation {")
 	r.indentLevel += 2
 
-	for _, methodSpec := range serviceSpec.GetMethod() {
+	methods := serviceSpec.GetMethod()
+	sort.Slice(methods, func(i, j int) bool {
+		return methods[i].GetName() < methods[j].GetName()
+	})
+
+	for _, methodSpec := range methods {
 		clientStream := methodSpec.GetClientStreaming()
 		serverStream := methodSpec.GetServerStreaming()
 
@@ -50,7 +55,12 @@ func (r *Runner) generateTypescriptServiceDefinition(generatedFileStream *protog
 	r.P(generatedFileStream, "export const "+strcase.ToLowerCamel(serviceSpec.GetName())+"ServiceDefinition: grpc.ServiceDefinition<I"+strcase.ToCamel(serviceSpec.GetName())+"ServiceImplementation> = {")
 	r.indentLevel += 2
 
-	for _, methodSpec := range serviceSpec.GetMethod() {
+	methods := serviceSpec.GetMethod()
+	sort.Slice(methods, func(i, j int) bool {
+		return methods[i].GetName() < methods[j].GetName()
+	})
+
+	for _, methodSpec := range methods {
 		r.generateTypescriptServiceDefinitionMethod(generatedFileStream, serviceSpec, methodSpec)
 	}
 
@@ -101,7 +111,12 @@ func (r *Runner) generateTypescriptServiceAbstractClass(generatedFileStream *pro
 		"    {",
 	)
 
-	for _, methodSpec := range serviceSpec.GetMethod() {
+	methods := serviceSpec.GetMethod()
+	sort.Slice(methods, func(i, j int) bool {
+		return methods[i].GetName() < methods[j].GetName()
+	})
+
+	for _, methodSpec := range methods {
 		methodName := methodSpec.GetName()
 		r.P(generatedFileStream, "    "+strcase.ToLowerCamel(methodName)+": (call) => this."+methodName+"(call),")
 	}
@@ -113,11 +128,6 @@ func (r *Runner) generateTypescriptServiceAbstractClass(generatedFileStream *pro
 		"  )",
 		"}\n",
 	)
-
-	methods := serviceSpec.GetMethod()
-	sort.Slice(methods, func(i, j int) bool {
-		return methods[i].GetName() < methods[j].GetName()
-	})
 
 	for _, methodSpec := range methods {
 		methodName := methodSpec.GetName()

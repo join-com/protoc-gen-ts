@@ -1,6 +1,8 @@
 package generator
 
 import (
+	"sort"
+
 	"github.com/iancoleman/strcase"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/types/descriptorpb"
@@ -27,7 +29,12 @@ func (r *Runner) generateTypescriptClientInterface(generatedFileStream *protogen
 	)
 	r.indentLevel += 2
 
-	for _, methodSpec := range serviceSpec.GetMethod() {
+	methods := serviceSpec.GetMethod()
+	sort.Slice(methods, func(i, j int) bool {
+		return methods[i].GetName() < methods[j].GetName()
+	})
+
+	for _, methodSpec := range methods {
 		r.generateTypescriptClientInterfaceMethod(generatedFileStream, serviceSpec, methodSpec)
 	}
 
@@ -118,7 +125,12 @@ func (r *Runner) generateTypescriptClientClass(generatedFileStream *protogen.Gen
 	r.indentLevel -= 2
 	r.P(generatedFileStream, "}\n")
 
-	for _, methodSpec := range serviceSpec.GetMethod() {
+	methods := serviceSpec.GetMethod()
+	sort.Slice(methods, func(i, j int) bool {
+		return methods[i].GetName() < methods[j].GetName()
+	})
+
+	for _, methodSpec := range methods {
 		r.generateTypescriptClientMethod(generatedFileStream, serviceSpec, methodSpec)
 	}
 

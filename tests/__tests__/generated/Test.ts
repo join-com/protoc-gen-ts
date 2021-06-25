@@ -514,15 +514,15 @@ export namespace Foo {
 
   export interface IUsersServiceImplementation {
     Find: grpc.handleUnaryCall<IRequest, Common_Common.IOtherPkgMessage>
+    FindBidiStream: grpc.handleBidiStreamingCall<
+      IRequest,
+      Common_Common.IOtherPkgMessage
+    >
     FindClientStream: grpc.handleClientStreamingCall<
       IRequest,
       Common_Common.IOtherPkgMessage
     >
     FindServerStream: grpc.handleServerStreamingCall<
-      IRequest,
-      Common_Common.IOtherPkgMessage
-    >
-    FindBidiStream: grpc.handleBidiStreamingCall<
       IRequest,
       Common_Common.IOtherPkgMessage
     >
@@ -534,6 +534,19 @@ export namespace Foo {
         path: '/foo.Users/Find',
         requestStream: false,
         responseStream: false,
+        requestSerialize: (request: IRequest) =>
+          Request.encodePatched(request).finish() as Buffer,
+        requestDeserialize: Request.decodePatched,
+        responseSerialize: (response: Common_Common.IOtherPkgMessage) =>
+          Common_Common.OtherPkgMessage.encodePatched(
+            response
+          ).finish() as Buffer,
+        responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
+      },
+      FindBidiStream: {
+        path: '/foo.Users/FindBidiStream',
+        requestStream: true,
+        responseStream: true,
         requestSerialize: (request: IRequest) =>
           Request.encodePatched(request).finish() as Buffer,
         requestDeserialize: Request.decodePatched,
@@ -569,19 +582,6 @@ export namespace Foo {
           ).finish() as Buffer,
         responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
       },
-      FindBidiStream: {
-        path: '/foo.Users/FindBidiStream',
-        requestStream: true,
-        responseStream: true,
-        requestSerialize: (request: IRequest) =>
-          Request.encodePatched(request).finish() as Buffer,
-        requestDeserialize: Request.decodePatched,
-        responseSerialize: (response: Common_Common.IOtherPkgMessage) =>
-          Common_Common.OtherPkgMessage.encodePatched(
-            response
-          ).finish() as Buffer,
-        responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
-      },
     }
 
   export abstract class AbstractUsersService extends joinGRPC.Service<IUsersServiceImplementation> {
@@ -593,9 +593,9 @@ export namespace Foo {
         usersServiceDefinition,
         {
           find: (call) => this.Find(call),
+          findBidiStream: (call) => this.FindBidiStream(call),
           findClientStream: (call) => this.FindClientStream(call),
           findServerStream: (call) => this.FindServerStream(call),
-          findBidiStream: (call) => this.FindBidiStream(call),
         },
         logger,
         trace

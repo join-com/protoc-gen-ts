@@ -22,13 +22,13 @@ export namespace Common {
     extends protobufjs.Message<ExtraPkgMessage>
     implements ConvertibleTo<IExtraPkgMessage>
   {
-    @protobufjs.Field.d(1, 'string')
+    @protobufjs.Field.d(1, 'string', 'optional')
     public firstName?: string
 
-    @protobufjs.Field.d(2, 'string')
+    @protobufjs.Field.d(2, 'string', 'optional')
     public lastName?: string
 
-    @protobufjs.Field.d(3, GoogleProtobuf.Timestamp)
+    @protobufjs.Field.d(3, GoogleProtobuf.Timestamp, 'optional')
     public birthDate?: GoogleProtobuf.Timestamp
 
     public asInterface(): IExtraPkgMessage {

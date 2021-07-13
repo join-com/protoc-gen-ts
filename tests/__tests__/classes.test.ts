@@ -42,4 +42,43 @@ describe('(v2) classes', () => {
       reconstructed.timestamp?.getTime()
     )
   })
+
+  it('undefined values are recovered as undefined', () => {
+    const emptyRequest: Foo.IRequest = {}
+    const requestBuffer = Foo.Request.encodePatched(emptyRequest).finish()
+    const reconstructedRequest = Foo.Request.decodePatched(requestBuffer)
+
+    const emptyTest: Foo.ITest = {}
+    const testBuffer = Foo.Test.encodePatched(emptyTest).finish()
+    const reconstructedTest = Foo.Test.decodePatched(testBuffer)
+
+    expect(reconstructedRequest.id).toBeUndefined()
+    expect(reconstructedTest.fieldEnum).toBeUndefined()
+  })
+
+  it('zero values are recovered as zeros', () => {
+    const zeroedRequest: Foo.IRequest = { id: 0 }
+    const requestBuffer = Foo.Request.encodePatched(zeroedRequest).finish()
+    const reconstructedRequest = Foo.Request.decodePatched(requestBuffer)
+
+    expect(reconstructedRequest.id).toBe(0)
+  })
+
+  it('enum values are recovered', () => {
+    const unknownValue: Foo.ITest = { fieldEnum: 'UNKNOWN' }
+    const unknownBuffer = Foo.Test.encodePatched(unknownValue).finish()
+    const reconstructedUnknown = Foo.Test.decodePatched(unknownBuffer)
+
+    const adminValue: Foo.ITest = { fieldEnum: 'ADMIN' }
+    const adminBuffer = Foo.Test.encodePatched(adminValue).finish()
+    const reconstructedAdmin = Foo.Test.decodePatched(adminBuffer)
+
+    const userValue: Foo.ITest = { fieldEnum: 'USER' }
+    const userBuffer = Foo.Test.encodePatched(userValue).finish()
+    const reconstructedUser = Foo.Test.decodePatched(userBuffer)
+
+    expect(reconstructedUnknown.fieldEnum).toBe('UNKNOWN')
+    expect(reconstructedAdmin.fieldEnum).toBe('ADMIN')
+    expect(reconstructedUser.fieldEnum).toBe('USER')
+  })
 })

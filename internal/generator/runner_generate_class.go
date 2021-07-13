@@ -167,13 +167,15 @@ func (r *Runner) generateTypescriptClassField(
 	if foundRequired && requiredField && foundOptional && optionalField {
 		utils.LogError("incompatible options for field " + fieldSpec.GetName() + " in " + messageSpec.GetName())
 	}
-	if requiredFields && !(foundOptional && optionalField) || foundRequired && requiredField {
+
+	isRequiredField := requiredFields && !(foundOptional && optionalField) || foundRequired && requiredField
+	if isRequiredField {
 		separator = "!: "
 	}
 
 	r.P(
 		generatedFileStream,
-		r.getMessageFieldDecorator(fieldSpec),
+		r.getMessageFieldDecorator(fieldSpec, isRequiredField),
 		"public "+fieldSpec.GetJsonName()+separator+r.getClassFieldType(fieldSpec)+"\n",
 	)
 }

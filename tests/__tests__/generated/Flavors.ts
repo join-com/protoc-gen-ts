@@ -103,7 +103,7 @@ export namespace Flavors {
     extends protobufjs.Message<UserRequest>
     implements ConvertibleTo<IUserRequest>, IUserRequest
   {
-    @protobufjs.Field.d(1, 'int32')
+    @protobufjs.Field.d(1, 'int32', 'optional')
     public userId?: UserId
 
     public asInterface(): IUserRequest {

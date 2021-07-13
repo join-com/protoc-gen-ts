@@ -19,10 +19,10 @@ export namespace Common {
     extends protobufjs.Message<OtherPkgMessage>
     implements ConvertibleTo<IOtherPkgMessage>, IOtherPkgMessage
   {
-    @protobufjs.Field.d(1, 'string')
+    @protobufjs.Field.d(1, 'string', 'optional')
     public firstName?: string
 
-    @protobufjs.Field.d(2, 'string')
+    @protobufjs.Field.d(2, 'string', 'optional')
     public latsName?: string
 
     public asInterface(): IOtherPkgMessage {

@@ -49,11 +49,17 @@ func (r *Runner) getEnumOrMessageTypeName(typeName string, isInterface bool) str
 	return alternativeImportName + "." + interfaceName
 }
 
-func (r *Runner) getMessageFieldDecorator(fieldSpec *descriptorpb.FieldDescriptorProto) string {
+func (r *Runner) getMessageFieldDecorator(fieldSpec *descriptorpb.FieldDescriptorProto, isRequiredField bool) string {
 	decorator := "@protobufjs.Field.d(" + strconv.FormatInt(int64(*fieldSpec.Number), 10) + ", " + r.getProtobufMessageFieldType(fieldSpec)
 
 	if fieldSpec.GetLabel() == descriptorpb.FieldDescriptorProto_LABEL_REPEATED {
 		decorator += ", 'repeated'"
+	} else if !isRequiredField {
+		decorator += ", 'optional'"
+
+		if fieldSpec.GetType() == descriptorpb.FieldDescriptorProto_TYPE_ENUM {
+			decorator += ", '__JoinGrpcUndefined__'"
+		}
 	}
 
 	decorator += ")"

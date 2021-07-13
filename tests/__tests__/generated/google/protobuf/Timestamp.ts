@@ -19,10 +19,10 @@ export namespace GoogleProtobuf {
     extends protobufjs.Message<Timestamp>
     implements ConvertibleTo<ITimestamp>, ITimestamp
   {
-    @protobufjs.Field.d(1, 'int64')
+    @protobufjs.Field.d(1, 'int64', 'optional')
     public seconds?: number
 
-    @protobufjs.Field.d(2, 'int32')
+    @protobufjs.Field.d(2, 'int32', 'optional')
     public nanos?: number
 
     public asInterface(): ITimestamp {

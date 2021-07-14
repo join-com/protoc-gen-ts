@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package regressions;
+
+// Makes protoc happy (useful for Golang code generation, not for TS)
+option go_package = "github.com/join-com/protoc-gen-ts/regressions";
+
+
+// Regression 01
+
+message Reg01Inner {
+  string value = 1;
+}
+
+message Reg01Outer {
+  Reg01Inner inner = 1;
+}

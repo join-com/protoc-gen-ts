@@ -181,14 +181,14 @@ func (r *Runner) generateTypescriptClassField(
 }
 
 func (r *Runner) generateTypescriptClassPatchedMethods(generatedFileStream *protogen.GeneratedFile, messageSpec *descriptorpb.DescriptorProto, requiredFields bool, hasEnums bool) {
-	r.generateAsInterfaceMethod(generatedFileStream, messageSpec, requiredFields, hasEnums)
+	r.generateAsInterfaceMethod(generatedFileStream, messageSpec, requiredFields)
 	r.generateFromInterfaceMethod(generatedFileStream, messageSpec, requiredFields, hasEnums)
 
 	r.generateDecodePatchedMethod(generatedFileStream, messageSpec, requiredFields)
 	r.generateEncodePatchedMethod(generatedFileStream, messageSpec, requiredFields, hasEnums)
 }
 
-func (r *Runner) generateAsInterfaceMethod(generatedFileStream *protogen.GeneratedFile, messageSpec *descriptorpb.DescriptorProto, requiredFields bool, hasEnums bool) {
+func (r *Runner) generateAsInterfaceMethod(generatedFileStream *protogen.GeneratedFile, messageSpec *descriptorpb.DescriptorProto, requiredFields bool) {
 	className := strcase.ToCamel(messageSpec.GetName())
 	r.P(generatedFileStream, "public asInterface(): I"+className+" {")
 	r.indentLevel += 2
@@ -198,29 +198,23 @@ func (r *Runner) generateAsInterfaceMethod(generatedFileStream *protogen.Generat
 		hasRepeated = hasRepeated || (fieldSpec.GetLabel() == descriptorpb.FieldDescriptorProto_LABEL_REPEATED)
 	}
 
-	if hasEnums {
-		r.P(generatedFileStream, "const message = {")
-		r.indentLevel += 2
-
-		r.P(generatedFileStream, "...this,")
-		for _, fieldSpec := range messageSpec.GetField() {
-			r.generatePatchedInterfaceField(generatedFileStream, fieldSpec, messageSpec, requiredFields)
-		}
-
-		r.indentLevel -= 2
-		r.P(generatedFileStream, "}")
-	} else {
-		r.P(generatedFileStream, "const message = { ...this }")
+	r.P(generatedFileStream, "const message = {")
+	r.indentLevel += 2
+	r.P(generatedFileStream, "...this,")
+	for _, fieldSpec := range messageSpec.GetField() {
+		r.generatePatchedInterfaceField(generatedFileStream, fieldSpec, messageSpec, requiredFields)
 	}
+	r.indentLevel -= 2
+	r.P(generatedFileStream, "}")
 
 	var fieldAssignment string
 	var loopInnerIfClause string
 	if hasRepeated {
-		fieldAssignment = "  const field = message[fieldName as keyof I"+className+"]"
+		fieldAssignment = "  const field = message[fieldName as keyof I" + className + "]"
 		loopInnerIfClause = "field == null || Array.isArray(field) && field.length === 0"
 	} else {
 		fieldAssignment = ""
-		loopInnerIfClause = "message[fieldName as keyof I"+className+"] == null"
+		loopInnerIfClause = "message[fieldName as keyof I" + className + "] == null"
 	}
 
 	r.P(
@@ -409,9 +403,6 @@ func (r *Runner) generatePatchedInterfaceField(
 		nestedMessageSpec, ok := r.messageSpecsByFQN[fieldTypeName]
 		if !ok || nestedMessageSpec == nil {
 			utils.LogError("Unable to retrieve message spec for " + fieldTypeName)
-		}
-		if fieldTypeName != ".google.protobuf.Timestamp" && !r.messageHasEnumsOrDates(nestedMessageSpec) {
-			return
 		}
 
 		if confirmRequired {

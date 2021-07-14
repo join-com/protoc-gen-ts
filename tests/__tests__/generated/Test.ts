@@ -6,7 +6,8 @@ import * as protobufjs from 'protobufjs/light'
 
 import { Common as Common_Common } from './common/Common'
 import { Common as Common_Extra } from './common/Extra'
-import { GoogleProtobuf } from './google/protobuf/Timestamp'
+import { GoogleProtobuf as GoogleProtobuf_Empty } from './google/protobuf/Empty'
+import { GoogleProtobuf as GoogleProtobuf_Timestamp } from './google/protobuf/Timestamp'
 
 import { grpc } from '@join-com/grpc'
 
@@ -79,6 +80,10 @@ export namespace Foo {
     otherPkgMessageRepeated?: Common_Common.IOtherPkgMessage[]
     fieldInt64?: number
     fieldInt64Repeated?: number[]
+  }
+
+  export interface IBigWrapper {
+    nestedTest?: ITest
   }
 
   export interface ICustomOptionsTest {
@@ -422,11 +427,11 @@ export namespace Foo {
     @protobufjs.Field.d(34, Nested, 'repeated')
     public messageRepeated?: Nested[]
 
-    @protobufjs.Field.d(35, GoogleProtobuf.Timestamp, 'optional')
-    public timestamp?: GoogleProtobuf.Timestamp
+    @protobufjs.Field.d(35, GoogleProtobuf_Timestamp.Timestamp, 'optional')
+    public timestamp?: GoogleProtobuf_Timestamp.Timestamp
 
-    @protobufjs.Field.d(36, GoogleProtobuf.Timestamp, 'repeated')
-    public timestampRepeated?: GoogleProtobuf.Timestamp[]
+    @protobufjs.Field.d(36, GoogleProtobuf_Timestamp.Timestamp, 'repeated')
+    public timestampRepeated?: GoogleProtobuf_Timestamp.Timestamp[]
 
     @protobufjs.Field.d(37, Common_Common.OtherPkgMessage, 'optional')
     public otherPkgMessage?: Common_Common.OtherPkgMessage
@@ -479,13 +484,13 @@ export namespace Foo {
         fieldEnumRepeated: value.fieldEnumRepeated?.map((e) => Role_Enum[e]!),
         timestamp:
           value.timestamp != null
-            ? GoogleProtobuf.Timestamp.fromInterface({
+            ? GoogleProtobuf_Timestamp.Timestamp.fromInterface({
                 seconds: Math.floor(value.timestamp.getTime() / 1000),
                 nanos: value.timestamp.getMilliseconds() * 1000000,
               })
             : undefined,
         timestampRepeated: value.timestampRepeated?.map((d) =>
-          GoogleProtobuf.Timestamp.fromInterface({
+          GoogleProtobuf_Timestamp.Timestamp.fromInterface({
             seconds: Math.floor(d.getTime() / 1000),
             nanos: d.getMilliseconds() * 1000000,
           })
@@ -509,6 +514,57 @@ export namespace Foo {
     ): protobufjs.Writer {
       const transformedMessage = Test.fromInterface(message)
       return Test.encode(transformedMessage, writer)
+    }
+  }
+
+  @protobufjs.Type.d('foo_BigWrapper')
+  export class BigWrapper
+    extends protobufjs.Message<BigWrapper>
+    implements ConvertibleTo<IBigWrapper>
+  {
+    @protobufjs.Field.d(1, Test, 'optional')
+    public nestedTest?: Test
+
+    public asInterface(): IBigWrapper {
+      const message = {
+        ...this,
+        nestedTest: this.nestedTest?.asInterface(),
+      }
+      for (const fieldName of Object.keys(message)) {
+        if (message[fieldName as keyof IBigWrapper] == null) {
+          // We remove the key to avoid problems with code making too many assumptions
+          delete message[fieldName as keyof IBigWrapper]
+        }
+      }
+      return message
+    }
+
+    public static fromInterface(this: void, value: IBigWrapper): BigWrapper {
+      const patchedValue = {
+        ...value,
+        nestedTest:
+          value.nestedTest != null
+            ? Test.fromInterface(value.nestedTest)
+            : undefined,
+      }
+
+      return BigWrapper.fromObject(patchedValue)
+    }
+
+    public static decodePatched(
+      this: void,
+      reader: protobufjs.Reader | Uint8Array
+    ): IBigWrapper {
+      return BigWrapper.decode(reader).asInterface()
+    }
+
+    public static encodePatched(
+      this: void,
+      message: IBigWrapper,
+      writer?: protobufjs.Writer
+    ): protobufjs.Writer {
+      const transformedMessage = BigWrapper.fromInterface(message)
+      return BigWrapper.encode(transformedMessage, writer)
     }
   }
 
@@ -616,6 +672,64 @@ export namespace Foo {
     ): Promise<void>
   }
 
+  export interface ISimpleTestServiceImplementation {
+    ForwardParameter: grpc.handleUnaryCall<IBigWrapper, IBigWrapper>
+    GetEmptyResult: grpc.handleUnaryCall<
+      GoogleProtobuf_Empty.IEmpty,
+      IBigWrapper
+    >
+  }
+
+  export const simpleTestServiceDefinition: grpc.ServiceDefinition<ISimpleTestServiceImplementation> =
+    {
+      ForwardParameter: {
+        path: '/foo.SimpleTest/ForwardParameter',
+        requestStream: false,
+        responseStream: false,
+        requestSerialize: (request: IBigWrapper) =>
+          BigWrapper.encodePatched(request).finish() as Buffer,
+        requestDeserialize: BigWrapper.decodePatched,
+        responseSerialize: (response: IBigWrapper) =>
+          BigWrapper.encodePatched(response).finish() as Buffer,
+        responseDeserialize: BigWrapper.decodePatched,
+      },
+      GetEmptyResult: {
+        path: '/foo.SimpleTest/GetEmptyResult',
+        requestStream: false,
+        responseStream: false,
+        requestSerialize: (request: GoogleProtobuf_Empty.IEmpty) =>
+          GoogleProtobuf_Empty.Empty.encodePatched(request).finish() as Buffer,
+        requestDeserialize: GoogleProtobuf_Empty.Empty.decodePatched,
+        responseSerialize: (response: IBigWrapper) =>
+          BigWrapper.encodePatched(response).finish() as Buffer,
+        responseDeserialize: BigWrapper.decodePatched,
+      },
+    }
+
+  export abstract class AbstractSimpleTestService extends joinGRPC.Service<ISimpleTestServiceImplementation> {
+    constructor(
+      protected readonly logger?: joinGRPC.INoDebugLogger,
+      trace?: joinGRPC.IServiceTrace
+    ) {
+      super(
+        simpleTestServiceDefinition,
+        {
+          forwardParameter: (call) => this.ForwardParameter(call),
+          getEmptyResult: (call) => this.GetEmptyResult(call),
+        },
+        logger,
+        trace
+      )
+    }
+
+    public abstract ForwardParameter(
+      call: grpc.ServerUnaryCall<IBigWrapper, IBigWrapper>
+    ): Promise<IBigWrapper>
+    public abstract GetEmptyResult(
+      call: grpc.ServerUnaryCall<GoogleProtobuf_Empty.IEmpty, IBigWrapper>
+    ): Promise<IBigWrapper>
+  }
+
   export interface IUsersClient
     extends joinGRPC.IExtendedClient<IUsersServiceImplementation, 'foo.Users'> {
     /**
@@ -698,6 +812,63 @@ export namespace Foo {
         metadata,
         options
       )
+    }
+  }
+
+  export interface ISimpleTestClient
+    extends joinGRPC.IExtendedClient<
+      ISimpleTestServiceImplementation,
+      'foo.SimpleTest'
+    > {
+    forwardParameter(
+      request: IBigWrapper,
+      metadata?: Record<string, string>,
+      options?: grpc.CallOptions
+    ): joinGRPC.IUnaryRequest<IBigWrapper>
+
+    getEmptyResult(
+      request: GoogleProtobuf_Empty.IEmpty,
+      metadata?: Record<string, string>,
+      options?: grpc.CallOptions
+    ): joinGRPC.IUnaryRequest<IBigWrapper>
+  }
+
+  export class SimpleTestClient
+    extends joinGRPC.Client<ISimpleTestServiceImplementation, 'foo.SimpleTest'>
+    implements ISimpleTestClient
+  {
+    constructor(
+      config: joinGRPC.ISimplifiedClientConfig<ISimpleTestServiceImplementation>
+    ) {
+      super(
+        {
+          ...config,
+          serviceDefinition: simpleTestServiceDefinition,
+          credentials: config?.credentials ?? grpc.credentials.createInsecure(),
+        },
+        'foo.SimpleTest'
+      )
+    }
+
+    public forwardParameter(
+      request: IBigWrapper,
+      metadata?: Record<string, string>,
+      options?: grpc.CallOptions
+    ): joinGRPC.IUnaryRequest<IBigWrapper> {
+      return this.makeUnaryRequest(
+        'ForwardParameter',
+        request,
+        metadata,
+        options
+      )
+    }
+
+    public getEmptyResult(
+      request: GoogleProtobuf_Empty.IEmpty,
+      metadata?: Record<string, string>,
+      options?: grpc.CallOptions
+    ): joinGRPC.IUnaryRequest<IBigWrapper> {
+      return this.makeUnaryRequest('GetEmptyResult', request, metadata, options)
     }
   }
 }

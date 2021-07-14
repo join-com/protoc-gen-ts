@@ -1,7 +1,7 @@
 import { Regressions } from './generated/Regressions'
 
 describe('regressions', () => {
-  it('decodes missing nested fields as undefined when there are no enums', () => {
+  it('01. decodes missing nested fields as undefined when there are no enums', () => {
     // Background: before this test was written, calling .asInterface() for nested objects was
     //             done only when there were enum fields at some level of the object.
 

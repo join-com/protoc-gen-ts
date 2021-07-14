@@ -44,24 +44,59 @@ describe('(v2) classes', () => {
   })
 
   it('undefined values are recovered as undefined', () => {
-    const emptyRequest: Foo.IRequest = {}
-    const requestBuffer = Foo.Request.encodePatched(emptyRequest).finish()
-    const reconstructedRequest = Foo.Request.decodePatched(requestBuffer)
+    const original: Foo.ITest = {}
+    const buffer = Foo.Test.encodePatched(original).finish()
+    const reconstructed = Foo.Test.decodePatched(buffer)
 
-    const emptyTest: Foo.ITest = {}
-    const testBuffer = Foo.Test.encodePatched(emptyTest).finish()
-    const reconstructedTest = Foo.Test.decodePatched(testBuffer)
+    expect(reconstructed.fieldEnum).toBeUndefined()
+    expect(reconstructed.fieldString).toBeUndefined()
+    expect(reconstructed.fieldInt32).toBeUndefined()
+  })
 
-    expect(reconstructedRequest.id).toBeUndefined()
-    expect(reconstructedTest.fieldEnum).toBeUndefined()
+  it('nested undefined values are recovered as undefined', () => {
+    const originalA: Foo.IBigWrapper = {}
+    const bufferA = Foo.BigWrapper.encodePatched(originalA).finish()
+    const reconstructedA = Foo.BigWrapper.decodePatched(bufferA)
+
+    const originalB: Foo.IBigWrapper = { nestedTest: {} }
+    const bufferB = Foo.BigWrapper.encodePatched(originalB).finish()
+    const reconstructedB = Foo.BigWrapper.decodePatched(bufferB)
+
+    const originalC: Foo.IBigWrapper = {
+      nestedTest: {
+        fieldEnum: undefined,
+        fieldString: undefined,
+        fieldInt32: undefined,
+      },
+    }
+    const bufferC = Foo.BigWrapper.encodePatched(originalC).finish()
+    const reconstructedC = Foo.BigWrapper.decodePatched(bufferC)
+
+    expect(reconstructedA.nestedTest?.fieldEnum).toBeUndefined()
+    expect(reconstructedA.nestedTest?.fieldString).toBeUndefined()
+    expect(reconstructedA.nestedTest?.fieldInt32).toBeUndefined()
+
+    expect(reconstructedB.nestedTest?.fieldEnum).toBeUndefined()
+    expect(reconstructedB.nestedTest?.fieldString).toBeUndefined()
+    expect(reconstructedB.nestedTest?.fieldInt32).toBeUndefined()
+
+    expect(reconstructedC.nestedTest?.fieldEnum).toBeUndefined()
+    expect(reconstructedC.nestedTest?.fieldString).toBeUndefined()
+    expect(reconstructedC.nestedTest?.fieldInt32).toBeUndefined()
   })
 
   it('zero values are recovered as zeros', () => {
-    const zeroedRequest: Foo.IRequest = { id: 0 }
-    const requestBuffer = Foo.Request.encodePatched(zeroedRequest).finish()
-    const reconstructedRequest = Foo.Request.decodePatched(requestBuffer)
+    const original: Foo.ITest = {
+      fieldInt32: 0,
+      fieldEnum: 'UNKNOWN',
+      fieldString: '',
+    }
+    const buffer = Foo.Test.encodePatched(original).finish()
+    const reconstructed = Foo.Test.decodePatched(buffer)
 
-    expect(reconstructedRequest.id).toBe(0)
+    expect(reconstructed.fieldInt32).toBe(0)
+    expect(reconstructed.fieldEnum).toBe('UNKNOWN')
+    expect(reconstructed.fieldString).toBe('')
   })
 
   it('enum values are recovered', () => {

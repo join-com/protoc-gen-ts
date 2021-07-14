@@ -104,6 +104,10 @@ message Test {
 
 }
 
+message BigWrapper {
+  Test nestedTest = 1;
+}
+
 message CustomOptionsTest {
   common.ExtraPkgMessage required_field = 1 [(join.protobuf.typescript_required) = true];
   int32 typical_optional_field = 2;

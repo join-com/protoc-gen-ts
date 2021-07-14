@@ -81,6 +81,10 @@ export namespace Foo {
     fieldInt64Repeated?: number[]
   }
 
+  export interface IBigWrapper {
+    nestedTest?: ITest
+  }
+
   export interface ICustomOptionsTest {
     requiredField: Common_Extra.IExtraPkgMessage
     typicalOptionalField?: number
@@ -509,6 +513,57 @@ export namespace Foo {
     ): protobufjs.Writer {
       const transformedMessage = Test.fromInterface(message)
       return Test.encode(transformedMessage, writer)
+    }
+  }
+
+  @protobufjs.Type.d('foo_BigWrapper')
+  export class BigWrapper
+    extends protobufjs.Message<BigWrapper>
+    implements ConvertibleTo<IBigWrapper>
+  {
+    @protobufjs.Field.d(1, Test, 'optional')
+    public nestedTest?: Test
+
+    public asInterface(): IBigWrapper {
+      const message = {
+        ...this,
+        nestedTest: this.nestedTest?.asInterface(),
+      }
+      for (const fieldName of Object.keys(message)) {
+        if (message[fieldName as keyof IBigWrapper] == null) {
+          // We remove the key to avoid problems with code making too many assumptions
+          delete message[fieldName as keyof IBigWrapper]
+        }
+      }
+      return message
+    }
+
+    public static fromInterface(this: void, value: IBigWrapper): BigWrapper {
+      const patchedValue = {
+        ...value,
+        nestedTest:
+          value.nestedTest != null
+            ? Test.fromInterface(value.nestedTest)
+            : undefined,
+      }
+
+      return BigWrapper.fromObject(patchedValue)
+    }
+
+    public static decodePatched(
+      this: void,
+      reader: protobufjs.Reader | Uint8Array
+    ): IBigWrapper {
+      return BigWrapper.decode(reader).asInterface()
+    }
+
+    public static encodePatched(
+      this: void,
+      message: IBigWrapper,
+      writer?: protobufjs.Writer
+    ): protobufjs.Writer {
+      const transformedMessage = BigWrapper.fromInterface(message)
+      return BigWrapper.encode(transformedMessage, writer)
     }
   }
 

@@ -7,6 +7,7 @@ option go_package = "github.com/join-com/protoc-gen-ts/foo";
 option (join.protobuf.typescript_generate_code) = true;
 option (join.protobuf.typescript_generate_imports) = true;
 
+import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 import "common/common.proto";
 import "common/extra.proto";
@@ -20,6 +21,11 @@ service Users {
   rpc FindClientStream(stream Request) returns (common.OtherPkgMessage) {}
   rpc FindServerStream(Request) returns (stream common.OtherPkgMessage) {}
   rpc FindBidiStream(stream Request) returns (stream common.OtherPkgMessage) {}
+}
+
+service SimpleTest {
+  rpc GetEmptyResult(google.protobuf.Empty) returns (BigWrapper) {}
+  rpc ForwardParameter(BigWrapper) returns (BigWrapper) {}
 }
 
 enum EnumType {

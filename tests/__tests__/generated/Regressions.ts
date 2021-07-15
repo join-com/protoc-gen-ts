@@ -26,9 +26,7 @@ export namespace Regressions {
     public value?: string
 
     public asInterface(): IReg01Inner {
-      const message = {
-        ...this,
-      }
+      const message = { ...this }
       for (const fieldName of Object.keys(message)) {
         if (message[fieldName as keyof IReg01Inner] == null) {
           // We remove the key to avoid problems with code making too many assumptions

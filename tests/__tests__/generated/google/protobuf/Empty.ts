@@ -17,9 +17,7 @@ export namespace GoogleProtobuf {
     implements ConvertibleTo<IEmpty>, IEmpty
   {
     public asInterface(): IEmpty {
-      const message = {
-        ...this,
-      }
+      const message = { ...this }
       for (const fieldName of Object.keys(message)) {
         if (message[fieldName as keyof IEmpty] == null) {
           // We remove the key to avoid problems with code making too many assumptions

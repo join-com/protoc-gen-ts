@@ -10,6 +10,9 @@ export namespace Common {
   }
 
   export interface IOtherPkgMessage {
+    /**
+     * @deprecated
+     */
     firstName?: string
     latsName?: string
   }

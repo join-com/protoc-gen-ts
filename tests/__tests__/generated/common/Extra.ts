@@ -12,6 +12,9 @@ export namespace Common {
   }
 
   export interface IExtraPkgMessage {
+    /**
+     * @deprecated
+     */
     firstName?: string
     lastName?: string
     birthDate?: Date

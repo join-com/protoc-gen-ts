@@ -54,6 +54,9 @@ export namespace Foo {
     fieldUint64Repeated?: number[]
     fieldSint32?: number
     fieldSint32Repeated?: number[]
+    /**
+     * @deprecated
+     */
     fieldSint64?: number
     fieldSint64Repeated?: number[]
     fieldFixed32?: number

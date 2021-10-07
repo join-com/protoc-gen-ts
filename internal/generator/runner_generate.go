@@ -295,8 +295,7 @@ func (r *Runner) generateTypescriptInterfaceField(
 	requiredFields bool,
 ) {
 	fieldOptions := fieldSpec.GetOptions()
-	messageOptions := messageSpec.GetOptions()
-	if fieldOptions != nil && messageOptions != nil && messageOptions.GetDeprecated() {
+	if fieldOptions != nil && fieldOptions.GetDeprecated() {
 		r.P(generatedFileStream, "/**\n  * @deprecated\n */")
 	}
 

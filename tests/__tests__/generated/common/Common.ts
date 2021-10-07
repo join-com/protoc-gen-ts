@@ -10,6 +10,9 @@ export namespace Common {
   }
 
   export interface IOtherPkgMessage {
+    /**
+     * @deprecated
+     */
     firstName?: string
     latsName?: string
   }
@@ -26,7 +29,9 @@ export namespace Common {
     public latsName?: string
 
     public asInterface(): IOtherPkgMessage {
-      const message = { ...this }
+      const message = {
+        ...this,
+      }
       for (const fieldName of Object.keys(message)) {
         if (message[fieldName as keyof IOtherPkgMessage] == null) {
           // We remove the key to avoid problems with code making too many assumptions

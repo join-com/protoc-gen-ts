@@ -7,6 +7,7 @@ option go_package = "github.com/join-com/protoc-gen-ts/regressions";
 
 
 // Regression 01
+// ----------------------------------------------------------------------------
 
 message Reg01Inner {
   string value = 1;
@@ -14,4 +15,18 @@ message Reg01Inner {
 
 message Reg01Outer {
   Reg01Inner inner = 1;
+}
+
+// Regression 02
+// ----------------------------------------------------------------------------
+
+message WithDeprecatedField {
+  string not_deprecated = 1;
+  string deprecated = 2 [deprecated=true];
+}
+
+message DeprecatedWithDeprecatedField {
+  option deprecated = true;
+  string not_deprecated = 1;
+  string deprecated = 2 [deprecated=true];
 }

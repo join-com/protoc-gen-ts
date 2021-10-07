@@ -42,7 +42,9 @@ export namespace Flavors {
     public emails!: Email[]
 
     public asInterface(): IUserProfile {
-      const message = { ...this }
+      const message = {
+        ...this,
+      }
       for (const fieldName of Object.keys(message)) {
         const field = message[fieldName as keyof IUserProfile]
         if (field == null || (Array.isArray(field) && field.length === 0)) {
@@ -107,7 +109,9 @@ export namespace Flavors {
     public userId?: UserId
 
     public asInterface(): IUserRequest {
-      const message = { ...this }
+      const message = {
+        ...this,
+      }
       for (const fieldName of Object.keys(message)) {
         if (message[fieldName as keyof IUserRequest] == null) {
           // We remove the key to avoid problems with code making too many assumptions

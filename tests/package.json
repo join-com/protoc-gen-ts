@@ -3,7 +3,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "all": "yarn compile && yarn proto:build && yarn v2:build && yarn lint && yarn test",
+    "all": "yarn compile && yarn proto:build && yarn lint && yarn test",
     "compile": "cd .. && ./build.sh",
     "lint": "yarn lint:tsc && yarn lint:eslint",
     "lint:eslint": "eslint . --ext .ts --max-warnings 0",

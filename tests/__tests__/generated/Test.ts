@@ -188,7 +188,9 @@ export namespace Foo {
     public title?: string
 
     public asInterface(): INested {
-      const message = { ...this }
+      const message = {
+        ...this,
+      }
       for (const fieldName of Object.keys(message)) {
         if (message[fieldName as keyof INested] == null) {
           // We remove the key to avoid problems with code making too many assumptions
@@ -227,7 +229,9 @@ export namespace Foo {
     public id?: number
 
     public asInterface(): IRequest {
-      const message = { ...this }
+      const message = {
+        ...this,
+      }
       for (const fieldName of Object.keys(message)) {
         if (message[fieldName as keyof IRequest] == null) {
           // We remove the key to avoid problems with code making too many assumptions
@@ -272,7 +276,9 @@ export namespace Foo {
     public optionalField?: number
 
     public asInterface(): IRequiredPropertiesTest {
-      const message = { ...this }
+      const message = {
+        ...this,
+      }
       for (const fieldName of Object.keys(message)) {
         if (message[fieldName as keyof IRequiredPropertiesTest] == null) {
           // We remove the key to avoid problems with code making too many assumptions

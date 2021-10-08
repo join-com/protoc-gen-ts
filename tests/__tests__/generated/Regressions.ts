@@ -17,7 +17,7 @@ export namespace Regressions {
     inner?: IReg01Inner
   }
 
-  export interface IWithDeprecatedField {
+  export interface IMessageWithDeprecatedField {
     notDeprecated?: string
     /**
      * @deprecated
@@ -28,7 +28,7 @@ export namespace Regressions {
   /**
    * @deprecated
    */
-  export interface IDeprecatedWithDeprecatedField {
+  export interface IDeprecatedMessageWithDeprecatedField {
     notDeprecated?: string
     /**
      * @deprecated
@@ -39,12 +39,12 @@ export namespace Regressions {
   /**
    * @deprecated
    */
-  @protobufjs.Type.d('regressions_DeprecatedWithDeprecatedField')
-  export class DeprecatedWithDeprecatedField
-    extends protobufjs.Message<DeprecatedWithDeprecatedField>
+  @protobufjs.Type.d('regressions_DeprecatedMessageWithDeprecatedField')
+  export class DeprecatedMessageWithDeprecatedField
+    extends protobufjs.Message<DeprecatedMessageWithDeprecatedField>
     implements
-      ConvertibleTo<IDeprecatedWithDeprecatedField>,
-      IDeprecatedWithDeprecatedField
+      ConvertibleTo<IDeprecatedMessageWithDeprecatedField>,
+      IDeprecatedMessageWithDeprecatedField
   {
     @protobufjs.Field.d(1, 'string', 'optional')
     public notDeprecated?: string
@@ -55,16 +55,19 @@ export namespace Regressions {
     @protobufjs.Field.d(2, 'string', 'optional')
     public deprecated?: string
 
-    public asInterface(): IDeprecatedWithDeprecatedField {
+    public asInterface(): IDeprecatedMessageWithDeprecatedField {
       const message = {
         ...this,
       }
       for (const fieldName of Object.keys(message)) {
         if (
-          message[fieldName as keyof IDeprecatedWithDeprecatedField] == null
+          message[fieldName as keyof IDeprecatedMessageWithDeprecatedField] ==
+          null
         ) {
           // We remove the key to avoid problems with code making too many assumptions
-          delete message[fieldName as keyof IDeprecatedWithDeprecatedField]
+          delete message[
+            fieldName as keyof IDeprecatedMessageWithDeprecatedField
+          ]
         }
       }
       return message
@@ -72,24 +75,76 @@ export namespace Regressions {
 
     public static fromInterface(
       this: void,
-      value: IDeprecatedWithDeprecatedField
-    ): DeprecatedWithDeprecatedField {
-      return DeprecatedWithDeprecatedField.fromObject(value)
+      value: IDeprecatedMessageWithDeprecatedField
+    ): DeprecatedMessageWithDeprecatedField {
+      return DeprecatedMessageWithDeprecatedField.fromObject(value)
     }
 
     public static decodePatched(
       this: void,
       reader: protobufjs.Reader | Uint8Array
-    ): IDeprecatedWithDeprecatedField {
-      return DeprecatedWithDeprecatedField.decode(reader).asInterface()
+    ): IDeprecatedMessageWithDeprecatedField {
+      return DeprecatedMessageWithDeprecatedField.decode(reader).asInterface()
     }
 
     public static encodePatched(
       this: void,
-      message: IDeprecatedWithDeprecatedField,
+      message: IDeprecatedMessageWithDeprecatedField,
       writer?: protobufjs.Writer
     ): protobufjs.Writer {
-      return DeprecatedWithDeprecatedField.encode(message, writer)
+      return DeprecatedMessageWithDeprecatedField.encode(message, writer)
+    }
+  }
+
+  @protobufjs.Type.d('regressions_MessageWithDeprecatedField')
+  export class MessageWithDeprecatedField
+    extends protobufjs.Message<MessageWithDeprecatedField>
+    implements
+      ConvertibleTo<IMessageWithDeprecatedField>,
+      IMessageWithDeprecatedField
+  {
+    @protobufjs.Field.d(1, 'string', 'optional')
+    public notDeprecated?: string
+
+    /**
+     * @deprecated
+     */
+    @protobufjs.Field.d(2, 'string', 'optional')
+    public deprecated?: string
+
+    public asInterface(): IMessageWithDeprecatedField {
+      const message = {
+        ...this,
+      }
+      for (const fieldName of Object.keys(message)) {
+        if (message[fieldName as keyof IMessageWithDeprecatedField] == null) {
+          // We remove the key to avoid problems with code making too many assumptions
+          delete message[fieldName as keyof IMessageWithDeprecatedField]
+        }
+      }
+      return message
+    }
+
+    public static fromInterface(
+      this: void,
+      value: IMessageWithDeprecatedField
+    ): MessageWithDeprecatedField {
+      return MessageWithDeprecatedField.fromObject(value)
+    }
+
+    public static decodePatched(
+      this: void,
+      reader: protobufjs.Reader | Uint8Array
+    ): IMessageWithDeprecatedField {
+      return MessageWithDeprecatedField.decode(reader).asInterface()
+    }
+
+    public static encodePatched(
+      this: void,
+      message: IMessageWithDeprecatedField,
+      writer?: protobufjs.Writer
+    ): protobufjs.Writer {
+      return MessageWithDeprecatedField.encode(message, writer)
     }
   }
 
@@ -173,53 +228,6 @@ export namespace Regressions {
       writer?: protobufjs.Writer
     ): protobufjs.Writer {
       return Reg01Outer.encode(message, writer)
-    }
-  }
-
-  @protobufjs.Type.d('regressions_WithDeprecatedField')
-  export class WithDeprecatedField
-    extends protobufjs.Message<WithDeprecatedField>
-    implements ConvertibleTo<IWithDeprecatedField>, IWithDeprecatedField
-  {
-    @protobufjs.Field.d(1, 'string', 'optional')
-    public notDeprecated?: string
-
-    @protobufjs.Field.d(2, 'string', 'optional')
-    public deprecated?: string
-
-    public asInterface(): IWithDeprecatedField {
-      const message = {
-        ...this,
-      }
-      for (const fieldName of Object.keys(message)) {
-        if (message[fieldName as keyof IWithDeprecatedField] == null) {
-          // We remove the key to avoid problems with code making too many assumptions
-          delete message[fieldName as keyof IWithDeprecatedField]
-        }
-      }
-      return message
-    }
-
-    public static fromInterface(
-      this: void,
-      value: IWithDeprecatedField
-    ): WithDeprecatedField {
-      return WithDeprecatedField.fromObject(value)
-    }
-
-    public static decodePatched(
-      this: void,
-      reader: protobufjs.Reader | Uint8Array
-    ): IWithDeprecatedField {
-      return WithDeprecatedField.decode(reader).asInterface()
-    }
-
-    public static encodePatched(
-      this: void,
-      message: IWithDeprecatedField,
-      writer?: protobufjs.Writer
-    ): protobufjs.Writer {
-      return WithDeprecatedField.encode(message, writer)
     }
   }
 }

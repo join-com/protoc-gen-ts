@@ -138,7 +138,7 @@ func (r *Runner) generateTypescriptMessageClass(generatedFileStream *protogen.Ge
 	r.indentLevel += 2
 
 	for _, fieldSpec := range messageSpec.GetField() {
-		r.generateTypescriptClassField(generatedFileStream, fieldSpec, messageSpec, messageOptions, requiredFields)
+		r.generateTypescriptClassField(generatedFileStream, fieldSpec, messageSpec, requiredFields)
 	}
 
 	r.generateTypescriptClassPatchedMethods(generatedFileStream, messageSpec, requiredFields, hasEnums)
@@ -151,12 +151,11 @@ func (r *Runner) generateTypescriptClassField(
 	generatedFileStream *protogen.GeneratedFile,
 	fieldSpec *descriptorpb.FieldDescriptorProto,
 	messageSpec *descriptorpb.DescriptorProto,
-	messageOptions *descriptorpb.MessageOptions,
 	requiredFields bool,
 ) {
 	fieldOptions := fieldSpec.GetOptions()
 	if fieldOptions != nil {
-		if messageOptions.GetDeprecated() {
+		if fieldOptions.GetDeprecated() {
 			r.P(generatedFileStream, "/**\n  * @deprecated\n */")
 		}
 	}

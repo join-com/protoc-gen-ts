@@ -22,6 +22,9 @@ export namespace Common {
     extends protobufjs.Message<OtherPkgMessage>
     implements ConvertibleTo<IOtherPkgMessage>, IOtherPkgMessage
   {
+    /**
+     * @deprecated
+     */
     @protobufjs.Field.d(1, 'string', 'optional')
     public firstName?: string
 

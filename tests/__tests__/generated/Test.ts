@@ -376,6 +376,9 @@ export namespace Foo {
     @protobufjs.Field.d(12, 'sint32', 'repeated')
     public fieldSint32Repeated?: number[]
 
+    /**
+     * @deprecated
+     */
     @protobufjs.Field.d(13, 'sint64', 'optional')
     public fieldSint64?: number
 

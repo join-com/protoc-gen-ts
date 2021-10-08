@@ -20,12 +20,12 @@ message Reg01Outer {
 // Regression 02
 // ----------------------------------------------------------------------------
 
-message WithDeprecatedField {
+message MessageWithDeprecatedField {
   string not_deprecated = 1;
   string deprecated = 2 [deprecated=true];
 }
 
-message DeprecatedWithDeprecatedField {
+message DeprecatedMessageWithDeprecatedField {
   option deprecated = true;
   string not_deprecated = 1;
   string deprecated = 2 [deprecated=true];

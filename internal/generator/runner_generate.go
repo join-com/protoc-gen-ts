@@ -12,6 +12,7 @@ import (
 	"github.com/iancoleman/strcase"
 	"github.com/join-com/protoc-gen-ts/internal/join_proto"
 	"github.com/join-com/protoc-gen-ts/internal/utils"
+	"github.com/join-com/protoc-gen-ts/version"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/types/descriptorpb"
 )
@@ -20,6 +21,7 @@ func (r *Runner) generateTypescriptFile(protoFile *protogen.File, generatedFileS
 	// TODO: Generate comment with version, in order to improve traceability & debugging experience
 	generatedFileStream.P(
 		"// GENERATED CODE -- DO NOT EDIT!\n",
+		"// GENERATOR VERSION: "+version.MajorVersion+"."+version.MinorVersion+"."+version.PatchVersion+"."+version.BuildCommit+"."+version.BuildTime+"\n",
 		"/* eslint-disable @typescript-eslint/no-non-null-assertion */\n",
 	)
 

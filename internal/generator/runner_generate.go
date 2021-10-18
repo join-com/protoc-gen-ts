@@ -123,6 +123,8 @@ func (r *Runner) generateTypescriptNamespace(generatedFileStream *protogen.Gener
 	)
 	r.indentLevel += 2
 
+	r.generateTypescriptClassDecoratorDefinition(generatedFileStream, protoFile)
+
 	// This interface is namespace-private, as it's being replicated for every generated file
 	r.P(
 		generatedFileStream,
@@ -142,6 +144,26 @@ func (r *Runner) generateTypescriptNamespace(generatedFileStream *protogen.Gener
 	r.currentPackage = ""
 	r.indentLevel -= 2
 	r.P(generatedFileStream, "\n}")
+}
+
+func (r *Runner) generateTypescriptClassDecoratorDefinition(generatedFileStream *protogen.GeneratedFile, protoFile *protogen.File) {
+	r.P(
+		generatedFileStream,
+		"const registerGrpcClass = <T extends protobufjs.Message<T>>(",
+		"  typeName: string",
+		"): protobufjs.TypeDecorator<T> => {",
+		"  if (protobufjs.util.decorateRoot.get(typeName) != null) {",
+		"    // eslint-disable-next-line @typescript-eslint/ban-types",
+		"    return (",
+		"      // eslint-disable-next-line @typescript-eslint/no-unused-vars",
+		"      _: protobufjs.Constructor<T>",
+		"    ): void => {",
+		"      // Do nothing",
+		"    }",
+		"  }",
+		"  return protobufjs.Type.d(typeName)",
+		"}",
+	)
 }
 
 func (r *Runner) generateTypescriptFlavors(generatedFileStream *protogen.GeneratedFile, protoFile *protogen.File) {

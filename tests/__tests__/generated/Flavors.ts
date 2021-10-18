@@ -1,5 +1,5 @@
 // GENERATED CODE -- DO NOT EDIT!
-// GENERATOR VERSION: 2.1.0.c3b10e1.1634550238
+// GENERATOR VERSION: 2.1.0.0758bd7.1634553278
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import * as joinGRPC from '@join-com/grpc'
@@ -11,6 +11,20 @@ import { grpc } from '@join-com/grpc'
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Flavors {
+  const registerGrpcClass = <T extends protobufjs.Message<T>>(
+    typeName: string
+  ): protobufjs.TypeDecorator<T> => {
+    if (protobufjs.util.decorateRoot.get(typeName) != null) {
+      // eslint-disable-next-line @typescript-eslint/ban-types
+      return (
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        _: protobufjs.Constructor<T>
+      ): void => {
+        // Do nothing
+      }
+    }
+    return protobufjs.Type.d(typeName)
+  }
   interface ConvertibleTo<T> {
     asInterface(): T
   }
@@ -28,7 +42,7 @@ export namespace Flavors {
     emails: Email[]
   }
 
-  @protobufjs.Type.d('flavors_UserProfile')
+  @registerGrpcClass('flavors_UserProfile')
   export class UserProfile
     extends protobufjs.Message<UserProfile>
     implements ConvertibleTo<IUserProfile>, IUserProfile
@@ -101,7 +115,7 @@ export namespace Flavors {
     }
   }
 
-  @protobufjs.Type.d('flavors_UserRequest')
+  @registerGrpcClass('flavors_UserRequest')
   export class UserRequest
     extends protobufjs.Message<UserRequest>
     implements ConvertibleTo<IUserRequest>, IUserRequest

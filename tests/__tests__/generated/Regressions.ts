@@ -1,11 +1,25 @@
 // GENERATED CODE -- DO NOT EDIT!
-// GENERATOR VERSION: 2.1.0.c3b10e1.1634550238
+// GENERATOR VERSION: 2.1.0.0758bd7.1634553278
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import * as protobufjs from 'protobufjs/light'
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Regressions {
+  const registerGrpcClass = <T extends protobufjs.Message<T>>(
+    typeName: string
+  ): protobufjs.TypeDecorator<T> => {
+    if (protobufjs.util.decorateRoot.get(typeName) != null) {
+      // eslint-disable-next-line @typescript-eslint/ban-types
+      return (
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        _: protobufjs.Constructor<T>
+      ): void => {
+        // Do nothing
+      }
+    }
+    return protobufjs.Type.d(typeName)
+  }
   interface ConvertibleTo<T> {
     asInterface(): T
   }
@@ -40,7 +54,7 @@ export namespace Regressions {
   /**
    * @deprecated
    */
-  @protobufjs.Type.d('regressions_DeprecatedMessageWithDeprecatedField')
+  @registerGrpcClass('regressions_DeprecatedMessageWithDeprecatedField')
   export class DeprecatedMessageWithDeprecatedField
     extends protobufjs.Message<DeprecatedMessageWithDeprecatedField>
     implements
@@ -97,7 +111,7 @@ export namespace Regressions {
     }
   }
 
-  @protobufjs.Type.d('regressions_MessageWithDeprecatedField')
+  @registerGrpcClass('regressions_MessageWithDeprecatedField')
   export class MessageWithDeprecatedField
     extends protobufjs.Message<MessageWithDeprecatedField>
     implements
@@ -149,7 +163,7 @@ export namespace Regressions {
     }
   }
 
-  @protobufjs.Type.d('regressions_Reg01Inner')
+  @registerGrpcClass('regressions_Reg01Inner')
   export class Reg01Inner
     extends protobufjs.Message<Reg01Inner>
     implements ConvertibleTo<IReg01Inner>, IReg01Inner
@@ -190,7 +204,7 @@ export namespace Regressions {
     }
   }
 
-  @protobufjs.Type.d('regressions_Reg01Outer')
+  @registerGrpcClass('regressions_Reg01Outer')
   export class Reg01Outer
     extends protobufjs.Message<Reg01Outer>
     implements ConvertibleTo<IReg01Outer>, IReg01Outer

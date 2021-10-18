@@ -7,7 +7,7 @@ import { Regressions } from './generated/Regressions'
 import { parse as parseComment } from 'comment-parser'
 import { join as pathJoin } from 'path'
 
-describe('regressions', () => {
+describe('regressions 01-02', () => {
   it('01. decodes missing nested fields as undefined when there are no enums', () => {
     // Background: before this test was written, calling .asInterface() for nested objects was
     //             done only when there were enum fields at some level of the object.

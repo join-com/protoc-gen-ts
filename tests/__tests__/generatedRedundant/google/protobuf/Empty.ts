@@ -1,18 +1,32 @@
 // GENERATED CODE -- DO NOT EDIT!
-// GENERATOR VERSION: 2.1.0.c3b10e1.1634550238
+// GENERATOR VERSION: 2.1.0.0758bd7.1634553278
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import * as protobufjs from 'protobufjs/light'
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace GoogleProtobuf {
+  const registerGrpcClass = <T extends protobufjs.Message<T>>(
+    typeName: string
+  ): protobufjs.TypeDecorator<T> => {
+    if (protobufjs.util.decorateRoot.get(typeName) != null) {
+      // eslint-disable-next-line @typescript-eslint/ban-types
+      return (
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        _: protobufjs.Constructor<T>
+      ): void => {
+        // Do nothing
+      }
+    }
+    return protobufjs.Type.d(typeName)
+  }
   interface ConvertibleTo<T> {
     asInterface(): T
   }
 
   export interface IEmpty {}
 
-  @protobufjs.Type.d('google_protobuf_Empty')
+  @registerGrpcClass('google_protobuf_Empty')
   export class Empty
     extends protobufjs.Message<Empty>
     implements ConvertibleTo<IEmpty>, IEmpty

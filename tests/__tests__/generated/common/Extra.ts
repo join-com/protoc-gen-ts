@@ -1,5 +1,5 @@
 // GENERATED CODE -- DO NOT EDIT!
-// GENERATOR VERSION: 2.1.0.c3b10e1.1634550238
+// GENERATOR VERSION: 2.1.0.0758bd7.1634553278
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import * as protobufjs from 'protobufjs/light'
@@ -8,6 +8,20 @@ import { GoogleProtobuf } from '../google/protobuf/Timestamp'
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Common {
+  const registerGrpcClass = <T extends protobufjs.Message<T>>(
+    typeName: string
+  ): protobufjs.TypeDecorator<T> => {
+    if (protobufjs.util.decorateRoot.get(typeName) != null) {
+      // eslint-disable-next-line @typescript-eslint/ban-types
+      return (
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        _: protobufjs.Constructor<T>
+      ): void => {
+        // Do nothing
+      }
+    }
+    return protobufjs.Type.d(typeName)
+  }
   interface ConvertibleTo<T> {
     asInterface(): T
   }
@@ -21,7 +35,7 @@ export namespace Common {
     birthDate?: Date
   }
 
-  @protobufjs.Type.d('common_ExtraPkgMessage')
+  @registerGrpcClass('common_ExtraPkgMessage')
   export class ExtraPkgMessage
     extends protobufjs.Message<ExtraPkgMessage>
     implements ConvertibleTo<IExtraPkgMessage>

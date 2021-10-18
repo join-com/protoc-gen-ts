@@ -132,7 +132,7 @@ func (r *Runner) generateTypescriptMessageClass(generatedFileStream *protogen.Ge
 	}
 	r.P(
 		generatedFileStream,
-		"@protobufjs.Type.d('"+strings.Replace(r.currentPackage, ".", "_", -1)+"_"+className+"')",
+		"@registerGrpcClass('"+strings.Replace(r.currentPackage, ".", "_", -1)+"_"+className+"')",
 		"export class "+className+" extends protobufjs.Message<"+className+"> implements "+implementedInterfaces+" {\n",
 	)
 	r.indentLevel += 2

@@ -1,5 +1,5 @@
 // GENERATED CODE -- DO NOT EDIT!
-// GENERATOR VERSION: 2.1.0.0758bd7.1634553278
+// GENERATOR VERSION: 2.1.0.c2c6dc6.1634553468
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import * as joinGRPC from '@join-com/grpc'

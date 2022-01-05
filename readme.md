@@ -2,9 +2,6 @@
 
 Generates `ts` files from `proto` file definitions.
 
-## Prerequisites
-1. Install protobuf `brew install protobuf`
-
 ## Setup
 
 To install the "new" generator (bear in mind that it could be installed in `${HOME}/.local/bin` too):

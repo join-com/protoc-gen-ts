@@ -130,9 +130,15 @@ func (r *Runner) generateTypescriptMessageClass(generatedFileStream *protogen.Ge
 	if !hasEnums {
 		implementedInterfaces += ", I" + className
 	}
+
+	classDecoratorName := "@protobufjs.Type.d"
+	if r.currentPackage == "google.protobuf" {
+		classDecoratorName = "@registerCommonClass"
+	}
+
 	r.P(
 		generatedFileStream,
-		"@registerGrpcClass('"+strings.Replace(r.currentPackage, ".", "_", -1)+"_"+className+"')",
+		classDecoratorName+"('"+strings.Replace(r.currentPackage, ".", "_", -1)+"_"+className+"')",
 		"export class "+className+" extends protobufjs.Message<"+className+"> implements "+implementedInterfaces+" {\n",
 	)
 	r.indentLevel += 2

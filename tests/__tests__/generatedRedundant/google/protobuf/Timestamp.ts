@@ -1,22 +1,19 @@
 // GENERATED CODE -- DO NOT EDIT!
-// GENERATOR VERSION: 2.1.0.c2c6dc6.1634553468
+// GENERATOR VERSION: 2.1.0.d41be8f.1643383265
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import * as protobufjs from 'protobufjs/light'
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace GoogleProtobuf {
-  const registerGrpcClass = <T extends protobufjs.Message<T>>(typeName: string): protobufjs.TypeDecorator<T> => {
-    if (protobufjs.util.decorateRoot.get(typeName) != null) {
-      // eslint-disable-next-line @typescript-eslint/ban-types
-      return (
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _: protobufjs.Constructor<T>,
-      ): void => {
-        // Do nothing
-      }
+  const registerCommonClass = <T extends protobufjs.Message<T>>(typeName: string): protobufjs.TypeDecorator<T> => {
+    const registeredType = protobufjs.util.decorateRoot.get(typeName)
+    if (registeredType == null) {
+      return protobufjs.Type.d(typeName)
     }
-    return protobufjs.Type.d(typeName)
+    return (ctor: protobufjs.Constructor<T>): void => {
+      Object.defineProperty(ctor, '$type', { value: registeredType, enumerable: false })
+    }
   }
   interface ConvertibleTo<T> {
     asInterface(): T
@@ -27,7 +24,7 @@ export namespace GoogleProtobuf {
     nanos?: number
   }
 
-  @registerGrpcClass('google_protobuf_Timestamp')
+  @registerCommonClass('google_protobuf_Timestamp')
   export class Timestamp extends protobufjs.Message<Timestamp> implements ConvertibleTo<ITimestamp>, ITimestamp {
     @protobufjs.Field.d(1, 'int64', 'optional')
     public seconds?: number

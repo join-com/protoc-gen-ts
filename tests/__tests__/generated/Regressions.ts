@@ -1,23 +1,11 @@
 // GENERATED CODE -- DO NOT EDIT!
-// GENERATOR VERSION: 2.1.0.c2c6dc6.1634553468
+// GENERATOR VERSION: 2.1.0.d41be8f.1643383265
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import * as protobufjs from 'protobufjs/light'
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Regressions {
-  const registerGrpcClass = <T extends protobufjs.Message<T>>(typeName: string): protobufjs.TypeDecorator<T> => {
-    if (protobufjs.util.decorateRoot.get(typeName) != null) {
-      // eslint-disable-next-line @typescript-eslint/ban-types
-      return (
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _: protobufjs.Constructor<T>,
-      ): void => {
-        // Do nothing
-      }
-    }
-    return protobufjs.Type.d(typeName)
-  }
   interface ConvertibleTo<T> {
     asInterface(): T
   }
@@ -52,7 +40,7 @@ export namespace Regressions {
   /**
    * @deprecated
    */
-  @registerGrpcClass('regressions_DeprecatedMessageWithDeprecatedField')
+  @protobufjs.Type.d('regressions_DeprecatedMessageWithDeprecatedField')
   export class DeprecatedMessageWithDeprecatedField
     extends protobufjs.Message<DeprecatedMessageWithDeprecatedField>
     implements ConvertibleTo<IDeprecatedMessageWithDeprecatedField>, IDeprecatedMessageWithDeprecatedField
@@ -102,7 +90,7 @@ export namespace Regressions {
     }
   }
 
-  @registerGrpcClass('regressions_MessageWithDeprecatedField')
+  @protobufjs.Type.d('regressions_MessageWithDeprecatedField')
   export class MessageWithDeprecatedField
     extends protobufjs.Message<MessageWithDeprecatedField>
     implements ConvertibleTo<IMessageWithDeprecatedField>, IMessageWithDeprecatedField
@@ -146,7 +134,7 @@ export namespace Regressions {
     }
   }
 
-  @registerGrpcClass('regressions_Reg01Inner')
+  @protobufjs.Type.d('regressions_Reg01Inner')
   export class Reg01Inner extends protobufjs.Message<Reg01Inner> implements ConvertibleTo<IReg01Inner>, IReg01Inner {
     @protobufjs.Field.d(1, 'string', 'optional')
     public value?: string
@@ -177,7 +165,7 @@ export namespace Regressions {
     }
   }
 
-  @registerGrpcClass('regressions_Reg01Outer')
+  @protobufjs.Type.d('regressions_Reg01Outer')
   export class Reg01Outer extends protobufjs.Message<Reg01Outer> implements ConvertibleTo<IReg01Outer>, IReg01Outer {
     @protobufjs.Field.d(1, Reg01Inner, 'optional')
     public inner?: Reg01Inner

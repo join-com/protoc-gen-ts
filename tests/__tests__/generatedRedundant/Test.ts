@@ -1,5 +1,5 @@
 // GENERATED CODE -- DO NOT EDIT!
-// GENERATOR VERSION: 2.1.0.c2c6dc6.1634553468
+// GENERATOR VERSION: 2.1.0.d41be8f.1643383265
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import * as joinGRPC from '@join-com/grpc'
@@ -14,18 +14,6 @@ import { grpc } from '@join-com/grpc'
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Foo {
-  const registerGrpcClass = <T extends protobufjs.Message<T>>(typeName: string): protobufjs.TypeDecorator<T> => {
-    if (protobufjs.util.decorateRoot.get(typeName) != null) {
-      // eslint-disable-next-line @typescript-eslint/ban-types
-      return (
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _: protobufjs.Constructor<T>,
-      ): void => {
-        // Do nothing
-      }
-    }
-    return protobufjs.Type.d(typeName)
-  }
   interface ConvertibleTo<T> {
     asInterface(): T
   }
@@ -114,7 +102,7 @@ export namespace Foo {
     optionalField?: number
   }
 
-  @registerGrpcClass('foo_CustomOptionsTest')
+  @protobufjs.Type.d('foo_CustomOptionsTest')
   export class CustomOptionsTest
     extends protobufjs.Message<CustomOptionsTest>
     implements ConvertibleTo<ICustomOptionsTest>
@@ -179,7 +167,7 @@ export namespace Foo {
   /**
    * @deprecated
    */
-  @registerGrpcClass('foo_Nested')
+  @protobufjs.Type.d('foo_Nested')
   export class Nested extends protobufjs.Message<Nested> implements ConvertibleTo<INested>, INested {
     @protobufjs.Field.d(1, 'string', 'optional')
     public title?: string
@@ -210,7 +198,7 @@ export namespace Foo {
     }
   }
 
-  @registerGrpcClass('foo_Request')
+  @protobufjs.Type.d('foo_Request')
   export class Request extends protobufjs.Message<Request> implements ConvertibleTo<IRequest>, IRequest {
     @protobufjs.Field.d(1, 'int32', 'optional')
     public id?: number
@@ -241,7 +229,7 @@ export namespace Foo {
     }
   }
 
-  @registerGrpcClass('foo_RequiredPropertiesTest')
+  @protobufjs.Type.d('foo_RequiredPropertiesTest')
   export class RequiredPropertiesTest
     extends protobufjs.Message<RequiredPropertiesTest>
     implements ConvertibleTo<IRequiredPropertiesTest>, IRequiredPropertiesTest
@@ -296,7 +284,7 @@ export namespace Foo {
     }
   }
 
-  @registerGrpcClass('foo_Test')
+  @protobufjs.Type.d('foo_Test')
   export class Test extends protobufjs.Message<Test> implements ConvertibleTo<ITest> {
     @protobufjs.Field.d(1, 'int32', 'optional')
     public fieldInt32?: number
@@ -475,7 +463,7 @@ export namespace Foo {
     }
   }
 
-  @registerGrpcClass('foo_BigWrapper')
+  @protobufjs.Type.d('foo_BigWrapper')
   export class BigWrapper extends protobufjs.Message<BigWrapper> implements ConvertibleTo<IBigWrapper> {
     @protobufjs.Field.d(1, Test, 'optional')
     public nestedTest?: Test

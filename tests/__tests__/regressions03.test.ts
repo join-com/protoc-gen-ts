@@ -2,6 +2,9 @@
 import { GoogleProtobuf as gp1 } from './generated/google/protobuf/Timestamp'
 import { GoogleProtobuf as gp2 } from './generatedRedundant/google/protobuf/Timestamp'
 
+import { GoogleProtobuf as gp3 } from './generated/google/protobuf/Empty'
+import { GoogleProtobuf as gp4 } from './generatedRedundant/google/protobuf/Empty'
+
 describe('regressions 03', () => {
   it('dummy test', () => {
     // This test has code only to ensure that the linters don't complain because of unused imports.
@@ -10,5 +13,11 @@ describe('regressions 03', () => {
 
     expect(_ts1.asInterface().seconds).toEqual(_ts2.asInterface().seconds)
     expect(_ts1.asInterface().nanos).toEqual(_ts2.asInterface().nanos)
+
+    const _ts3 = gp3.Empty.fromInterface({})
+    const _ts4 = gp4.Empty.fromInterface({ seconds: 0, nanos: 0 })
+
+    expect(_ts3.asInterface()).toEqual({})
+    expect(_ts4.asInterface()).toEqual({})
   })
 })

@@ -18,12 +18,7 @@ module.exports = {
     'node/no-missing-import': [
       'error',
       {
-        resolvePaths: [
-          './__tests__',
-          './node_modules',
-          './node_modules/@types',
-          './node_modules/@types/node',
-        ],
+        resolvePaths: ['./__tests__', './node_modules', './node_modules/@types', './node_modules/@types/node'],
         tryExtensions: ['.ts', '.d.ts'],
       },
     ],

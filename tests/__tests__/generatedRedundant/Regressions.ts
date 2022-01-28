@@ -1,25 +1,11 @@
 // GENERATED CODE -- DO NOT EDIT!
-// GENERATOR VERSION: 2.1.0.c2c6dc6.1634553468
+// GENERATOR VERSION: 2.1.0.d41be8f.1643383265
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import * as protobufjs from 'protobufjs/light'
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Regressions {
-  const registerGrpcClass = <T extends protobufjs.Message<T>>(
-    typeName: string
-  ): protobufjs.TypeDecorator<T> => {
-    if (protobufjs.util.decorateRoot.get(typeName) != null) {
-      // eslint-disable-next-line @typescript-eslint/ban-types
-      return (
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _: protobufjs.Constructor<T>
-      ): void => {
-        // Do nothing
-      }
-    }
-    return protobufjs.Type.d(typeName)
-  }
   interface ConvertibleTo<T> {
     asInterface(): T
   }
@@ -54,12 +40,10 @@ export namespace Regressions {
   /**
    * @deprecated
    */
-  @registerGrpcClass('regressions_DeprecatedMessageWithDeprecatedField')
+  @protobufjs.Type.d('regressions_DeprecatedMessageWithDeprecatedField')
   export class DeprecatedMessageWithDeprecatedField
     extends protobufjs.Message<DeprecatedMessageWithDeprecatedField>
-    implements
-      ConvertibleTo<IDeprecatedMessageWithDeprecatedField>,
-      IDeprecatedMessageWithDeprecatedField
+    implements ConvertibleTo<IDeprecatedMessageWithDeprecatedField>, IDeprecatedMessageWithDeprecatedField
   {
     @protobufjs.Field.d(1, 'string', 'optional')
     public notDeprecated?: string
@@ -75,14 +59,9 @@ export namespace Regressions {
         ...this,
       }
       for (const fieldName of Object.keys(message)) {
-        if (
-          message[fieldName as keyof IDeprecatedMessageWithDeprecatedField] ==
-          null
-        ) {
+        if (message[fieldName as keyof IDeprecatedMessageWithDeprecatedField] == null) {
           // We remove the key to avoid problems with code making too many assumptions
-          delete message[
-            fieldName as keyof IDeprecatedMessageWithDeprecatedField
-          ]
+          delete message[fieldName as keyof IDeprecatedMessageWithDeprecatedField]
         }
       }
       return message
@@ -90,14 +69,14 @@ export namespace Regressions {
 
     public static fromInterface(
       this: void,
-      value: IDeprecatedMessageWithDeprecatedField
+      value: IDeprecatedMessageWithDeprecatedField,
     ): DeprecatedMessageWithDeprecatedField {
       return DeprecatedMessageWithDeprecatedField.fromObject(value)
     }
 
     public static decodePatched(
       this: void,
-      reader: protobufjs.Reader | Uint8Array
+      reader: protobufjs.Reader | Uint8Array,
     ): IDeprecatedMessageWithDeprecatedField {
       return DeprecatedMessageWithDeprecatedField.decode(reader).asInterface()
     }
@@ -105,18 +84,16 @@ export namespace Regressions {
     public static encodePatched(
       this: void,
       message: IDeprecatedMessageWithDeprecatedField,
-      writer?: protobufjs.Writer
+      writer?: protobufjs.Writer,
     ): protobufjs.Writer {
       return DeprecatedMessageWithDeprecatedField.encode(message, writer)
     }
   }
 
-  @registerGrpcClass('regressions_MessageWithDeprecatedField')
+  @protobufjs.Type.d('regressions_MessageWithDeprecatedField')
   export class MessageWithDeprecatedField
     extends protobufjs.Message<MessageWithDeprecatedField>
-    implements
-      ConvertibleTo<IMessageWithDeprecatedField>,
-      IMessageWithDeprecatedField
+    implements ConvertibleTo<IMessageWithDeprecatedField>, IMessageWithDeprecatedField
   {
     @protobufjs.Field.d(1, 'string', 'optional')
     public notDeprecated?: string
@@ -140,34 +117,25 @@ export namespace Regressions {
       return message
     }
 
-    public static fromInterface(
-      this: void,
-      value: IMessageWithDeprecatedField
-    ): MessageWithDeprecatedField {
+    public static fromInterface(this: void, value: IMessageWithDeprecatedField): MessageWithDeprecatedField {
       return MessageWithDeprecatedField.fromObject(value)
     }
 
-    public static decodePatched(
-      this: void,
-      reader: protobufjs.Reader | Uint8Array
-    ): IMessageWithDeprecatedField {
+    public static decodePatched(this: void, reader: protobufjs.Reader | Uint8Array): IMessageWithDeprecatedField {
       return MessageWithDeprecatedField.decode(reader).asInterface()
     }
 
     public static encodePatched(
       this: void,
       message: IMessageWithDeprecatedField,
-      writer?: protobufjs.Writer
+      writer?: protobufjs.Writer,
     ): protobufjs.Writer {
       return MessageWithDeprecatedField.encode(message, writer)
     }
   }
 
-  @registerGrpcClass('regressions_Reg01Inner')
-  export class Reg01Inner
-    extends protobufjs.Message<Reg01Inner>
-    implements ConvertibleTo<IReg01Inner>, IReg01Inner
-  {
+  @protobufjs.Type.d('regressions_Reg01Inner')
+  export class Reg01Inner extends protobufjs.Message<Reg01Inner> implements ConvertibleTo<IReg01Inner>, IReg01Inner {
     @protobufjs.Field.d(1, 'string', 'optional')
     public value?: string
 
@@ -188,27 +156,17 @@ export namespace Regressions {
       return Reg01Inner.fromObject(value)
     }
 
-    public static decodePatched(
-      this: void,
-      reader: protobufjs.Reader | Uint8Array
-    ): IReg01Inner {
+    public static decodePatched(this: void, reader: protobufjs.Reader | Uint8Array): IReg01Inner {
       return Reg01Inner.decode(reader).asInterface()
     }
 
-    public static encodePatched(
-      this: void,
-      message: IReg01Inner,
-      writer?: protobufjs.Writer
-    ): protobufjs.Writer {
+    public static encodePatched(this: void, message: IReg01Inner, writer?: protobufjs.Writer): protobufjs.Writer {
       return Reg01Inner.encode(message, writer)
     }
   }
 
-  @registerGrpcClass('regressions_Reg01Outer')
-  export class Reg01Outer
-    extends protobufjs.Message<Reg01Outer>
-    implements ConvertibleTo<IReg01Outer>, IReg01Outer
-  {
+  @protobufjs.Type.d('regressions_Reg01Outer')
+  export class Reg01Outer extends protobufjs.Message<Reg01Outer> implements ConvertibleTo<IReg01Outer>, IReg01Outer {
     @protobufjs.Field.d(1, Reg01Inner, 'optional')
     public inner?: Reg01Inner
 
@@ -230,18 +188,11 @@ export namespace Regressions {
       return Reg01Outer.fromObject(value)
     }
 
-    public static decodePatched(
-      this: void,
-      reader: protobufjs.Reader | Uint8Array
-    ): IReg01Outer {
+    public static decodePatched(this: void, reader: protobufjs.Reader | Uint8Array): IReg01Outer {
       return Reg01Outer.decode(reader).asInterface()
     }
 
-    public static encodePatched(
-      this: void,
-      message: IReg01Outer,
-      writer?: protobufjs.Writer
-    ): protobufjs.Writer {
+    public static encodePatched(this: void, message: IReg01Outer, writer?: protobufjs.Writer): protobufjs.Writer {
       return Reg01Outer.encode(message, writer)
     }
   }

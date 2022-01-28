@@ -1,5 +1,5 @@
 // GENERATED CODE -- DO NOT EDIT!
-// GENERATOR VERSION: 2.1.0.c2c6dc6.1634553468
+// GENERATOR VERSION: 2.1.0.d41be8f.1643383265
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import * as protobufjs from 'protobufjs/light'
@@ -8,20 +8,6 @@ import { GoogleProtobuf } from '../google/protobuf/Timestamp'
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Common {
-  const registerGrpcClass = <T extends protobufjs.Message<T>>(
-    typeName: string
-  ): protobufjs.TypeDecorator<T> => {
-    if (protobufjs.util.decorateRoot.get(typeName) != null) {
-      // eslint-disable-next-line @typescript-eslint/ban-types
-      return (
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _: protobufjs.Constructor<T>
-      ): void => {
-        // Do nothing
-      }
-    }
-    return protobufjs.Type.d(typeName)
-  }
   interface ConvertibleTo<T> {
     asInterface(): T
   }
@@ -35,11 +21,8 @@ export namespace Common {
     birthDate?: Date
   }
 
-  @registerGrpcClass('common_ExtraPkgMessage')
-  export class ExtraPkgMessage
-    extends protobufjs.Message<ExtraPkgMessage>
-    implements ConvertibleTo<IExtraPkgMessage>
-  {
+  @protobufjs.Type.d('common_ExtraPkgMessage')
+  export class ExtraPkgMessage extends protobufjs.Message<ExtraPkgMessage> implements ConvertibleTo<IExtraPkgMessage> {
     /**
      * @deprecated
      */
@@ -57,10 +40,7 @@ export namespace Common {
         ...this,
         birthDate:
           this.birthDate != null
-            ? new Date(
-                (this.birthDate.seconds ?? 0) * 1000 +
-                  (this.birthDate.nanos ?? 0) / 1000000
-              )
+            ? new Date((this.birthDate.seconds ?? 0) * 1000 + (this.birthDate.nanos ?? 0) / 1000000)
             : undefined,
       }
       for (const fieldName of Object.keys(message)) {
@@ -72,10 +52,7 @@ export namespace Common {
       return message
     }
 
-    public static fromInterface(
-      this: void,
-      value: IExtraPkgMessage
-    ): ExtraPkgMessage {
+    public static fromInterface(this: void, value: IExtraPkgMessage): ExtraPkgMessage {
       const patchedValue = {
         ...value,
         birthDate:
@@ -90,18 +67,11 @@ export namespace Common {
       return ExtraPkgMessage.fromObject(patchedValue)
     }
 
-    public static decodePatched(
-      this: void,
-      reader: protobufjs.Reader | Uint8Array
-    ): IExtraPkgMessage {
+    public static decodePatched(this: void, reader: protobufjs.Reader | Uint8Array): IExtraPkgMessage {
       return ExtraPkgMessage.decode(reader).asInterface()
     }
 
-    public static encodePatched(
-      this: void,
-      message: IExtraPkgMessage,
-      writer?: protobufjs.Writer
-    ): protobufjs.Writer {
+    public static encodePatched(this: void, message: IExtraPkgMessage, writer?: protobufjs.Writer): protobufjs.Writer {
       const transformedMessage = ExtraPkgMessage.fromInterface(message)
       return ExtraPkgMessage.encode(transformedMessage, writer)
     }

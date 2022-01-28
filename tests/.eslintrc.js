@@ -29,7 +29,7 @@ module.exports = {
     ],
     quotes: ['error', 'single', { avoidEscape: true }],
     'sort-imports': 'error',
-    'max-len': ['error', { code: 100 }],
+    'max-len': ['error', { code: 120 }],
   },
   overrides: [
     {

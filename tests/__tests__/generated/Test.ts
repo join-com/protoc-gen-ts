@@ -1,5 +1,5 @@
 // GENERATED CODE -- DO NOT EDIT!
-// GENERATOR VERSION: 2.1.0.c2c6dc6.1634553468
+// GENERATOR VERSION: 2.1.0.d41be8f.1643383265
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import * as joinGRPC from '@join-com/grpc'
@@ -14,20 +14,6 @@ import { grpc } from '@join-com/grpc'
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Foo {
-  const registerGrpcClass = <T extends protobufjs.Message<T>>(
-    typeName: string
-  ): protobufjs.TypeDecorator<T> => {
-    if (protobufjs.util.decorateRoot.get(typeName) != null) {
-      // eslint-disable-next-line @typescript-eslint/ban-types
-      return (
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _: protobufjs.Constructor<T>
-      ): void => {
-        // Do nothing
-      }
-    }
-    return protobufjs.Type.d(typeName)
-  }
   interface ConvertibleTo<T> {
     asInterface(): T
   }
@@ -116,7 +102,7 @@ export namespace Foo {
     optionalField?: number
   }
 
-  @registerGrpcClass('foo_CustomOptionsTest')
+  @protobufjs.Type.d('foo_CustomOptionsTest')
   export class CustomOptionsTest
     extends protobufjs.Message<CustomOptionsTest>
     implements ConvertibleTo<ICustomOptionsTest>
@@ -144,32 +130,20 @@ export namespace Foo {
       return message
     }
 
-    public static fromInterface(
-      this: void,
-      value: ICustomOptionsTest
-    ): CustomOptionsTest {
+    public static fromInterface(this: void, value: ICustomOptionsTest): CustomOptionsTest {
       const patchedValue = {
         ...value,
-        requiredField: Common_Extra.ExtraPkgMessage.fromInterface(
-          value.requiredField
-        ),
+        requiredField: Common_Extra.ExtraPkgMessage.fromInterface(value.requiredField),
       }
 
       return CustomOptionsTest.fromObject(patchedValue)
     }
 
-    public static decodePatched(
-      this: void,
-      reader: protobufjs.Reader | Uint8Array
-    ): ICustomOptionsTest {
+    public static decodePatched(this: void, reader: protobufjs.Reader | Uint8Array): ICustomOptionsTest {
       const message = CustomOptionsTest.decode(reader).asInterface()
-      for (const fieldName of [
-        'requiredField',
-      ] as (keyof ICustomOptionsTest)[]) {
+      for (const fieldName of ['requiredField'] as (keyof ICustomOptionsTest)[]) {
         if (message[fieldName] == null) {
-          throw new Error(
-            `Required field ${fieldName} in CustomOptionsTest is null or undefined`
-          )
+          throw new Error(`Required field ${fieldName} in CustomOptionsTest is null or undefined`)
         }
       }
       return message
@@ -178,15 +152,11 @@ export namespace Foo {
     public static encodePatched(
       this: void,
       message: ICustomOptionsTest,
-      writer?: protobufjs.Writer
+      writer?: protobufjs.Writer,
     ): protobufjs.Writer {
-      for (const fieldName of [
-        'requiredField',
-      ] as (keyof ICustomOptionsTest)[]) {
+      for (const fieldName of ['requiredField'] as (keyof ICustomOptionsTest)[]) {
         if (message[fieldName] == null) {
-          throw new Error(
-            `Required field ${fieldName} in CustomOptionsTest is null or undefined`
-          )
+          throw new Error(`Required field ${fieldName} in CustomOptionsTest is null or undefined`)
         }
       }
       const transformedMessage = CustomOptionsTest.fromInterface(message)
@@ -197,11 +167,8 @@ export namespace Foo {
   /**
    * @deprecated
    */
-  @registerGrpcClass('foo_Nested')
-  export class Nested
-    extends protobufjs.Message<Nested>
-    implements ConvertibleTo<INested>, INested
-  {
+  @protobufjs.Type.d('foo_Nested')
+  export class Nested extends protobufjs.Message<Nested> implements ConvertibleTo<INested>, INested {
     @protobufjs.Field.d(1, 'string', 'optional')
     public title?: string
 
@@ -222,27 +189,17 @@ export namespace Foo {
       return Nested.fromObject(value)
     }
 
-    public static decodePatched(
-      this: void,
-      reader: protobufjs.Reader | Uint8Array
-    ): INested {
+    public static decodePatched(this: void, reader: protobufjs.Reader | Uint8Array): INested {
       return Nested.decode(reader).asInterface()
     }
 
-    public static encodePatched(
-      this: void,
-      message: INested,
-      writer?: protobufjs.Writer
-    ): protobufjs.Writer {
+    public static encodePatched(this: void, message: INested, writer?: protobufjs.Writer): protobufjs.Writer {
       return Nested.encode(message, writer)
     }
   }
 
-  @registerGrpcClass('foo_Request')
-  export class Request
-    extends protobufjs.Message<Request>
-    implements ConvertibleTo<IRequest>, IRequest
-  {
+  @protobufjs.Type.d('foo_Request')
+  export class Request extends protobufjs.Message<Request> implements ConvertibleTo<IRequest>, IRequest {
     @protobufjs.Field.d(1, 'int32', 'optional')
     public id?: number
 
@@ -263,23 +220,16 @@ export namespace Foo {
       return Request.fromObject(value)
     }
 
-    public static decodePatched(
-      this: void,
-      reader: protobufjs.Reader | Uint8Array
-    ): IRequest {
+    public static decodePatched(this: void, reader: protobufjs.Reader | Uint8Array): IRequest {
       return Request.decode(reader).asInterface()
     }
 
-    public static encodePatched(
-      this: void,
-      message: IRequest,
-      writer?: protobufjs.Writer
-    ): protobufjs.Writer {
+    public static encodePatched(this: void, message: IRequest, writer?: protobufjs.Writer): protobufjs.Writer {
       return Request.encode(message, writer)
     }
   }
 
-  @registerGrpcClass('foo_RequiredPropertiesTest')
+  @protobufjs.Type.d('foo_RequiredPropertiesTest')
   export class RequiredPropertiesTest
     extends protobufjs.Message<RequiredPropertiesTest>
     implements ConvertibleTo<IRequiredPropertiesTest>, IRequiredPropertiesTest
@@ -306,26 +256,15 @@ export namespace Foo {
       return message
     }
 
-    public static fromInterface(
-      this: void,
-      value: IRequiredPropertiesTest
-    ): RequiredPropertiesTest {
+    public static fromInterface(this: void, value: IRequiredPropertiesTest): RequiredPropertiesTest {
       return RequiredPropertiesTest.fromObject(value)
     }
 
-    public static decodePatched(
-      this: void,
-      reader: protobufjs.Reader | Uint8Array
-    ): IRequiredPropertiesTest {
+    public static decodePatched(this: void, reader: protobufjs.Reader | Uint8Array): IRequiredPropertiesTest {
       const message = RequiredPropertiesTest.decode(reader).asInterface()
-      for (const fieldName of [
-        'requiredField',
-        'customRequiredField',
-      ] as (keyof IRequiredPropertiesTest)[]) {
+      for (const fieldName of ['requiredField', 'customRequiredField'] as (keyof IRequiredPropertiesTest)[]) {
         if (message[fieldName] == null) {
-          throw new Error(
-            `Required field ${fieldName} in RequiredPropertiesTest is null or undefined`
-          )
+          throw new Error(`Required field ${fieldName} in RequiredPropertiesTest is null or undefined`)
         }
       }
       return message
@@ -334,27 +273,19 @@ export namespace Foo {
     public static encodePatched(
       this: void,
       message: IRequiredPropertiesTest,
-      writer?: protobufjs.Writer
+      writer?: protobufjs.Writer,
     ): protobufjs.Writer {
-      for (const fieldName of [
-        'requiredField',
-        'customRequiredField',
-      ] as (keyof IRequiredPropertiesTest)[]) {
+      for (const fieldName of ['requiredField', 'customRequiredField'] as (keyof IRequiredPropertiesTest)[]) {
         if (message[fieldName] == null) {
-          throw new Error(
-            `Required field ${fieldName} in RequiredPropertiesTest is null or undefined`
-          )
+          throw new Error(`Required field ${fieldName} in RequiredPropertiesTest is null or undefined`)
         }
       }
       return RequiredPropertiesTest.encode(message, writer)
     }
   }
 
-  @registerGrpcClass('foo_Test')
-  export class Test
-    extends protobufjs.Message<Test>
-    implements ConvertibleTo<ITest>
-  {
+  @protobufjs.Type.d('foo_Test')
+  export class Test extends protobufjs.Message<Test> implements ConvertibleTo<ITest> {
     @protobufjs.Field.d(1, 'int32', 'optional')
     public fieldInt32?: number
 
@@ -475,28 +406,19 @@ export namespace Foo {
     public asInterface(): ITest {
       const message = {
         ...this,
-        fieldEnum: (this.fieldEnum != null
-          ? EnumType_Enum[this.fieldEnum]!
-          : undefined) as EnumType | undefined,
-        fieldEnumRepeated: this.fieldEnumRepeated?.map(
-          (e) => Role_Enum[e]! as Role
-        ),
+        fieldEnum: (this.fieldEnum != null ? EnumType_Enum[this.fieldEnum]! : undefined) as EnumType | undefined,
+        fieldEnumRepeated: this.fieldEnumRepeated?.map(e => Role_Enum[e]! as Role),
         message: this.message?.asInterface(),
-        messageRepeated: this.messageRepeated?.map((o) => o.asInterface()),
+        messageRepeated: this.messageRepeated?.map(o => o.asInterface()),
         timestamp:
           this.timestamp != null
-            ? new Date(
-                (this.timestamp.seconds ?? 0) * 1000 +
-                  (this.timestamp.nanos ?? 0) / 1000000
-              )
+            ? new Date((this.timestamp.seconds ?? 0) * 1000 + (this.timestamp.nanos ?? 0) / 1000000)
             : undefined,
         timestampRepeated: this.timestampRepeated?.map(
-          (ts) => new Date((ts.seconds ?? 0) * 1000 + (ts.nanos ?? 0) / 1000000)
+          ts => new Date((ts.seconds ?? 0) * 1000 + (ts.nanos ?? 0) / 1000000),
         ),
         otherPkgMessage: this.otherPkgMessage?.asInterface(),
-        otherPkgMessageRepeated: this.otherPkgMessageRepeated?.map((o) =>
-          o.asInterface()
-        ),
+        otherPkgMessageRepeated: this.otherPkgMessageRepeated?.map(o => o.asInterface()),
       }
       for (const fieldName of Object.keys(message)) {
         const field = message[fieldName as keyof ITest]
@@ -511,10 +433,8 @@ export namespace Foo {
     public static fromInterface(this: void, value: ITest): Test {
       const patchedValue = {
         ...value,
-        fieldEnum: (value.fieldEnum != null
-          ? EnumType_Enum[value.fieldEnum]!
-          : undefined) as EnumType_Enum | undefined,
-        fieldEnumRepeated: value.fieldEnumRepeated?.map((e) => Role_Enum[e]!),
+        fieldEnum: (value.fieldEnum != null ? EnumType_Enum[value.fieldEnum]! : undefined) as EnumType_Enum | undefined,
+        fieldEnumRepeated: value.fieldEnumRepeated?.map(e => Role_Enum[e]!),
         timestamp:
           value.timestamp != null
             ? GoogleProtobuf_Timestamp.Timestamp.fromInterface({
@@ -522,39 +442,29 @@ export namespace Foo {
                 nanos: value.timestamp.getMilliseconds() * 1000000,
               })
             : undefined,
-        timestampRepeated: value.timestampRepeated?.map((d) =>
+        timestampRepeated: value.timestampRepeated?.map(d =>
           GoogleProtobuf_Timestamp.Timestamp.fromInterface({
             seconds: Math.floor(d.getTime() / 1000),
             nanos: d.getMilliseconds() * 1000000,
-          })
+          }),
         ),
       }
 
       return Test.fromObject(patchedValue)
     }
 
-    public static decodePatched(
-      this: void,
-      reader: protobufjs.Reader | Uint8Array
-    ): ITest {
+    public static decodePatched(this: void, reader: protobufjs.Reader | Uint8Array): ITest {
       return Test.decode(reader).asInterface()
     }
 
-    public static encodePatched(
-      this: void,
-      message: ITest,
-      writer?: protobufjs.Writer
-    ): protobufjs.Writer {
+    public static encodePatched(this: void, message: ITest, writer?: protobufjs.Writer): protobufjs.Writer {
       const transformedMessage = Test.fromInterface(message)
       return Test.encode(transformedMessage, writer)
     }
   }
 
-  @registerGrpcClass('foo_BigWrapper')
-  export class BigWrapper
-    extends protobufjs.Message<BigWrapper>
-    implements ConvertibleTo<IBigWrapper>
-  {
+  @protobufjs.Type.d('foo_BigWrapper')
+  export class BigWrapper extends protobufjs.Message<BigWrapper> implements ConvertibleTo<IBigWrapper> {
     @protobufjs.Field.d(1, Test, 'optional')
     public nestedTest?: Test
 
@@ -575,27 +485,17 @@ export namespace Foo {
     public static fromInterface(this: void, value: IBigWrapper): BigWrapper {
       const patchedValue = {
         ...value,
-        nestedTest:
-          value.nestedTest != null
-            ? Test.fromInterface(value.nestedTest)
-            : undefined,
+        nestedTest: value.nestedTest != null ? Test.fromInterface(value.nestedTest) : undefined,
       }
 
       return BigWrapper.fromObject(patchedValue)
     }
 
-    public static decodePatched(
-      this: void,
-      reader: protobufjs.Reader | Uint8Array
-    ): IBigWrapper {
+    public static decodePatched(this: void, reader: protobufjs.Reader | Uint8Array): IBigWrapper {
       return BigWrapper.decode(reader).asInterface()
     }
 
-    public static encodePatched(
-      this: void,
-      message: IBigWrapper,
-      writer?: protobufjs.Writer
-    ): protobufjs.Writer {
+    public static encodePatched(this: void, message: IBigWrapper, writer?: protobufjs.Writer): protobufjs.Writer {
       const transformedMessage = BigWrapper.fromInterface(message)
       return BigWrapper.encode(transformedMessage, writer)
     }
@@ -603,208 +503,165 @@ export namespace Foo {
 
   export interface IUsersServiceImplementation {
     Find: grpc.handleUnaryCall<IRequest, Common_Common.IOtherPkgMessage>
-    FindBidiStream: grpc.handleBidiStreamingCall<
-      IRequest,
-      Common_Common.IOtherPkgMessage
-    >
-    FindClientStream: grpc.handleClientStreamingCall<
-      IRequest,
-      Common_Common.IOtherPkgMessage
-    >
-    FindServerStream: grpc.handleServerStreamingCall<
-      IRequest,
-      Common_Common.IOtherPkgMessage
-    >
+    FindBidiStream: grpc.handleBidiStreamingCall<IRequest, Common_Common.IOtherPkgMessage>
+    FindClientStream: grpc.handleClientStreamingCall<IRequest, Common_Common.IOtherPkgMessage>
+    FindServerStream: grpc.handleServerStreamingCall<IRequest, Common_Common.IOtherPkgMessage>
   }
 
-  export const usersServiceDefinition: grpc.ServiceDefinition<IUsersServiceImplementation> =
-    {
-      Find: {
-        path: '/foo.Users/Find',
-        requestStream: false,
-        responseStream: false,
-        requestSerialize: (request: IRequest) =>
-          Request.encodePatched(request).finish() as Buffer,
-        requestDeserialize: Request.decodePatched,
-        responseSerialize: (response: Common_Common.IOtherPkgMessage) =>
-          Common_Common.OtherPkgMessage.encodePatched(
-            response
-          ).finish() as Buffer,
-        responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
-      },
-      FindBidiStream: {
-        path: '/foo.Users/FindBidiStream',
-        requestStream: true,
-        responseStream: true,
-        requestSerialize: (request: IRequest) =>
-          Request.encodePatched(request).finish() as Buffer,
-        requestDeserialize: Request.decodePatched,
-        responseSerialize: (response: Common_Common.IOtherPkgMessage) =>
-          Common_Common.OtherPkgMessage.encodePatched(
-            response
-          ).finish() as Buffer,
-        responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
-      },
-      FindClientStream: {
-        path: '/foo.Users/FindClientStream',
-        requestStream: true,
-        responseStream: false,
-        requestSerialize: (request: IRequest) =>
-          Request.encodePatched(request).finish() as Buffer,
-        requestDeserialize: Request.decodePatched,
-        responseSerialize: (response: Common_Common.IOtherPkgMessage) =>
-          Common_Common.OtherPkgMessage.encodePatched(
-            response
-          ).finish() as Buffer,
-        responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
-      },
-      FindServerStream: {
-        path: '/foo.Users/FindServerStream',
-        requestStream: false,
-        responseStream: true,
-        requestSerialize: (request: IRequest) =>
-          Request.encodePatched(request).finish() as Buffer,
-        requestDeserialize: Request.decodePatched,
-        responseSerialize: (response: Common_Common.IOtherPkgMessage) =>
-          Common_Common.OtherPkgMessage.encodePatched(
-            response
-          ).finish() as Buffer,
-        responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
-      },
-    }
+  export const usersServiceDefinition: grpc.ServiceDefinition<IUsersServiceImplementation> = {
+    Find: {
+      path: '/foo.Users/Find',
+      requestStream: false,
+      responseStream: false,
+      requestSerialize: (request: IRequest) => Request.encodePatched(request).finish() as Buffer,
+      requestDeserialize: Request.decodePatched,
+      responseSerialize: (response: Common_Common.IOtherPkgMessage) =>
+        Common_Common.OtherPkgMessage.encodePatched(response).finish() as Buffer,
+      responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
+    },
+    FindBidiStream: {
+      path: '/foo.Users/FindBidiStream',
+      requestStream: true,
+      responseStream: true,
+      requestSerialize: (request: IRequest) => Request.encodePatched(request).finish() as Buffer,
+      requestDeserialize: Request.decodePatched,
+      responseSerialize: (response: Common_Common.IOtherPkgMessage) =>
+        Common_Common.OtherPkgMessage.encodePatched(response).finish() as Buffer,
+      responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
+    },
+    FindClientStream: {
+      path: '/foo.Users/FindClientStream',
+      requestStream: true,
+      responseStream: false,
+      requestSerialize: (request: IRequest) => Request.encodePatched(request).finish() as Buffer,
+      requestDeserialize: Request.decodePatched,
+      responseSerialize: (response: Common_Common.IOtherPkgMessage) =>
+        Common_Common.OtherPkgMessage.encodePatched(response).finish() as Buffer,
+      responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
+    },
+    FindServerStream: {
+      path: '/foo.Users/FindServerStream',
+      requestStream: false,
+      responseStream: true,
+      requestSerialize: (request: IRequest) => Request.encodePatched(request).finish() as Buffer,
+      requestDeserialize: Request.decodePatched,
+      responseSerialize: (response: Common_Common.IOtherPkgMessage) =>
+        Common_Common.OtherPkgMessage.encodePatched(response).finish() as Buffer,
+      responseDeserialize: Common_Common.OtherPkgMessage.decodePatched,
+    },
+  }
 
   export abstract class AbstractUsersService extends joinGRPC.Service<IUsersServiceImplementation> {
-    constructor(
-      protected readonly logger?: joinGRPC.INoDebugLogger,
-      trace?: joinGRPC.IServiceTrace
-    ) {
+    constructor(protected readonly logger?: joinGRPC.INoDebugLogger, trace?: joinGRPC.IServiceTrace) {
       super(
         usersServiceDefinition,
         {
-          find: (call) => this.Find(call),
-          findBidiStream: (call) => this.FindBidiStream(call),
-          findClientStream: (call) => this.FindClientStream(call),
-          findServerStream: (call) => this.FindServerStream(call),
+          find: call => this.Find(call),
+          findBidiStream: call => this.FindBidiStream(call),
+          findClientStream: call => this.FindClientStream(call),
+          findServerStream: call => this.FindServerStream(call),
         },
         logger,
-        trace
+        trace,
       )
     }
 
     public abstract Find(
-      call: grpc.ServerUnaryCall<IRequest, Common_Common.IOtherPkgMessage>
+      call: grpc.ServerUnaryCall<IRequest, Common_Common.IOtherPkgMessage>,
     ): Promise<Common_Common.IOtherPkgMessage>
     public abstract FindBidiStream(
-      call: grpc.ServerDuplexStream<IRequest, Common_Common.IOtherPkgMessage>
+      call: grpc.ServerDuplexStream<IRequest, Common_Common.IOtherPkgMessage>,
     ): Promise<void>
     public abstract FindClientStream(
-      call: grpc.ServerReadableStream<IRequest, Common_Common.IOtherPkgMessage>
+      call: grpc.ServerReadableStream<IRequest, Common_Common.IOtherPkgMessage>,
     ): Promise<Common_Common.IOtherPkgMessage>
     public abstract FindServerStream(
-      call: grpc.ServerWritableStream<IRequest, Common_Common.IOtherPkgMessage>
+      call: grpc.ServerWritableStream<IRequest, Common_Common.IOtherPkgMessage>,
     ): Promise<void>
   }
 
   export interface ISimpleTestServiceImplementation {
     ForwardParameter: grpc.handleUnaryCall<IBigWrapper, IBigWrapper>
-    GetEmptyResult: grpc.handleUnaryCall<
-      GoogleProtobuf_Empty.IEmpty,
-      IBigWrapper
-    >
+    GetEmptyResult: grpc.handleUnaryCall<GoogleProtobuf_Empty.IEmpty, IBigWrapper>
   }
 
-  export const simpleTestServiceDefinition: grpc.ServiceDefinition<ISimpleTestServiceImplementation> =
-    {
-      ForwardParameter: {
-        path: '/foo.SimpleTest/ForwardParameter',
-        requestStream: false,
-        responseStream: false,
-        requestSerialize: (request: IBigWrapper) =>
-          BigWrapper.encodePatched(request).finish() as Buffer,
-        requestDeserialize: BigWrapper.decodePatched,
-        responseSerialize: (response: IBigWrapper) =>
-          BigWrapper.encodePatched(response).finish() as Buffer,
-        responseDeserialize: BigWrapper.decodePatched,
-      },
-      GetEmptyResult: {
-        path: '/foo.SimpleTest/GetEmptyResult',
-        requestStream: false,
-        responseStream: false,
-        requestSerialize: (request: GoogleProtobuf_Empty.IEmpty) =>
-          GoogleProtobuf_Empty.Empty.encodePatched(request).finish() as Buffer,
-        requestDeserialize: GoogleProtobuf_Empty.Empty.decodePatched,
-        responseSerialize: (response: IBigWrapper) =>
-          BigWrapper.encodePatched(response).finish() as Buffer,
-        responseDeserialize: BigWrapper.decodePatched,
-      },
-    }
+  export const simpleTestServiceDefinition: grpc.ServiceDefinition<ISimpleTestServiceImplementation> = {
+    ForwardParameter: {
+      path: '/foo.SimpleTest/ForwardParameter',
+      requestStream: false,
+      responseStream: false,
+      requestSerialize: (request: IBigWrapper) => BigWrapper.encodePatched(request).finish() as Buffer,
+      requestDeserialize: BigWrapper.decodePatched,
+      responseSerialize: (response: IBigWrapper) => BigWrapper.encodePatched(response).finish() as Buffer,
+      responseDeserialize: BigWrapper.decodePatched,
+    },
+    GetEmptyResult: {
+      path: '/foo.SimpleTest/GetEmptyResult',
+      requestStream: false,
+      responseStream: false,
+      requestSerialize: (request: GoogleProtobuf_Empty.IEmpty) =>
+        GoogleProtobuf_Empty.Empty.encodePatched(request).finish() as Buffer,
+      requestDeserialize: GoogleProtobuf_Empty.Empty.decodePatched,
+      responseSerialize: (response: IBigWrapper) => BigWrapper.encodePatched(response).finish() as Buffer,
+      responseDeserialize: BigWrapper.decodePatched,
+    },
+  }
 
   export abstract class AbstractSimpleTestService extends joinGRPC.Service<ISimpleTestServiceImplementation> {
-    constructor(
-      protected readonly logger?: joinGRPC.INoDebugLogger,
-      trace?: joinGRPC.IServiceTrace
-    ) {
+    constructor(protected readonly logger?: joinGRPC.INoDebugLogger, trace?: joinGRPC.IServiceTrace) {
       super(
         simpleTestServiceDefinition,
         {
-          forwardParameter: (call) => this.ForwardParameter(call),
-          getEmptyResult: (call) => this.GetEmptyResult(call),
+          forwardParameter: call => this.ForwardParameter(call),
+          getEmptyResult: call => this.GetEmptyResult(call),
         },
         logger,
-        trace
+        trace,
       )
     }
 
-    public abstract ForwardParameter(
-      call: grpc.ServerUnaryCall<IBigWrapper, IBigWrapper>
-    ): Promise<IBigWrapper>
+    public abstract ForwardParameter(call: grpc.ServerUnaryCall<IBigWrapper, IBigWrapper>): Promise<IBigWrapper>
     public abstract GetEmptyResult(
-      call: grpc.ServerUnaryCall<GoogleProtobuf_Empty.IEmpty, IBigWrapper>
+      call: grpc.ServerUnaryCall<GoogleProtobuf_Empty.IEmpty, IBigWrapper>,
     ): Promise<IBigWrapper>
   }
 
-  export interface IUsersClient
-    extends joinGRPC.IExtendedClient<IUsersServiceImplementation, 'foo.Users'> {
+  export interface IUsersClient extends joinGRPC.IExtendedClient<IUsersServiceImplementation, 'foo.Users'> {
     /**
      * @deprecated
      */
     find(
       request: IRequest,
       metadata?: Record<string, string>,
-      options?: grpc.CallOptions
+      options?: grpc.CallOptions,
     ): joinGRPC.IUnaryRequest<Common_Common.IOtherPkgMessage>
 
     findBidiStream(
       metadata?: Record<string, string>,
-      options?: grpc.CallOptions
+      options?: grpc.CallOptions,
     ): joinGRPC.IBidiStreamRequest<IRequest, Common_Common.IOtherPkgMessage>
 
     findClientStream(
       metadata?: Record<string, string>,
-      options?: grpc.CallOptions
+      options?: grpc.CallOptions,
     ): joinGRPC.IClientStreamRequest<IRequest, Common_Common.IOtherPkgMessage>
 
     findServerStream(
       request: IRequest,
       metadata?: Record<string, string>,
-      options?: grpc.CallOptions
+      options?: grpc.CallOptions,
     ): joinGRPC.IServerStreamRequest<Common_Common.IOtherPkgMessage>
   }
 
-  export class UsersClient
-    extends joinGRPC.Client<IUsersServiceImplementation, 'foo.Users'>
-    implements IUsersClient
-  {
-    constructor(
-      config: joinGRPC.ISimplifiedClientConfig<IUsersServiceImplementation>
-    ) {
+  export class UsersClient extends joinGRPC.Client<IUsersServiceImplementation, 'foo.Users'> implements IUsersClient {
+    constructor(config: joinGRPC.ISimplifiedClientConfig<IUsersServiceImplementation>) {
       super(
         {
           ...config,
           serviceDefinition: usersServiceDefinition,
           credentials: config?.credentials ?? grpc.credentials.createInsecure(),
         },
-        'foo.Users'
+        'foo.Users',
       )
     }
 
@@ -814,7 +671,7 @@ export namespace Foo {
     public find(
       request: IRequest,
       metadata?: Record<string, string>,
-      options?: grpc.CallOptions
+      options?: grpc.CallOptions,
     ): joinGRPC.IUnaryRequest<Common_Common.IOtherPkgMessage> {
       this.logger?.warn("using deprecated service method 'UsersClient.find'")
       return this.makeUnaryRequest('Find', request, metadata, options)
@@ -822,14 +679,14 @@ export namespace Foo {
 
     public findBidiStream(
       metadata?: Record<string, string>,
-      options?: grpc.CallOptions
+      options?: grpc.CallOptions,
     ): joinGRPC.IBidiStreamRequest<IRequest, Common_Common.IOtherPkgMessage> {
       return this.makeBidiStreamRequest('FindBidiStream', metadata, options)
     }
 
     public findClientStream(
       metadata?: Record<string, string>,
-      options?: grpc.CallOptions
+      options?: grpc.CallOptions,
     ): joinGRPC.IClientStreamRequest<IRequest, Common_Common.IOtherPkgMessage> {
       return this.makeClientStreamRequest('FindClientStream', metadata, options)
     }
@@ -837,32 +694,24 @@ export namespace Foo {
     public findServerStream(
       request: IRequest,
       metadata?: Record<string, string>,
-      options?: grpc.CallOptions
+      options?: grpc.CallOptions,
     ): joinGRPC.IServerStreamRequest<Common_Common.IOtherPkgMessage> {
-      return this.makeServerStreamRequest(
-        'FindServerStream',
-        request,
-        metadata,
-        options
-      )
+      return this.makeServerStreamRequest('FindServerStream', request, metadata, options)
     }
   }
 
   export interface ISimpleTestClient
-    extends joinGRPC.IExtendedClient<
-      ISimpleTestServiceImplementation,
-      'foo.SimpleTest'
-    > {
+    extends joinGRPC.IExtendedClient<ISimpleTestServiceImplementation, 'foo.SimpleTest'> {
     forwardParameter(
       request: IBigWrapper,
       metadata?: Record<string, string>,
-      options?: grpc.CallOptions
+      options?: grpc.CallOptions,
     ): joinGRPC.IUnaryRequest<IBigWrapper>
 
     getEmptyResult(
       request: GoogleProtobuf_Empty.IEmpty,
       metadata?: Record<string, string>,
-      options?: grpc.CallOptions
+      options?: grpc.CallOptions,
     ): joinGRPC.IUnaryRequest<IBigWrapper>
   }
 
@@ -870,36 +719,29 @@ export namespace Foo {
     extends joinGRPC.Client<ISimpleTestServiceImplementation, 'foo.SimpleTest'>
     implements ISimpleTestClient
   {
-    constructor(
-      config: joinGRPC.ISimplifiedClientConfig<ISimpleTestServiceImplementation>
-    ) {
+    constructor(config: joinGRPC.ISimplifiedClientConfig<ISimpleTestServiceImplementation>) {
       super(
         {
           ...config,
           serviceDefinition: simpleTestServiceDefinition,
           credentials: config?.credentials ?? grpc.credentials.createInsecure(),
         },
-        'foo.SimpleTest'
+        'foo.SimpleTest',
       )
     }
 
     public forwardParameter(
       request: IBigWrapper,
       metadata?: Record<string, string>,
-      options?: grpc.CallOptions
+      options?: grpc.CallOptions,
     ): joinGRPC.IUnaryRequest<IBigWrapper> {
-      return this.makeUnaryRequest(
-        'ForwardParameter',
-        request,
-        metadata,
-        options
-      )
+      return this.makeUnaryRequest('ForwardParameter', request, metadata, options)
     }
 
     public getEmptyResult(
       request: GoogleProtobuf_Empty.IEmpty,
       metadata?: Record<string, string>,
-      options?: grpc.CallOptions
+      options?: grpc.CallOptions,
     ): joinGRPC.IUnaryRequest<IBigWrapper> {
       return this.makeUnaryRequest('GetEmptyResult', request, metadata, options)
     }

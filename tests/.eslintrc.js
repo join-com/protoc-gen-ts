@@ -18,18 +18,13 @@ module.exports = {
     'node/no-missing-import': [
       'error',
       {
-        resolvePaths: [
-          './__tests__',
-          './node_modules',
-          './node_modules/@types',
-          './node_modules/@types/node',
-        ],
+        resolvePaths: ['./__tests__', './node_modules', './node_modules/@types', './node_modules/@types/node'],
         tryExtensions: ['.ts', '.d.ts'],
       },
     ],
     quotes: ['error', 'single', { avoidEscape: true }],
     'sort-imports': 'error',
-    'max-len': ['error', { code: 100 }],
+    'max-len': ['error', { code: 120 }],
   },
   overrides: [
     {

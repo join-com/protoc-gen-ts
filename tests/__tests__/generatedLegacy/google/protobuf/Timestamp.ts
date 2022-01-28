@@ -9,13 +9,8 @@ export namespace GoogleProtobuf {
   }
 
   export class Timestamp implements ITimestamp {
-    public static decode(
-      inReader: Uint8Array | protobufjs.Reader,
-      length?: number
-    ) {
-      const reader = !(inReader instanceof protobufjs.Reader)
-        ? protobufjs.Reader.create(inReader)
-        : inReader
+    public static decode(inReader: Uint8Array | protobufjs.Reader, length?: number) {
+      const reader = !(inReader instanceof protobufjs.Reader) ? protobufjs.Reader.create(inReader) : inReader
       const end = length === undefined ? reader.len : reader.pos + length
       const message = new Timestamp()
       while (reader.pos < end) {
@@ -23,10 +18,7 @@ export namespace GoogleProtobuf {
         switch (tag >>> 3) {
           case 1:
             const seconds = reader.int64()
-            message.seconds = new protobufjs.util.LongBits(
-              seconds.low >>> 0,
-              seconds.high >>> 0
-            ).toNumber()
+            message.seconds = new protobufjs.util.LongBits(seconds.low >>> 0, seconds.high >>> 0).toNumber()
             break
           case 2:
             message.nanos = reader.int32()

@@ -3,7 +3,7 @@ import { Foo } from './generated/Test'
 
 class SimpleTestService extends Foo.AbstractSimpleTestService {
   public async ForwardParameter(
-    call: grpc.ServerUnaryCall<Foo.IBigWrapper, Foo.IBigWrapper>
+    call: grpc.ServerUnaryCall<Foo.IBigWrapper, Foo.IBigWrapper>,
   ): Promise<Foo.IBigWrapper> {
     return Promise.resolve(call.request)
   }

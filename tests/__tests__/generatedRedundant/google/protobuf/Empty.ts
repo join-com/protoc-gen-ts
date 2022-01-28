@@ -6,14 +6,12 @@ import * as protobufjs from 'protobufjs/light'
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace GoogleProtobuf {
-  const registerGrpcClass = <T extends protobufjs.Message<T>>(
-    typeName: string
-  ): protobufjs.TypeDecorator<T> => {
+  const registerGrpcClass = <T extends protobufjs.Message<T>>(typeName: string): protobufjs.TypeDecorator<T> => {
     if (protobufjs.util.decorateRoot.get(typeName) != null) {
       // eslint-disable-next-line @typescript-eslint/ban-types
       return (
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _: protobufjs.Constructor<T>
+        _: protobufjs.Constructor<T>,
       ): void => {
         // Do nothing
       }
@@ -27,10 +25,7 @@ export namespace GoogleProtobuf {
   export interface IEmpty {}
 
   @registerGrpcClass('google_protobuf_Empty')
-  export class Empty
-    extends protobufjs.Message<Empty>
-    implements ConvertibleTo<IEmpty>, IEmpty
-  {
+  export class Empty extends protobufjs.Message<Empty> implements ConvertibleTo<IEmpty>, IEmpty {
     public asInterface(): IEmpty {
       const message = {
         ...this,
@@ -48,18 +43,11 @@ export namespace GoogleProtobuf {
       return Empty.fromObject(value)
     }
 
-    public static decodePatched(
-      this: void,
-      reader: protobufjs.Reader | Uint8Array
-    ): IEmpty {
+    public static decodePatched(this: void, reader: protobufjs.Reader | Uint8Array): IEmpty {
       return Empty.decode(reader).asInterface()
     }
 
-    public static encodePatched(
-      this: void,
-      message: IEmpty,
-      writer?: protobufjs.Writer
-    ): protobufjs.Writer {
+    public static encodePatched(this: void, message: IEmpty, writer?: protobufjs.Writer): protobufjs.Writer {
       return Empty.encode(message, writer)
     }
   }

@@ -6,14 +6,12 @@ import * as protobufjs from 'protobufjs/light'
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace GoogleProtobuf {
-  const registerGrpcClass = <T extends protobufjs.Message<T>>(
-    typeName: string
-  ): protobufjs.TypeDecorator<T> => {
+  const registerGrpcClass = <T extends protobufjs.Message<T>>(typeName: string): protobufjs.TypeDecorator<T> => {
     if (protobufjs.util.decorateRoot.get(typeName) != null) {
       // eslint-disable-next-line @typescript-eslint/ban-types
       return (
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _: protobufjs.Constructor<T>
+        _: protobufjs.Constructor<T>,
       ): void => {
         // Do nothing
       }
@@ -30,10 +28,7 @@ export namespace GoogleProtobuf {
   }
 
   @registerGrpcClass('google_protobuf_Timestamp')
-  export class Timestamp
-    extends protobufjs.Message<Timestamp>
-    implements ConvertibleTo<ITimestamp>, ITimestamp
-  {
+  export class Timestamp extends protobufjs.Message<Timestamp> implements ConvertibleTo<ITimestamp>, ITimestamp {
     @protobufjs.Field.d(1, 'int64', 'optional')
     public seconds?: number
 
@@ -57,18 +52,11 @@ export namespace GoogleProtobuf {
       return Timestamp.fromObject(value)
     }
 
-    public static decodePatched(
-      this: void,
-      reader: protobufjs.Reader | Uint8Array
-    ): ITimestamp {
+    public static decodePatched(this: void, reader: protobufjs.Reader | Uint8Array): ITimestamp {
       return Timestamp.decode(reader).asInterface()
     }
 
-    public static encodePatched(
-      this: void,
-      message: ITimestamp,
-      writer?: protobufjs.Writer
-    ): protobufjs.Writer {
+    public static encodePatched(this: void, message: ITimestamp, writer?: protobufjs.Writer): protobufjs.Writer {
       return Timestamp.encode(message, writer)
     }
   }

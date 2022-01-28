@@ -10,13 +10,8 @@ export namespace Common {
   }
 
   export class OtherPkgMessage implements IOtherPkgMessage {
-    public static decode(
-      inReader: Uint8Array | protobufjs.Reader,
-      length?: number
-    ) {
-      const reader = !(inReader instanceof protobufjs.Reader)
-        ? protobufjs.Reader.create(inReader)
-        : inReader
+    public static decode(inReader: Uint8Array | protobufjs.Reader, length?: number) {
+      const reader = !(inReader instanceof protobufjs.Reader) ? protobufjs.Reader.create(inReader) : inReader
       const end = length === undefined ? reader.len : reader.pos + length
       const message = new OtherPkgMessage()
       while (reader.pos < end) {

@@ -47,12 +47,8 @@ describe('(v2) legacy compatibility', () => {
   })
 
   it('generates interfaces compatible with the legacy ones', () => {
-    type ITest_extends_LegacyITest = Foo.ITest extends LegacyFoo.ITest
-      ? true
-      : never
-    type LegacyITest_extends_ITest = LegacyFoo.ITest extends Foo.ITest
-      ? true
-      : never
+    type ITest_extends_LegacyITest = Foo.ITest extends LegacyFoo.ITest ? true : never
+    type LegacyITest_extends_ITest = LegacyFoo.ITest extends Foo.ITest ? true : never
 
     type GeneratesCompatibleInterfaces = ITest_extends_LegacyITest extends true
       ? LegacyITest_extends_ITest extends true

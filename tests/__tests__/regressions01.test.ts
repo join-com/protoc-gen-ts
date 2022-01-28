@@ -32,43 +32,27 @@ describe('regressions 01-02', () => {
     const project = new Project({ tsConfigFilePath: tsConfigPath })
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const regressionsFile = project.getSourceFile(
-      pathJoin(__dirname, 'generated', 'Regressions.ts')
-    )!
+    const regressionsFile = project.getSourceFile(pathJoin(__dirname, 'generated', 'Regressions.ts'))!
     expect(regressionsFile).toBeDefined()
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const moduleDeclaration = regressionsFile.getFirstChildByKind(
-      ts.SyntaxKind.ModuleDeclaration
-    )!
+    const moduleDeclaration = regressionsFile.getFirstChildByKind(ts.SyntaxKind.ModuleDeclaration)!
     expect(moduleDeclaration).toBeDefined()
     expect(moduleDeclaration.getName()).toBe('Regressions')
 
     // Here is where we verify the fix works as intended.
     // -------------------------------------------------------------------------
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const messageInterfaceWithDeprecatedField = moduleDeclaration.getInterface(
-      'IMessageWithDeprecatedField'
-    )!
+    const messageInterfaceWithDeprecatedField = moduleDeclaration.getInterface('IMessageWithDeprecatedField')!
     expect(messageInterfaceWithDeprecatedField).toBeDefined()
-    verifyThatDeprecatedFieldHasJSDocDeprecationAnnotation(
-      messageInterfaceWithDeprecatedField
-    )
-    verifyThatNotDeprecatedFieldDoesNotHaveJSDocAnnotation(
-      messageInterfaceWithDeprecatedField
-    )
+    verifyThatDeprecatedFieldHasJSDocDeprecationAnnotation(messageInterfaceWithDeprecatedField)
+    verifyThatNotDeprecatedFieldDoesNotHaveJSDocAnnotation(messageInterfaceWithDeprecatedField)
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const messageClassWithDeprecatedField = moduleDeclaration.getClass(
-      'MessageWithDeprecatedField'
-    )!
+    const messageClassWithDeprecatedField = moduleDeclaration.getClass('MessageWithDeprecatedField')!
     expect(messageClassWithDeprecatedField).toBeDefined()
-    verifyThatDeprecatedFieldHasJSDocDeprecationAnnotation(
-      messageClassWithDeprecatedField
-    )
-    verifyThatNotDeprecatedFieldDoesNotHaveJSDocAnnotation(
-      messageClassWithDeprecatedField
-    )
+    verifyThatDeprecatedFieldHasJSDocDeprecationAnnotation(messageClassWithDeprecatedField)
+    verifyThatNotDeprecatedFieldDoesNotHaveJSDocAnnotation(messageClassWithDeprecatedField)
 
     // Here we verify that the fix did not introduce any unintended regression.
     // -------------------------------------------------------------------------
@@ -76,28 +60,20 @@ describe('regressions 01-02', () => {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       moduleDeclaration.getInterface('IDeprecatedMessageWithDeprecatedField')!
     expect(deprecatedMessageInterfaceWithDeprecatedField).toBeDefined()
-    verifyThatDeprecatedFieldHasJSDocDeprecationAnnotation(
-      deprecatedMessageInterfaceWithDeprecatedField
-    )
-    verifyThatNotDeprecatedFieldDoesNotHaveJSDocAnnotation(
-      deprecatedMessageInterfaceWithDeprecatedField
-    )
+    verifyThatDeprecatedFieldHasJSDocDeprecationAnnotation(deprecatedMessageInterfaceWithDeprecatedField)
+    verifyThatNotDeprecatedFieldDoesNotHaveJSDocAnnotation(deprecatedMessageInterfaceWithDeprecatedField)
 
     const deprecatedMessageClassWithDeprecatedField =
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       moduleDeclaration.getClass('DeprecatedMessageWithDeprecatedField')!
     expect(deprecatedMessageClassWithDeprecatedField).toBeDefined()
-    verifyThatDeprecatedFieldHasJSDocDeprecationAnnotation(
-      deprecatedMessageClassWithDeprecatedField
-    )
-    verifyThatNotDeprecatedFieldDoesNotHaveJSDocAnnotation(
-      deprecatedMessageClassWithDeprecatedField
-    )
+    verifyThatDeprecatedFieldHasJSDocDeprecationAnnotation(deprecatedMessageClassWithDeprecatedField)
+    verifyThatNotDeprecatedFieldDoesNotHaveJSDocAnnotation(deprecatedMessageClassWithDeprecatedField)
   })
 })
 
 function verifyThatDeprecatedFieldHasJSDocDeprecationAnnotation(
-  generatedInterface: InterfaceDeclaration | ClassDeclaration
+  generatedInterface: InterfaceDeclaration | ClassDeclaration,
 ): void {
   const deprecatedField =
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -121,7 +97,7 @@ function verifyThatDeprecatedFieldHasJSDocDeprecationAnnotation(
 }
 
 function verifyThatNotDeprecatedFieldDoesNotHaveJSDocAnnotation(
-  generatedInterface: InterfaceDeclaration | ClassDeclaration
+  generatedInterface: InterfaceDeclaration | ClassDeclaration,
 ): void {
   const notDeprecatedField =
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

@@ -74,10 +74,7 @@ describe('(v2) interfaces', () => {
     // We don't directly compare Foo.ITest against TypesMap because all properties are optional
 
     type Match<A, B> = A extends B ? (B extends A ? true : never) : never
-    type IsOk<K extends keyof TypesMap & keyof Foo.ITest> = Match<
-      Foo.ITest[K],
-      TypesMap[K]
-    > extends true
+    type IsOk<K extends keyof TypesMap & keyof Foo.ITest> = Match<Foo.ITest[K], TypesMap[K]> extends true
       ? Match<NonNullable<Foo.ITest[K]>, NonNullable<TypesMap[K]>>
       : never
 

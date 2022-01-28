@@ -38,9 +38,7 @@ describe('(v2) classes', () => {
 
     expect(reconstructed.timestamp).not.toBeUndefined()
     expect(reconstructed.timestamp).not.toBeNull()
-    expect(testObj.timestamp?.getTime()).toEqual(
-      reconstructed.timestamp?.getTime()
-    )
+    expect(testObj.timestamp?.getTime()).toEqual(reconstructed.timestamp?.getTime())
   })
 
   it('undefined values are recovered as undefined', () => {

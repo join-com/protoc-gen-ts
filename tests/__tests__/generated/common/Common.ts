@@ -6,14 +6,12 @@ import * as protobufjs from 'protobufjs/light'
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Common {
-  const registerGrpcClass = <T extends protobufjs.Message<T>>(
-    typeName: string
-  ): protobufjs.TypeDecorator<T> => {
+  const registerGrpcClass = <T extends protobufjs.Message<T>>(typeName: string): protobufjs.TypeDecorator<T> => {
     if (protobufjs.util.decorateRoot.get(typeName) != null) {
       // eslint-disable-next-line @typescript-eslint/ban-types
       return (
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _: protobufjs.Constructor<T>
+        _: protobufjs.Constructor<T>,
       ): void => {
         // Do nothing
       }
@@ -59,25 +57,15 @@ export namespace Common {
       return message
     }
 
-    public static fromInterface(
-      this: void,
-      value: IOtherPkgMessage
-    ): OtherPkgMessage {
+    public static fromInterface(this: void, value: IOtherPkgMessage): OtherPkgMessage {
       return OtherPkgMessage.fromObject(value)
     }
 
-    public static decodePatched(
-      this: void,
-      reader: protobufjs.Reader | Uint8Array
-    ): IOtherPkgMessage {
+    public static decodePatched(this: void, reader: protobufjs.Reader | Uint8Array): IOtherPkgMessage {
       return OtherPkgMessage.decode(reader).asInterface()
     }
 
-    public static encodePatched(
-      this: void,
-      message: IOtherPkgMessage,
-      writer?: protobufjs.Writer
-    ): protobufjs.Writer {
+    public static encodePatched(this: void, message: IOtherPkgMessage, writer?: protobufjs.Writer): protobufjs.Writer {
       return OtherPkgMessage.encode(message, writer)
     }
   }

@@ -18,13 +18,8 @@ export namespace Foo {
   }
 
   export class Request implements IRequest {
-    public static decode(
-      inReader: Uint8Array | protobufjs.Reader,
-      length?: number
-    ) {
-      const reader = !(inReader instanceof protobufjs.Reader)
-        ? protobufjs.Reader.create(inReader)
-        : inReader
+    public static decode(inReader: Uint8Array | protobufjs.Reader, length?: number) {
+      const reader = !(inReader instanceof protobufjs.Reader) ? protobufjs.Reader.create(inReader) : inReader
       const end = length === undefined ? reader.len : reader.pos + length
       const message = new Request()
       while (reader.pos < end) {
@@ -63,14 +58,9 @@ export namespace Foo {
    * @deprecated
    */
   export class Nested implements INested {
-    public static decode(
-      inReader: Uint8Array | protobufjs.Reader,
-      length?: number
-    ) {
+    public static decode(inReader: Uint8Array | protobufjs.Reader, length?: number) {
       logger.warn('message Nested is deprecated')
-      const reader = !(inReader instanceof protobufjs.Reader)
-        ? protobufjs.Reader.create(inReader)
-        : inReader
+      const reader = !(inReader instanceof protobufjs.Reader) ? protobufjs.Reader.create(inReader) : inReader
       const end = length === undefined ? reader.len : reader.pos + length
       const message = new Nested()
       while (reader.pos < end) {
@@ -142,13 +132,8 @@ export namespace Foo {
   }
 
   export class Test implements ITest {
-    public static decode(
-      inReader: Uint8Array | protobufjs.Reader,
-      length?: number
-    ) {
-      const reader = !(inReader instanceof protobufjs.Reader)
-        ? protobufjs.Reader.create(inReader)
-        : inReader
+    public static decode(inReader: Uint8Array | protobufjs.Reader, length?: number) {
+      const reader = !(inReader instanceof protobufjs.Reader) ? protobufjs.Reader.create(inReader) : inReader
       const end = length === undefined ? reader.len : reader.pos + length
       const message = new Test()
       while (reader.pos < end) {
@@ -158,9 +143,7 @@ export namespace Foo {
             message.fieldInt32 = reader.int32()
             break
           case 2:
-            if (
-              !(message.fieldInt32Repeated && message.fieldInt32Repeated.length)
-            ) {
+            if (!(message.fieldInt32Repeated && message.fieldInt32Repeated.length)) {
               message.fieldInt32Repeated = []
             }
             if ((tag & 7) === 2) {
@@ -176,12 +159,7 @@ export namespace Foo {
             message.fieldDouble = reader.double()
             break
           case 4:
-            if (
-              !(
-                message.fieldDoubleRepeated &&
-                message.fieldDoubleRepeated.length
-              )
-            ) {
+            if (!(message.fieldDoubleRepeated && message.fieldDoubleRepeated.length)) {
               message.fieldDoubleRepeated = []
             }
             if ((tag & 7) === 2) {
@@ -197,9 +175,7 @@ export namespace Foo {
             message.fieldFloat = reader.float()
             break
           case 6:
-            if (
-              !(message.fieldFloatRepeated && message.fieldFloatRepeated.length)
-            ) {
+            if (!(message.fieldFloatRepeated && message.fieldFloatRepeated.length)) {
               message.fieldFloatRepeated = []
             }
             if ((tag & 7) === 2) {
@@ -215,12 +191,7 @@ export namespace Foo {
             message.fieldUint32 = reader.uint32()
             break
           case 8:
-            if (
-              !(
-                message.fieldUint32Repeated &&
-                message.fieldUint32Repeated.length
-              )
-            ) {
+            if (!(message.fieldUint32Repeated && message.fieldUint32Repeated.length)) {
               message.fieldUint32Repeated = []
             }
             if ((tag & 7) === 2) {
@@ -234,18 +205,10 @@ export namespace Foo {
             break
           case 9:
             const fieldUint64 = reader.uint64()
-            message.fieldUint64 = new protobufjs.util.LongBits(
-              fieldUint64.low >>> 0,
-              fieldUint64.high >>> 0
-            ).toNumber()
+            message.fieldUint64 = new protobufjs.util.LongBits(fieldUint64.low >>> 0, fieldUint64.high >>> 0).toNumber()
             break
           case 10:
-            if (
-              !(
-                message.fieldUint64Repeated &&
-                message.fieldUint64Repeated.length
-              )
-            ) {
+            if (!(message.fieldUint64Repeated && message.fieldUint64Repeated.length)) {
               message.fieldUint64Repeated = []
             }
             if ((tag & 7) === 2) {
@@ -255,17 +218,14 @@ export namespace Foo {
                 message.fieldUint64Repeated.push(
                   new protobufjs.util.LongBits(
                     fieldUint64Repeated.low >>> 0,
-                    fieldUint64Repeated.high >>> 0
-                  ).toNumber()
+                    fieldUint64Repeated.high >>> 0,
+                  ).toNumber(),
                 )
               }
             } else {
               const fieldUint64Repeated = reader.uint64()
               message.fieldUint64Repeated.push(
-                new protobufjs.util.LongBits(
-                  fieldUint64Repeated.low >>> 0,
-                  fieldUint64Repeated.high >>> 0
-                ).toNumber()
+                new protobufjs.util.LongBits(fieldUint64Repeated.low >>> 0, fieldUint64Repeated.high >>> 0).toNumber(),
               )
             }
             break
@@ -273,12 +233,7 @@ export namespace Foo {
             message.fieldSint32 = reader.sint32()
             break
           case 12:
-            if (
-              !(
-                message.fieldSint32Repeated &&
-                message.fieldSint32Repeated.length
-              )
-            ) {
+            if (!(message.fieldSint32Repeated && message.fieldSint32Repeated.length)) {
               message.fieldSint32Repeated = []
             }
             if ((tag & 7) === 2) {
@@ -293,18 +248,10 @@ export namespace Foo {
           case 13:
             logger.warn('field fieldSint64 is deprecated in Test')
             const fieldSint64 = reader.sint64()
-            message.fieldSint64 = new protobufjs.util.LongBits(
-              fieldSint64.low >>> 0,
-              fieldSint64.high >>> 0
-            ).toNumber()
+            message.fieldSint64 = new protobufjs.util.LongBits(fieldSint64.low >>> 0, fieldSint64.high >>> 0).toNumber()
             break
           case 14:
-            if (
-              !(
-                message.fieldSint64Repeated &&
-                message.fieldSint64Repeated.length
-              )
-            ) {
+            if (!(message.fieldSint64Repeated && message.fieldSint64Repeated.length)) {
               message.fieldSint64Repeated = []
             }
             if ((tag & 7) === 2) {
@@ -314,17 +261,14 @@ export namespace Foo {
                 message.fieldSint64Repeated.push(
                   new protobufjs.util.LongBits(
                     fieldSint64Repeated.low >>> 0,
-                    fieldSint64Repeated.high >>> 0
-                  ).toNumber()
+                    fieldSint64Repeated.high >>> 0,
+                  ).toNumber(),
                 )
               }
             } else {
               const fieldSint64Repeated = reader.sint64()
               message.fieldSint64Repeated.push(
-                new protobufjs.util.LongBits(
-                  fieldSint64Repeated.low >>> 0,
-                  fieldSint64Repeated.high >>> 0
-                ).toNumber()
+                new protobufjs.util.LongBits(fieldSint64Repeated.low >>> 0, fieldSint64Repeated.high >>> 0).toNumber(),
               )
             }
             break
@@ -332,12 +276,7 @@ export namespace Foo {
             message.fieldFixed32 = reader.fixed32()
             break
           case 16:
-            if (
-              !(
-                message.fieldFixed32Repeated &&
-                message.fieldFixed32Repeated.length
-              )
-            ) {
+            if (!(message.fieldFixed32Repeated && message.fieldFixed32Repeated.length)) {
               message.fieldFixed32Repeated = []
             }
             if ((tag & 7) === 2) {
@@ -353,16 +292,11 @@ export namespace Foo {
             const fieldFixed64 = reader.fixed64()
             message.fieldFixed64 = new protobufjs.util.LongBits(
               fieldFixed64.low >>> 0,
-              fieldFixed64.high >>> 0
+              fieldFixed64.high >>> 0,
             ).toNumber()
             break
           case 18:
-            if (
-              !(
-                message.fieldFixed64Repeated &&
-                message.fieldFixed64Repeated.length
-              )
-            ) {
+            if (!(message.fieldFixed64Repeated && message.fieldFixed64Repeated.length)) {
               message.fieldFixed64Repeated = []
             }
             if ((tag & 7) === 2) {
@@ -372,8 +306,8 @@ export namespace Foo {
                 message.fieldFixed64Repeated.push(
                   new protobufjs.util.LongBits(
                     fieldFixed64Repeated.low >>> 0,
-                    fieldFixed64Repeated.high >>> 0
-                  ).toNumber()
+                    fieldFixed64Repeated.high >>> 0,
+                  ).toNumber(),
                 )
               }
             } else {
@@ -381,8 +315,8 @@ export namespace Foo {
               message.fieldFixed64Repeated.push(
                 new protobufjs.util.LongBits(
                   fieldFixed64Repeated.low >>> 0,
-                  fieldFixed64Repeated.high >>> 0
-                ).toNumber()
+                  fieldFixed64Repeated.high >>> 0,
+                ).toNumber(),
               )
             }
             break
@@ -390,12 +324,7 @@ export namespace Foo {
             message.fieldSfixed32 = reader.sfixed32()
             break
           case 20:
-            if (
-              !(
-                message.fieldSfixed32Repeated &&
-                message.fieldSfixed32Repeated.length
-              )
-            ) {
+            if (!(message.fieldSfixed32Repeated && message.fieldSfixed32Repeated.length)) {
               message.fieldSfixed32Repeated = []
             }
             if ((tag & 7) === 2) {
@@ -411,16 +340,11 @@ export namespace Foo {
             const fieldSfixed64 = reader.sfixed64()
             message.fieldSfixed64 = new protobufjs.util.LongBits(
               fieldSfixed64.low >>> 0,
-              fieldSfixed64.high >>> 0
+              fieldSfixed64.high >>> 0,
             ).toNumber()
             break
           case 22:
-            if (
-              !(
-                message.fieldSfixed64Repeated &&
-                message.fieldSfixed64Repeated.length
-              )
-            ) {
+            if (!(message.fieldSfixed64Repeated && message.fieldSfixed64Repeated.length)) {
               message.fieldSfixed64Repeated = []
             }
             if ((tag & 7) === 2) {
@@ -430,8 +354,8 @@ export namespace Foo {
                 message.fieldSfixed64Repeated.push(
                   new protobufjs.util.LongBits(
                     fieldSfixed64Repeated.low >>> 0,
-                    fieldSfixed64Repeated.high >>> 0
-                  ).toNumber()
+                    fieldSfixed64Repeated.high >>> 0,
+                  ).toNumber(),
                 )
               }
             } else {
@@ -439,8 +363,8 @@ export namespace Foo {
               message.fieldSfixed64Repeated.push(
                 new protobufjs.util.LongBits(
                   fieldSfixed64Repeated.low >>> 0,
-                  fieldSfixed64Repeated.high >>> 0
-                ).toNumber()
+                  fieldSfixed64Repeated.high >>> 0,
+                ).toNumber(),
               )
             }
             break
@@ -448,9 +372,7 @@ export namespace Foo {
             message.fieldBool = reader.bool()
             break
           case 24:
-            if (
-              !(message.fieldBoolRepeated && message.fieldBoolRepeated.length)
-            ) {
+            if (!(message.fieldBoolRepeated && message.fieldBoolRepeated.length)) {
               message.fieldBoolRepeated = []
             }
             if ((tag & 7) === 2) {
@@ -466,12 +388,7 @@ export namespace Foo {
             message.fieldString = reader.string()
             break
           case 26:
-            if (
-              !(
-                message.fieldStringRepeated &&
-                message.fieldStringRepeated.length
-              )
-            ) {
+            if (!(message.fieldStringRepeated && message.fieldStringRepeated.length)) {
               message.fieldStringRepeated = []
             }
             message.fieldStringRepeated.push(reader.string())
@@ -480,15 +397,13 @@ export namespace Foo {
             message.fieldBytes = new Uint8Array(reader.bytes())
             break
           case 28:
-            if (
-              !(message.fieldBytesRepeated && message.fieldBytesRepeated.length)
-            ) {
+            if (!(message.fieldBytesRepeated && message.fieldBytesRepeated.length)) {
               message.fieldBytesRepeated = []
             }
             message.fieldBytesRepeated.push(new Uint8Array(reader.bytes()))
             break
           case 29:
-            message.fieldEnum = ((val) => {
+            message.fieldEnum = (val => {
               switch (val) {
                 case 0:
                   return 'UNKNOWN'
@@ -502,15 +417,13 @@ export namespace Foo {
             })(reader.int32())
             break
           case 30:
-            if (
-              !(message.fieldEnumRepeated && message.fieldEnumRepeated.length)
-            ) {
+            if (!(message.fieldEnumRepeated && message.fieldEnumRepeated.length)) {
               message.fieldEnumRepeated = []
             }
             if ((tag & 7) === 2) {
               const end2 = reader.uint32() + reader.pos
               while (reader.pos < end2) {
-                const fieldEnumRepeated = ((val) => {
+                const fieldEnumRepeated = (val => {
                   switch (val) {
                     case 0:
                       return 'VIEW'
@@ -525,7 +438,7 @@ export namespace Foo {
                 }
               }
             } else {
-              const fieldEnumRepeated = ((val) => {
+              const fieldEnumRepeated = (val => {
                 switch (val) {
                   case 0:
                     return 'VIEW'
@@ -550,61 +463,33 @@ export namespace Foo {
             message.messageRepeated.push(Nested.decode(reader, reader.uint32()))
             break
           case 35:
-            const timestamp = GoogleProtobuf.Timestamp.decode(
-              reader,
-              reader.uint32()
-            )
-            message.timestamp = new Date(
-              (timestamp.seconds || 0) * 1000 + (timestamp.nanos || 0) / 1000000
-            )
+            const timestamp = GoogleProtobuf.Timestamp.decode(reader, reader.uint32())
+            message.timestamp = new Date((timestamp.seconds || 0) * 1000 + (timestamp.nanos || 0) / 1000000)
             break
           case 36:
-            if (
-              !(message.timestampRepeated && message.timestampRepeated.length)
-            ) {
+            if (!(message.timestampRepeated && message.timestampRepeated.length)) {
               message.timestampRepeated = []
             }
-            const timestampRepeated = GoogleProtobuf.Timestamp.decode(
-              reader,
-              reader.uint32()
-            )
+            const timestampRepeated = GoogleProtobuf.Timestamp.decode(reader, reader.uint32())
             message.timestampRepeated.push(
-              new Date(
-                (timestampRepeated.seconds || 0) * 1000 +
-                  (timestampRepeated.nanos || 0) / 1000000
-              )
+              new Date((timestampRepeated.seconds || 0) * 1000 + (timestampRepeated.nanos || 0) / 1000000),
             )
             break
           case 37:
-            message.otherPkgMessage = Common.OtherPkgMessage.decode(
-              reader,
-              reader.uint32()
-            )
+            message.otherPkgMessage = Common.OtherPkgMessage.decode(reader, reader.uint32())
             break
           case 38:
-            if (
-              !(
-                message.otherPkgMessageRepeated &&
-                message.otherPkgMessageRepeated.length
-              )
-            ) {
+            if (!(message.otherPkgMessageRepeated && message.otherPkgMessageRepeated.length)) {
               message.otherPkgMessageRepeated = []
             }
-            message.otherPkgMessageRepeated.push(
-              Common.OtherPkgMessage.decode(reader, reader.uint32())
-            )
+            message.otherPkgMessageRepeated.push(Common.OtherPkgMessage.decode(reader, reader.uint32()))
             break
           case 39:
             const fieldInt64 = reader.int64()
-            message.fieldInt64 = new protobufjs.util.LongBits(
-              fieldInt64.low >>> 0,
-              fieldInt64.high >>> 0
-            ).toNumber()
+            message.fieldInt64 = new protobufjs.util.LongBits(fieldInt64.low >>> 0, fieldInt64.high >>> 0).toNumber()
             break
           case 40:
-            if (
-              !(message.fieldInt64Repeated && message.fieldInt64Repeated.length)
-            ) {
+            if (!(message.fieldInt64Repeated && message.fieldInt64Repeated.length)) {
               message.fieldInt64Repeated = []
             }
             if ((tag & 7) === 2) {
@@ -612,19 +497,13 @@ export namespace Foo {
               while (reader.pos < end2) {
                 const fieldInt64Repeated = reader.int64()
                 message.fieldInt64Repeated.push(
-                  new protobufjs.util.LongBits(
-                    fieldInt64Repeated.low >>> 0,
-                    fieldInt64Repeated.high >>> 0
-                  ).toNumber()
+                  new protobufjs.util.LongBits(fieldInt64Repeated.low >>> 0, fieldInt64Repeated.high >>> 0).toNumber(),
                 )
               }
             } else {
               const fieldInt64Repeated = reader.int64()
               message.fieldInt64Repeated.push(
-                new protobufjs.util.LongBits(
-                  fieldInt64Repeated.low >>> 0,
-                  fieldInt64Repeated.high >>> 0
-                ).toNumber()
+                new protobufjs.util.LongBits(fieldInt64Repeated.low >>> 0, fieldInt64Repeated.high >>> 0).toNumber(),
               )
             }
             break
@@ -791,7 +670,7 @@ export namespace Foo {
         }
       }
       if (this.fieldEnum != null) {
-        const fieldEnum = ((val) => {
+        const fieldEnum = (val => {
           switch (val) {
             case 'UNKNOWN':
               return 0
@@ -809,7 +688,7 @@ export namespace Foo {
       }
       if (this.fieldEnumRepeated != null) {
         for (const value of this.fieldEnumRepeated) {
-          const fieldEnumRepeated = ((val) => {
+          const fieldEnumRepeated = (val => {
             switch (val) {
               case 'VIEW':
                 return 0
@@ -888,13 +767,11 @@ export namespace Foo {
       responseStream: false,
       requestType: Request,
       responseType: Common.OtherPkgMessage,
-      requestSerialize: (args: IRequest) =>
-        new Request(args).encode().finish() as Buffer,
+      requestSerialize: (args: IRequest) => new Request(args).encode().finish() as Buffer,
       requestDeserialize: (argBuf: Buffer) => Request.decode(argBuf),
       responseSerialize: (args: Common.IOtherPkgMessage) =>
         new Common.OtherPkgMessage(args).encode().finish() as Buffer,
-      responseDeserialize: (argBuf: Buffer) =>
-        Common.OtherPkgMessage.decode(argBuf),
+      responseDeserialize: (argBuf: Buffer) => Common.OtherPkgMessage.decode(argBuf),
     },
     findClientStream: {
       path: '/Users/FindClientStream',
@@ -902,13 +779,11 @@ export namespace Foo {
       responseStream: false,
       requestType: Request,
       responseType: Common.OtherPkgMessage,
-      requestSerialize: (args: IRequest) =>
-        new Request(args).encode().finish() as Buffer,
+      requestSerialize: (args: IRequest) => new Request(args).encode().finish() as Buffer,
       requestDeserialize: (argBuf: Buffer) => Request.decode(argBuf),
       responseSerialize: (args: Common.IOtherPkgMessage) =>
         new Common.OtherPkgMessage(args).encode().finish() as Buffer,
-      responseDeserialize: (argBuf: Buffer) =>
-        Common.OtherPkgMessage.decode(argBuf),
+      responseDeserialize: (argBuf: Buffer) => Common.OtherPkgMessage.decode(argBuf),
     },
     findServerStream: {
       path: '/Users/FindServerStream',
@@ -916,13 +791,11 @@ export namespace Foo {
       responseStream: true,
       requestType: Request,
       responseType: Common.OtherPkgMessage,
-      requestSerialize: (args: IRequest) =>
-        new Request(args).encode().finish() as Buffer,
+      requestSerialize: (args: IRequest) => new Request(args).encode().finish() as Buffer,
       requestDeserialize: (argBuf: Buffer) => Request.decode(argBuf),
       responseSerialize: (args: Common.IOtherPkgMessage) =>
         new Common.OtherPkgMessage(args).encode().finish() as Buffer,
-      responseDeserialize: (argBuf: Buffer) =>
-        Common.OtherPkgMessage.decode(argBuf),
+      responseDeserialize: (argBuf: Buffer) => Common.OtherPkgMessage.decode(argBuf),
     },
     findBidiStream: {
       path: '/Users/FindBidiStream',
@@ -930,13 +803,11 @@ export namespace Foo {
       responseStream: true,
       requestType: Request,
       responseType: Common.OtherPkgMessage,
-      requestSerialize: (args: IRequest) =>
-        new Request(args).encode().finish() as Buffer,
+      requestSerialize: (args: IRequest) => new Request(args).encode().finish() as Buffer,
       requestDeserialize: (argBuf: Buffer) => Request.decode(argBuf),
       responseSerialize: (args: Common.IOtherPkgMessage) =>
         new Common.OtherPkgMessage(args).encode().finish() as Buffer,
-      responseDeserialize: (argBuf: Buffer) =>
-        Common.OtherPkgMessage.decode(argBuf),
+      responseDeserialize: (argBuf: Buffer) => Common.OtherPkgMessage.decode(argBuf),
     },
   }
 
@@ -944,24 +815,18 @@ export namespace Foo {
     /**
      * @deprecated
      */
-    find(
-      call: grpcts.grpc.ServerUnaryCall<IRequest>
-    ): Promise<Common.IOtherPkgMessage>
+    find(call: grpcts.grpc.ServerUnaryCall<IRequest>): Promise<Common.IOtherPkgMessage>
     find(
       call: grpcts.grpc.ServerUnaryCall<IRequest>,
-      callback: grpcts.grpc.sendUnaryData<Common.IOtherPkgMessage>
+      callback: grpcts.grpc.sendUnaryData<Common.IOtherPkgMessage>,
     ): void
-    findClientStream(
-      call: grpcts.grpc.ServerReadableStream<IRequest>
-    ): Promise<Common.IOtherPkgMessage>
+    findClientStream(call: grpcts.grpc.ServerReadableStream<IRequest>): Promise<Common.IOtherPkgMessage>
     findClientStream(
       call: grpcts.grpc.ServerReadableStream<IRequest>,
-      callback: grpcts.grpc.sendUnaryData<Common.IOtherPkgMessage>
+      callback: grpcts.grpc.sendUnaryData<Common.IOtherPkgMessage>,
     ): void
     findServerStream(call: grpcts.grpc.ServerWriteableStream<IRequest>): void
-    findBidiStream(
-      call: grpcts.grpc.ServerDuplexStream<IRequest, Common.IOtherPkgMessage>
-    ): void
+    findBidiStream(call: grpcts.grpc.ServerDuplexStream<IRequest, Common.IOtherPkgMessage>): void
   }
 
   export type ClientConfig = Omit<grpcts.Config, 'definition'>
@@ -975,30 +840,16 @@ export namespace Foo {
      */
     public find(req: IRequest, metadata?: grpcts.Metadata) {
       logger.warn('method Find is deprecated')
-      return super.makeUnaryRequest<IRequest, Common.IOtherPkgMessage>(
-        'find',
-        req,
-        metadata
-      )
+      return super.makeUnaryRequest<IRequest, Common.IOtherPkgMessage>('find', req, metadata)
     }
     public findClientStream(metadata?: grpcts.Metadata) {
-      return super.makeClientStreamRequest<IRequest, Common.IOtherPkgMessage>(
-        'findClientStream',
-        metadata
-      )
+      return super.makeClientStreamRequest<IRequest, Common.IOtherPkgMessage>('findClientStream', metadata)
     }
     public findServerStream(req: IRequest, metadata?: grpcts.Metadata) {
-      return super.makeServerStreamRequest<IRequest, Common.IOtherPkgMessage>(
-        'findServerStream',
-        req,
-        metadata
-      )
+      return super.makeServerStreamRequest<IRequest, Common.IOtherPkgMessage>('findServerStream', req, metadata)
     }
     public findBidiStream(metadata?: grpcts.Metadata) {
-      return super.makeBidiStreamRequest<IRequest, Common.IOtherPkgMessage>(
-        'findBidiStream',
-        metadata
-      )
+      return super.makeBidiStreamRequest<IRequest, Common.IOtherPkgMessage>('findBidiStream', metadata)
     }
   }
 }

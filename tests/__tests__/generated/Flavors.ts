@@ -1,5 +1,5 @@
 // GENERATED CODE -- DO NOT EDIT!
-// GENERATOR VERSION: 2.1.0.d41be8f.1643383265
+// GENERATOR VERSION: 2.1.0.f1fa0f2.1644588877
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import * as joinGRPC from '@join-com/grpc'
@@ -133,14 +133,17 @@ export namespace Flavors {
   }
 
   export abstract class AbstractUsersService extends joinGRPC.Service<IUsersServiceImplementation> {
-    constructor(protected readonly logger?: joinGRPC.INoDebugLogger, trace?: joinGRPC.IServiceTrace) {
+    constructor(
+      protected readonly logger?: joinGRPC.INoDebugLogger,
+      protected readonly errorHandler?: joinGRPC.IServiceErrorHandler,
+    ) {
       super(
         usersServiceDefinition,
         {
           find: call => this.Find(call),
         },
         logger,
-        trace,
+        errorHandler,
       )
     }
 

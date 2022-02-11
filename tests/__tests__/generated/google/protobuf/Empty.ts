@@ -1,5 +1,5 @@
 // GENERATED CODE -- DO NOT EDIT!
-// GENERATOR VERSION: 2.1.0.d41be8f.1643383265
+// GENERATOR VERSION: 2.1.0.f1fa0f2.1644588877
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import * as protobufjs from 'protobufjs/light'

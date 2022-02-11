@@ -105,7 +105,7 @@ func (r *Runner) generateTypescriptServiceAbstractClass(generatedFileStream *pro
 
 	r.P(
 		generatedFileStream,
-		"constructor(protected readonly logger?: joinGRPC.INoDebugLogger, trace?: joinGRPC.IServiceTrace) {",
+		"constructor(protected readonly logger?: joinGRPC.INoDebugLogger, protected readonly errorHandler?: joinGRPC.IServiceErrorHandler) {",
 		"  super(",
 		"    "+strcase.ToLowerCamel(serviceSpec.GetName())+"ServiceDefinition,",
 		"    {",
@@ -124,7 +124,7 @@ func (r *Runner) generateTypescriptServiceAbstractClass(generatedFileStream *pro
 	r.P(generatedFileStream,
 		"    },",
 		"    logger,",
-		"    trace,",
+		"    errorHandler,",
 		"  )",
 		"}\n",
 	)

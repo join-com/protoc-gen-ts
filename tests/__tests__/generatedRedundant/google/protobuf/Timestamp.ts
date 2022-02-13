@@ -1,20 +1,11 @@
 // GENERATED CODE -- DO NOT EDIT!
-// GENERATOR VERSION: 2.1.0.d41be8f.1643383265
+// GENERATOR VERSION: 2.1.0.5feef43.1644781028
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import * as protobufjs from 'protobufjs/light'
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace GoogleProtobuf {
-  const registerCommonClass = <T extends protobufjs.Message<T>>(typeName: string): protobufjs.TypeDecorator<T> => {
-    const registeredType = protobufjs.util.decorateRoot.get(typeName)
-    if (registeredType == null) {
-      return protobufjs.Type.d(typeName)
-    }
-    return (ctor: protobufjs.Constructor<T>): void => {
-      Object.defineProperty(ctor, '$type', { value: registeredType, enumerable: false })
-    }
-  }
   interface ConvertibleTo<T> {
     asInterface(): T
   }
@@ -24,7 +15,7 @@ export namespace GoogleProtobuf {
     nanos?: number
   }
 
-  @registerCommonClass('google_protobuf_Timestamp')
+  @protobufjs.Type.d('google_protobuf_Timestamp')
   export class Timestamp extends protobufjs.Message<Timestamp> implements ConvertibleTo<ITimestamp>, ITimestamp {
     @protobufjs.Field.d(1, 'int64', 'optional')
     public seconds?: number

@@ -123,7 +123,9 @@ func (r *Runner) generateTypescriptNamespace(generatedFileStream *protogen.Gener
 	)
 	r.indentLevel += 2
 
-	r.generateTypescriptClassDecoratorDefinition(generatedFileStream, protoFile)
+	if r.currentPackage == "google.protobuf" {
+		r.generateTypescriptCommonPackageDecoratorDefinition(generatedFileStream, protoFile)
+	}
 
 	// This interface is namespace-private, as it's being replicated for every generated file
 	r.P(
@@ -146,22 +148,17 @@ func (r *Runner) generateTypescriptNamespace(generatedFileStream *protogen.Gener
 	r.P(generatedFileStream, "\n}")
 }
 
-func (r *Runner) generateTypescriptClassDecoratorDefinition(generatedFileStream *protogen.GeneratedFile, protoFile *protogen.File) {
+func (r *Runner) generateTypescriptCommonPackageDecoratorDefinition(generatedFileStream *protogen.GeneratedFile, protoFile *protogen.File) {
 	r.P(
 		generatedFileStream,
-		"const registerGrpcClass = <T extends protobufjs.Message<T>>(",
-		"  typeName: string",
-		"): protobufjs.TypeDecorator<T> => {",
-		"  if (protobufjs.util.decorateRoot.get(typeName) != null) {",
-		"    // eslint-disable-next-line @typescript-eslint/ban-types",
-		"    return (",
-		"      // eslint-disable-next-line @typescript-eslint/no-unused-vars",
-		"      _: protobufjs.Constructor<T>",
-		"    ): void => {",
-		"      // Do nothing",
-		"    }",
+		"const registerCommonClass = <T extends protobufjs.Message<T>>(typeName: string): protobufjs.TypeDecorator<T> => {",
+		"  const registeredType = protobufjs.util.decorateRoot.get(typeName)",
+		"  if (registeredType == null) {",
+		"    return protobufjs.Type.d(typeName)",
 		"  }",
-		"  return protobufjs.Type.d(typeName)",
+		"  return (ctor: protobufjs.Constructor<T>): void => {",
+		"    Object.defineProperty(ctor, '$type', { value: registeredType, enumerable: false })",
+		"  }",
 		"}",
 	)
 }

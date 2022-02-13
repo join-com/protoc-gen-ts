@@ -77,6 +77,7 @@ message UserProfile {
 ## Develop
 
 1. Follow [instructions](https://golang.org/doc/install) to install Go and add /usr/local/go/bin to the PATH environment variable
-2. Clone and navigate to repository and build package with `go install .`
-3. Inside `integrationTests` file run `yarn proto:build` to generate files for test proto files
-4. `yarn test` to run tests
+2. Run `./build.sh` to compile the package
+3. Or navigate to `tests` folder and run `yarn compile`
+4. Run `yarn proto:build:package(1/2/3)` to generate one of the packages for tests
+5. Run `yarn test` to run tests

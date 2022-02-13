@@ -123,10 +123,6 @@ func (r *Runner) generateTypescriptNamespace(generatedFileStream *protogen.Gener
 	)
 	r.indentLevel += 2
 
-	if r.currentPackage == "google.protobuf" {
-		r.generateTypescriptCommonPackageDecoratorDefinition(generatedFileStream, protoFile)
-	}
-
 	// This interface is namespace-private, as it's being replicated for every generated file
 	r.P(
 		generatedFileStream,
@@ -146,21 +142,6 @@ func (r *Runner) generateTypescriptNamespace(generatedFileStream *protogen.Gener
 	r.currentPackage = ""
 	r.indentLevel -= 2
 	r.P(generatedFileStream, "\n}")
-}
-
-func (r *Runner) generateTypescriptCommonPackageDecoratorDefinition(generatedFileStream *protogen.GeneratedFile, protoFile *protogen.File) {
-	r.P(
-		generatedFileStream,
-		"const registerCommonClass = <T extends protobufjs.Message<T>>(typeName: string): protobufjs.TypeDecorator<T> => {",
-		"  const registeredType = protobufjs.util.decorateRoot.get(typeName)",
-		"  if (registeredType == null) {",
-		"    return protobufjs.Type.d(typeName)",
-		"  }",
-		"  return (ctor: protobufjs.Constructor<T>): void => {",
-		"    Object.defineProperty(ctor, '$type', { value: registeredType, enumerable: false })",
-		"  }",
-		"}",
-	)
 }
 
 func (r *Runner) generateTypescriptFlavors(generatedFileStream *protogen.GeneratedFile, protoFile *protogen.File) {

@@ -1,5 +1,5 @@
 import { Server, grpc } from '@join-com/grpc'
-import { Foo } from './generated/Test'
+import { Foo } from './package1/generated/Test'
 
 class SimpleTestService extends Foo.AbstractSimpleTestService {
   public async ForwardParameter(

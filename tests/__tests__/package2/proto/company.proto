@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package companies;
+
+// Makes protoc happy (useful for Golang code generation, not for TS)
+option go_package = "github.com/join-com/protoc-gen-ts/foo";
+
+import "google/protobuf/timestamp.proto";
+
+service Companies {
+  rpc FindById(FindByIdRequest) returns (FindByIdResponse) {}
+}
+
+message Company {
+  int32 id = 1;
+  string name = 2;
+  google.protobuf.Timestamp created_at = 3;
+}
+
+message FindByIdRequest {
+  int32 id = 1;
+}
+
+message FindByIdResponse {
+  Company company = 1;
+}

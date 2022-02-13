@@ -1,5 +1,5 @@
-import { Common } from './generated/common/Common'
-import { Foo } from './generated/Test'
+import { Common } from './package1/generated/common/Common'
+import { Foo } from './package1/generated/Test'
 
 type TypesMap = {
   // Booleans

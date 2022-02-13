@@ -1,6 +1,6 @@
-import { Common } from './generated/common/Extra'
-import { Flavors } from './generated/Flavors'
-import { Foo } from './generated/Test'
+import { Common } from './package1/generated/common/Extra'
+import { Flavors } from './package1/generated/Flavors'
+import { Foo } from './package1/generated/Test'
 import { WithFlavor } from '@coderspirit/nominal'
 
 describe('(v2) custom options', () => {

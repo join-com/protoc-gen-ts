@@ -1,5 +1,5 @@
-import { Foo } from './generated/Test'
-import { Foo as LegacyFoo } from './generatedLegacy/Test'
+import { Foo } from './package1/generated/Test'
+import { Foo as LegacyFoo } from './package1/generatedLegacy/Test'
 
 describe('(v2) legacy compatibility', () => {
   const request: Foo.IRequest = { id: 42 }

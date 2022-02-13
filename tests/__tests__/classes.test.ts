@@ -1,4 +1,4 @@
-import { Foo } from './generated/Test'
+import { Foo } from './package1/generated/Test'
 
 describe('(v2) classes', () => {
   const request: Foo.IRequest = { id: 42 }

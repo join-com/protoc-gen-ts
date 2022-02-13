@@ -9,11 +9,13 @@
     "lint:eslint": "eslint . --ext .ts --max-warnings 0",
     "lint:tsc": "tsc --noEmit && eslint",
     "test": "export PATH=\"${PWD}/../dist:${PATH}\" && jest --runInBand --forceExit",
-    "proto:build": "yarn proto:clean && yarn proto:generate && yarn proto:prettier && yarn proto:clone",
-    "proto:clean": "find __tests__/generated ! -name 'tslint.json' ! -name '.prettierrc' -type f -exec rm -f {} +",
-    "proto:generate": "export PATH=\"${PWD}/../dist:${PATH}\" && protoc __tests__/proto/*.proto -I __tests__/proto --tsx_out=\"${PWD}/__tests__/generated\"",
-    "proto:prettier": "prettier --write '__tests__/generated/**/*.ts'",
-    "proto:clone": "rm -rf __tests__/generatedRedundant && cp -R __tests__/generated __tests__/generatedRedundant && echo 'For regression tests' > __tests__/generatedRedundant/README"
+    "proto:build": "yarn proto:clean && yarn proto:generate && yarn proto:prettier",
+    "proto:clean": "find __tests__/$PACKAGE/generated ! -name 'tslint.json' ! -name '.prettierrc' -type f -exec rm -f {} +",
+    "proto:generate": "export PATH=\"${PWD}/../dist:${PATH}\" && protoc __tests__/$PACKAGE/proto/*.proto -I __tests__/$PACKAGE/proto --tsx_out=\"${PWD}/__tests__/$PACKAGE/generated\"",
+    "proto:prettier": "prettier --write \"__tests__/$PACKAGE/generated/**/*.ts\"",
+    "proto:build:package1": "PACKAGE=package1 yarn proto:build",
+    "proto:build:package2": "PACKAGE=package2 yarn proto:build",
+    "proto:build:package3": "PACKAGE=package3 yarn proto:build"
   },
   "dependencies": {
     "@coderspirit/nominal": "^3.0.0",

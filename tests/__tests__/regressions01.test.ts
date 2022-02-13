@@ -2,7 +2,7 @@
 import * as ts from 'typescript'
 // eslint-disable-next-line node/no-unpublished-import
 import { ClassDeclaration, InterfaceDeclaration, Project } from 'ts-morph'
-import { Regressions } from './generated/Regressions'
+import { Regressions } from './package1/generated/Regressions'
 // eslint-disable-next-line node/no-unpublished-import
 import { parse as parseComment } from 'comment-parser'
 import { join as pathJoin } from 'path'
@@ -32,7 +32,7 @@ describe('regressions 01-02', () => {
     const project = new Project({ tsConfigFilePath: tsConfigPath })
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const regressionsFile = project.getSourceFile(pathJoin(__dirname, 'generated', 'Regressions.ts'))!
+    const regressionsFile = project.getSourceFile(pathJoin(__dirname, 'package1/generated', 'Regressions.ts'))!
     expect(regressionsFile).toBeDefined()
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

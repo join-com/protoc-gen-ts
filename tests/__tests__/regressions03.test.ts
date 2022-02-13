@@ -1,14 +1,21 @@
-// The real test is here: we want to ensure that redundant imports don't cause an error.
-import { GoogleProtobuf as gp1 } from './generated/google/protobuf/Timestamp'
-import { GoogleProtobuf as gp2 } from './generatedRedundant/google/protobuf/Timestamp'
+/**
+ * The real test is here: we want to ensure that multiple imports having google Timestamp field do not throw
+ * `duplicate name 'Timestamp' in Root` error
+ */
+import { Companies } from './package2'
+import { Foo } from './package1'
+import { Jobs } from './package3'
 
 describe('regressions 03', () => {
   it('dummy test', () => {
     // This test has code only to ensure that the linters don't complain because of unused imports.
-    const _ts1 = gp1.Timestamp.fromInterface({ seconds: 0, nanos: 0 })
-    const _ts2 = gp2.Timestamp.fromInterface({ seconds: 0, nanos: 0 })
+    const _ts1 = Companies.Company.fromInterface({ id: 1 })
+    expect(_ts1.asInterface()).toEqual({ id: 1 })
 
-    expect(_ts1.asInterface().seconds).toEqual(_ts2.asInterface().seconds)
-    expect(_ts1.asInterface().nanos).toEqual(_ts2.asInterface().nanos)
+    const _ts2 = Jobs.Job.fromInterface({ id: 2 })
+    expect(_ts2.asInterface()).toEqual({ id: 2 })
+
+    const _ts3 = Foo.Test.fromInterface({ fieldInt32: 3 })
+    expect(_ts3.asInterface()).toEqual({ fieldInt32: 3 })
   })
 })

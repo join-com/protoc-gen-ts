@@ -1,5 +1,5 @@
 // GENERATED CODE -- DO NOT EDIT!
-// GENERATOR VERSION: 2.1.0.d41be8f.1643383265
+// GENERATOR VERSION: 2.1.0.52c4a08.1645020547
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import * as joinGRPC from '@join-com/grpc'
@@ -552,7 +552,10 @@ export namespace Foo {
   }
 
   export abstract class AbstractUsersService extends joinGRPC.Service<IUsersServiceImplementation> {
-    constructor(protected readonly logger?: joinGRPC.INoDebugLogger, trace?: joinGRPC.IServiceTrace) {
+    constructor(
+      protected readonly logger?: joinGRPC.INoDebugLogger,
+      protected readonly errorHandler?: joinGRPC.IServiceErrorHandler,
+    ) {
       super(
         usersServiceDefinition,
         {
@@ -562,7 +565,7 @@ export namespace Foo {
           findServerStream: call => this.FindServerStream(call),
         },
         logger,
-        trace,
+        errorHandler,
       )
     }
 
@@ -608,7 +611,10 @@ export namespace Foo {
   }
 
   export abstract class AbstractSimpleTestService extends joinGRPC.Service<ISimpleTestServiceImplementation> {
-    constructor(protected readonly logger?: joinGRPC.INoDebugLogger, trace?: joinGRPC.IServiceTrace) {
+    constructor(
+      protected readonly logger?: joinGRPC.INoDebugLogger,
+      protected readonly errorHandler?: joinGRPC.IServiceErrorHandler,
+    ) {
       super(
         simpleTestServiceDefinition,
         {
@@ -616,7 +622,7 @@ export namespace Foo {
           getEmptyResult: call => this.GetEmptyResult(call),
         },
         logger,
-        trace,
+        errorHandler,
       )
     }
 

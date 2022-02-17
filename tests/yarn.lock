@@ -309,7 +309,7 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@coderspirit/nominal@^3.0.0":
+"@coderspirit/nominal@3.0.0", "@coderspirit/nominal@^3.0.0":
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/@coderspirit/nominal/-/nominal-3.0.0.tgz#49e4f664b0ea601911b484ccd73ee285fe494f2f"
   integrity sha512-z/95nEg07AqoAY8KEhd8p5k5spmXAsRYIcnsfZYzee6pVdn4anC1S900SClU9ISO1lGQELl950l6l4aWT6ke4w==
@@ -329,12 +329,24 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@grpc/grpc-js@^1.3.4":
-  version "1.3.7"
-  resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-1.3.7.tgz#58b687aff93b743aafde237fd2ee9a3259d7f2d8"
-  integrity sha512-CKQVuwuSPh40tgOkR7c0ZisxYRiN05PcKPW72mQL5y++qd7CwBRoaJZvU5xfXnCJDFBmS3qZGQ71Frx6Ofo2XA==
+"@grpc/grpc-js@^1.5.4":
+  version "1.5.5"
+  resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-1.5.5.tgz#f850a1bb7de8a1d0bb4821aabd3655d1c928d4c6"
+  integrity sha512-FTd27ItHlsSG/7hp62xgI9YnqSwRbHRSVmDVR8DwOoC+6t8JhHRXe2JL0U8N9GLc0jS0HrtEbO/KP5+G0ebjLQ==
   dependencies:
+    "@grpc/proto-loader" "^0.6.4"
     "@types/node" ">=12.12.47"
+
+"@grpc/proto-loader@^0.6.4":
+  version "0.6.9"
+  resolved "https://registry.yarnpkg.com/@grpc/proto-loader/-/proto-loader-0.6.9.tgz#4014eef366da733f8e04a9ddd7376fe8a58547b7"
+  integrity sha512-UlcCS8VbsU9d3XTXGiEVFonN7hXk+oMXZtoHHG2oSA1/GcDP1q6OUgs20PzHDGizzyi8ufGSUDlk3O2NyY7leg==
+  dependencies:
+    "@types/long" "^4.0.1"
+    lodash.camelcase "^4.3.0"
+    long "^4.0.0"
+    protobufjs "^6.10.0"
+    yargs "^16.2.0"
 
 "@humanwhocodes/config-array@^0.5.0":
   version "0.5.0"
@@ -610,13 +622,13 @@
   dependencies:
     grpc "^1.24.5"
 
-"@join-com/grpc@^2.0.2":
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/@join-com/grpc/-/grpc-2.1.1.tgz#9ab6db4760ee340ee20e127960b645acfa6f3ed3"
-  integrity sha512-EDop0TeP2/PXMHXfImSY5QXn7UBIHhmOMIr9rUlLuWvCTWMpcG9+PRut4VrgmVdcZVQxuzL8sDKPs9/M4sGAoQ==
+"@join-com/grpc@^3.0.0-alpha.13":
+  version "3.0.0-alpha.13"
+  resolved "https://registry.yarnpkg.com/@join-com/grpc/-/grpc-3.0.0-alpha.13.tgz#81ff40a573567604e7e6f019dc14a3ab529bd57d"
+  integrity sha512-vr9BjGzeasBrd4tZmU9Vii24fv3gCU40RHslJW3HYhpBTACMx2EhqJVh+0FK6/wa/M+h+wJmkA4O/mqv3G9tIg==
   dependencies:
-    "@coderspirit/nominal" "^3.0.0"
-    "@grpc/grpc-js" "^1.3.4"
+    "@coderspirit/nominal" "3.0.0"
+    "@grpc/grpc-js" "^1.5.4"
     protobufjs "^6.11.2"
 
 "@join-com/node-trace@^0.1.8":
@@ -3843,7 +3855,7 @@ protobufjs@^5.0.3:
     glob "^7.0.5"
     yargs "^3.10.0"
 
-protobufjs@^6.11.2:
+protobufjs@^6.10.0, protobufjs@^6.11.2:
   version "6.11.2"
   resolved "https://registry.yarnpkg.com/protobufjs/-/protobufjs-6.11.2.tgz#de39fabd4ed32beaa08e9bb1e30d08544c1edf8b"
   integrity sha512-4BQJoPooKJl2G9j3XftkIXjoC9C0Av2NOrWmbLWT1vH32GcSUHjM0Arra6UfTsVyfMAuFzaLucXn1sadxJydAw==

@@ -1,27 +1,18 @@
 // GENERATED CODE -- DO NOT EDIT!
-// GENERATOR VERSION: 2.1.0.52c4a08.1645020547
+// GENERATOR VERSION: 2.1.0.9e5a89f.1645085209
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import * as protobufjs from 'protobufjs/light'
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace GoogleProtobuf {
-  const registerCommonClass = <T extends protobufjs.Message<T>>(typeName: string): protobufjs.TypeDecorator<T> => {
-    const registeredType = protobufjs.util.decorateRoot.get(typeName)
-    if (registeredType == null) {
-      return protobufjs.Type.d(typeName)
-    }
-    return (ctor: protobufjs.Constructor<T>): void => {
-      Object.defineProperty(ctor, '$type', { value: registeredType, enumerable: false })
-    }
-  }
   interface ConvertibleTo<T> {
     asInterface(): T
   }
 
   export interface IEmpty {}
 
-  @registerCommonClass('google_protobuf_Empty')
+  @protobufjs.Type.d('google_protobuf_Empty')
   export class Empty extends protobufjs.Message<Empty> implements ConvertibleTo<IEmpty>, IEmpty {
     public asInterface(): IEmpty {
       const message = {

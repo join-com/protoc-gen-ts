@@ -1,8 +1,12 @@
 // GENERATED CODE -- DO NOT EDIT!
-// GENERATOR VERSION: 2.1.0.9e5a89f.1645085209
+// GENERATOR VERSION: 2.1.0.e9910b5.1646051017
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import * as protobufjs from 'protobufjs/light'
+
+import { root } from './root'
+
+protobufjs.roots['decorated'] = root
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Regressions {

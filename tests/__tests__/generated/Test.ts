@@ -1,5 +1,5 @@
 // GENERATED CODE -- DO NOT EDIT!
-// GENERATOR VERSION: 2.1.0.9e5a89f.1645085209
+// GENERATOR VERSION: 2.1.0.e9910b5.1646051017
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import * as joinGRPC from '@join-com/grpc'
@@ -9,8 +9,10 @@ import { Common as Common_Common } from './common/Common'
 import { Common as Common_Extra } from './common/Extra'
 import { GoogleProtobuf as GoogleProtobuf_Empty } from './google/protobuf/Empty'
 import { GoogleProtobuf as GoogleProtobuf_Timestamp } from './google/protobuf/Timestamp'
-
 import { grpc } from '@join-com/grpc'
+import { root } from './root'
+
+protobufjs.roots['decorated'] = root
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Foo {

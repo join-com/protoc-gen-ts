@@ -1,13 +1,15 @@
 // GENERATED CODE -- DO NOT EDIT!
-// GENERATOR VERSION: 2.1.0.9e5a89f.1645085209
+// GENERATOR VERSION: 2.1.0.e9910b5.1646051017
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import * as joinGRPC from '@join-com/grpc'
 import * as protobufjs from 'protobufjs/light'
 
 import { WithFlavor } from '@coderspirit/nominal'
-
 import { grpc } from '@join-com/grpc'
+import { root } from './root'
+
+protobufjs.roots['decorated'] = root
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Flavors {

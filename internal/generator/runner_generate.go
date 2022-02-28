@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"sort"
 	"strconv"
+	"strings"
 
 	"github.com/iancoleman/strcase"
 	"github.com/join-com/protoc-gen-ts/internal/join_proto"
@@ -26,6 +27,7 @@ func (r *Runner) generateTypescriptFile(protoFile *protogen.File, generatedFileS
 	)
 
 	r.generateTypescriptImports(protoFile, generatedFileStream)
+	r.generateRootChange(protoFile, generatedFileStream)
 	r.generateTypescriptNamespace(generatedFileStream, protoFile)
 }
 
@@ -63,11 +65,21 @@ func (r *Runner) generateTypescriptImports(protoFile *protogen.File, generatedFi
 	for _, importLine := range importLines {
 		generatedFileStream.P(importLine)
 	}
-	generatedFileStream.P("")
 
 	if len(protoFile.Proto.GetService()) > 0 {
-		generatedFileStream.P("import { grpc } from '@join-com/grpc'\n")
+		generatedFileStream.P("import { grpc } from '@join-com/grpc'")
 	}
+
+	numStepsBack := len(strings.Split(currentSourcePath, "/")) - 1
+	if numStepsBack == 0 {
+		generatedFileStream.P("import { root } from './root'\n")
+	} else {
+		generatedFileStream.P("import { root } from '" + strings.Repeat("../", numStepsBack) + "root'\n")
+	}
+}
+
+func (r *Runner) generateRootChange(protoFile *protogen.File, generatedFileStream *protogen.GeneratedFile) {
+	generatedFileStream.P("protobufjs.roots['decorated'] = root\n")
 }
 
 func (r *Runner) fileHasFlavors(generatedFileStream *protogen.GeneratedFile, protoFile *protogen.File) bool {

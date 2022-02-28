@@ -75,5 +75,9 @@ func (r *Runner) Run(plugin *protogen.Plugin) error {
 		r.generateTypescriptFile(file, generatedFileStream)
 	}
 
+	// Generate file with shared protobuf Root instance
+	rootFileStream := plugin.NewGeneratedFile("root.ts", "")
+	r.generateRoot(rootFileStream)
+
 	return nil
 }

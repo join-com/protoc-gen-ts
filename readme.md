@@ -8,7 +8,7 @@ To install the "new" generator (bear in mind that it could be installed in `${HO
 ```
 curl -Lo protoc-gen-tsx \
     https://github.com/join-com/protoc-gen-ts/releases/download/[VERSION]/protoc-gen-tsx.darwin.amd64 \
-&& chmod +x protoc-gen-tsx \
+&& sudo chmod +x protoc-gen-tsx \
 && sudo mv protoc-gen-tsx /usr/local/bin
 ```
 

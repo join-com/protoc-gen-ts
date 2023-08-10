@@ -37,4 +37,7 @@ extend google.protobuf.FieldOptions {
 
   // Marks field as flavored
   optional string typescript_flavor = 50203;
+
+  // Marks field as mask
+  optional string typescript_mask = 50204;
 }

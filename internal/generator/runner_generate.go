@@ -100,6 +100,24 @@ func (r *Runner) fileHasFlavors(generatedFileStream *protogen.GeneratedFile, pro
 	return false
 }
 
+func (r *Runner) fileHasFieldMasks(generatedFileStream *protogen.GeneratedFile, protoFile *protogen.File) bool {
+	for _, messageSpec := range protoFile.Proto.GetMessageType() {
+		for _, fieldSpec := range messageSpec.GetField() {
+			fieldOptions := fieldSpec.GetOptions()
+			if fieldOptions == nil {
+				continue
+			}
+
+			maskName, found := join_proto.GetStringCustomFieldOption("typescript_mask", fieldOptions, r.extensionTypes)
+			if found && maskName != "" {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
 func (r *Runner) generateImportName(currentSourcePath string, importSourcePath string) string {
 	packageName, validPkgName := r.packagesByFile[importSourcePath]
 	if !validPkgName {
@@ -142,6 +160,15 @@ func (r *Runner) generateTypescriptNamespace(generatedFileStream *protogen.Gener
 		"  asInterface(): T",
 		"}\n",
 	)
+
+	if r.fileHasFieldMasks(generatedFileStream, protoFile) {
+		r.P(
+			generatedFileStream,
+			"interface IFieldMask<T> {",
+			"  paths?: (keyof T)[] | string[]",
+			"}\n",
+		)
+	}
 
 	r.generateTypescriptFlavors(generatedFileStream, protoFile)
 	r.generateTypescriptEnums(generatedFileStream, protoFile)

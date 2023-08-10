@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package field_masks;
+
+// Makes protoc happy (useful for Golang code generation, not for TS)
+option go_package = "github.com/join-com/protoc-gen-ts/field_mask";
+
+// Needed to have access to field mask fields
+import "options.proto";
+import "google/protobuf/field_mask.proto";
+
+service Users {
+  rpc Get(GetRequest) returns (User) {}
+}
+
+message GetRequest {
+  int32 id = 1;
+  google.protobuf.FieldMask read_mask = 2 [(join.protobuf.typescript_mask) = "User"];
+}
+
+message User {
+  int32 id = 1;
+  string name = 2;
+  string email = 3;
+}

@@ -11,6 +11,7 @@ import (
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/reflect/protoregistry"
 	"google.golang.org/protobuf/types/descriptorpb"
+	"log"
 )
 
 // Sort of a global state for the generator's runner
@@ -58,6 +59,7 @@ func (r *Runner) Run(plugin *protogen.Plugin) error {
 
 	// Data collection step (files are listed in topological order)
 	for _, file := range plugin.Files {
+		log.Println(file.Desc.Path())
 		r.currentProtoFilePath = file.Desc.Path()
 		r.collectData(file)
 	}

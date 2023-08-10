@@ -69,14 +69,19 @@ func (r *Runner) getMessageFieldDecorator(fieldSpec *descriptorpb.FieldDescripto
 
 func (r *Runner) getInterfaceFieldType(fieldSpec *descriptorpb.FieldDescriptorProto) string {
 	fieldOptions := fieldSpec.GetOptions()
-	found, flavorName := false, ""
+	flavorFound, flavorName := false, ""
+	maskFound, maskName := false, ""
+
 	if fieldOptions != nil {
-		flavorName, found = join_proto.GetStringCustomFieldOption("typescript_flavor", fieldOptions, r.extensionTypes)
+		flavorName, flavorFound = join_proto.GetStringCustomFieldOption("typescript_flavor", fieldOptions, r.extensionTypes)
+		maskName, maskFound  = join_proto.GetStringCustomFieldOption("typescript_mask", fieldOptions, r.extensionTypes)
 	}
 
 	baseType := "unknown"
-	if found && flavorName != "" {
+	if flavorFound && flavorName != "" {
 		baseType = flavorName
+	} else if maskFound && maskName != "" {
+		baseType = "IFieldMask<I" + maskName + ">"
 	} else {
 		switch fieldSpec.GetType() {
 		case descriptorpb.FieldDescriptorProto_TYPE_BOOL:

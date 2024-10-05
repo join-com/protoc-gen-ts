@@ -194,8 +194,11 @@ func (r *Runner) generateAsInterfaceMethod(generatedFileStream *protogen.Generat
 	r.indentLevel += 2
 
 	hasRepeated := false
+	onlyRequired := true
 	for _, fieldSpec := range messageSpec.GetField() {
 		hasRepeated = hasRepeated || (fieldSpec.GetLabel() == descriptorpb.FieldDescriptorProto_LABEL_REPEATED)
+		requiredField, foundRequired := join_proto.GetBooleanCustomFieldOption("typescript_required", fieldSpec.GetOptions(), r.extensionTypes)
+		onlyRequired = onlyRequired && requiredField && foundRequired
 	}
 
 	r.P(generatedFileStream, "const message = {")
@@ -211,22 +214,24 @@ func (r *Runner) generateAsInterfaceMethod(generatedFileStream *protogen.Generat
 	var loopInnerIfClause string
 	if hasRepeated {
 		fieldAssignment = "  const field = message[fieldName as keyof I" + className + "]"
-		loopInnerIfClause = "field == null || Array.isArray(field) && field.length === 0"
+		loopInnerIfClause = "field == null || Array.isArray(field) && (field as any[]).length === 0"
 	} else {
 		fieldAssignment = ""
 		loopInnerIfClause = "message[fieldName as keyof I" + className + "] == null"
 	}
 
-	r.P(
-		generatedFileStream,
-		"for (const fieldName of Object.keys(message)) {",
-		fieldAssignment,
-		"  if ("+loopInnerIfClause+") {",
-		"    // We remove the key to avoid problems with code making too many assumptions",
-		"    delete message[fieldName as keyof I"+className+"]",
-		"  }",
-		"}",
-	)
+	if !onlyRequired {
+		r.P(
+			generatedFileStream,
+			"for (const fieldName of Object.keys(message)) {",
+			fieldAssignment,
+			"  if ("+loopInnerIfClause+") {",
+			"    // We remove the key to avoid problems with code making too many assumptions",
+			"    delete message[fieldName as keyof I"+className+"]",
+			"  }",
+			"}",
+		)
+	}
 
 	r.P(generatedFileStream, "return message")
 
@@ -271,7 +276,7 @@ func (r *Runner) generateDecodePatchedMethod(generatedFileStream *protogen.Gener
 		var loopInerIfClause string
 		if hasRepeated {
 			fieldAssignment = "  const field = message[fieldName]"
-			loopInerIfClause = "field == null || Array.isArray(field) && field.length === 0"
+			loopInerIfClause = "field == null || Array.isArray(field) && (field as any[]).length === 0"
 		} else {
 			fieldAssignment = ""
 			loopInerIfClause = "message[fieldName] == null"
@@ -330,7 +335,7 @@ func (r *Runner) generateEncodePatchedMethod(generatedFileStream *protogen.Gener
 		var loopInerIfClause string
 		if hasRepeated {
 			fieldAssignment = "  const field = message[fieldName]"
-			loopInerIfClause = "field == null || Array.isArray(field) && field.length === 0"
+			loopInerIfClause = "field == null || Array.isArray(field) && (field as any[]).length === 0"
 		} else {
 			fieldAssignment = ""
 			loopInerIfClause = "message[fieldName] == null"

@@ -34,7 +34,7 @@ commands:
 jobs:
   build_and_test:
     docker:
-      - image: cimg/golang:1.17-node
+      - image: cimg/go:1.17-node
         <<: *docker-auth
     steps:
       - install_protoc

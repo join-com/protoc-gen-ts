@@ -126,4 +126,10 @@ message RequiredPropertiesTest {
   int32 required_field = 1;
   int32 custom_required_field = 2 [(join.protobuf.typescript_required) = true]; // This should not make a difference
   int32 optional_field = 3 [(join.protobuf.typescript_optional) = true];
+  repeated int32 repeated_optional_field = 4 [(join.protobuf.typescript_optional) = true];
+  EnumType required_enum_field = 5 [(join.protobuf.typescript_required) = true];
+}
+
+message OneRequiredFieldTest {
+  int32 single_required_field = 1 [(join.protobuf.typescript_required) = true];
 }

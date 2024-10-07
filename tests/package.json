@@ -18,11 +18,10 @@
   "dependencies": {
     "@coderspirit/nominal": "^3.0.0",
     "@join-com/gcloud-logger-trace": "^0.1.17",
-    "@join-com/grpc": "^3.6.1",
+    "@join-com/grpc": "^3.6.4",
     "protobufjs": "^6.11.2"
   },
   "devDependencies": {
-    "@join-com/grpc-ts": "^2.0.2",
     "@types/jest": "^27.0.2",
     "@types/node": "^14.14.41",
     "@typescript-eslint/eslint-plugin": "^4.33.0",

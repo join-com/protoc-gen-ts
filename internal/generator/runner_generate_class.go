@@ -214,7 +214,7 @@ func (r *Runner) generateAsInterfaceMethod(generatedFileStream *protogen.Generat
 	var loopInnerIfClause string
 	if hasRepeated {
 		fieldAssignment = "  const field = message[fieldName as keyof I" + className + "]"
-		loopInnerIfClause = "field == null || Array.isArray(field) && (field as any[]).length === 0"
+		loopInnerIfClause = "field == null || Array.isArray(field) && (field as unknown[]).length === 0"
 	} else {
 		fieldAssignment = ""
 		loopInnerIfClause = "message[fieldName as keyof I" + className + "] == null"
@@ -276,7 +276,7 @@ func (r *Runner) generateDecodePatchedMethod(generatedFileStream *protogen.Gener
 		var loopInerIfClause string
 		if hasRepeated {
 			fieldAssignment = "  const field = message[fieldName]"
-			loopInerIfClause = "field == null || Array.isArray(field) && (field as any[]).length === 0"
+			loopInerIfClause = "field == null || Array.isArray(field) && (field as unknown[]).length === 0"
 		} else {
 			fieldAssignment = ""
 			loopInerIfClause = "message[fieldName] == null"
@@ -335,7 +335,7 @@ func (r *Runner) generateEncodePatchedMethod(generatedFileStream *protogen.Gener
 		var loopInerIfClause string
 		if hasRepeated {
 			fieldAssignment = "  const field = message[fieldName]"
-			loopInerIfClause = "field == null || Array.isArray(field) && (field as any[]).length === 0"
+			loopInerIfClause = "field == null || Array.isArray(field) && (field as unknown[]).length === 0"
 		} else {
 			fieldAssignment = ""
 			loopInerIfClause = "message[fieldName] == null"

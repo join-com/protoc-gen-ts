@@ -1,5 +1,5 @@
 // GENERATED CODE -- DO NOT EDIT!
-// GENERATOR VERSION: 2.3.0.9b92372.1728131327
+// GENERATOR VERSION: 2.3.1.cbb8b0b.1728390468
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import * as joinGRPC from '@join-com/grpc'
@@ -50,7 +50,7 @@ export namespace Flavors {
       }
       for (const fieldName of Object.keys(message)) {
         const field = message[fieldName as keyof IUserProfile]
-        if (field == null || (Array.isArray(field) && field.length === 0)) {
+        if (field == null || (Array.isArray(field) && (field as any[]).length === 0)) {
           // We remove the key to avoid problems with code making too many assumptions
           delete message[fieldName as keyof IUserProfile]
         }
@@ -66,7 +66,7 @@ export namespace Flavors {
       const message = UserProfile.decode(reader).asInterface()
       for (const fieldName of ['id', 'username', 'emails'] as (keyof IUserProfile)[]) {
         const field = message[fieldName]
-        if (field == null || (Array.isArray(field) && field.length === 0)) {
+        if (field == null || (Array.isArray(field) && (field as any[]).length === 0)) {
           throw new Error(`Required field ${fieldName} in UserProfile is null or undefined`)
         }
       }
@@ -76,7 +76,7 @@ export namespace Flavors {
     public static encodePatched(this: void, message: IUserProfile, writer?: protobufjs.Writer): protobufjs.Writer {
       for (const fieldName of ['id', 'username', 'emails'] as (keyof IUserProfile)[]) {
         const field = message[fieldName]
-        if (field == null || (Array.isArray(field) && field.length === 0)) {
+        if (field == null || (Array.isArray(field) && (field as any[]).length === 0)) {
           throw new Error(`Required field ${fieldName} in UserProfile is null or undefined`)
         }
       }

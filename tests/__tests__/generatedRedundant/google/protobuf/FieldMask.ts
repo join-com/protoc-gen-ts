@@ -1,5 +1,5 @@
 // GENERATED CODE -- DO NOT EDIT!
-// GENERATOR VERSION: 2.3.0.efa59c2.1691588972
+// GENERATOR VERSION: 2.3.1.cbb8b0b.1728390468
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import * as protobufjs from 'protobufjs/light'
@@ -29,7 +29,7 @@ export namespace GoogleProtobuf {
       }
       for (const fieldName of Object.keys(message)) {
         const field = message[fieldName as keyof IFieldMask]
-        if (field == null || (Array.isArray(field) && field.length === 0)) {
+        if (field == null || (Array.isArray(field) && (field as any[]).length === 0)) {
           // We remove the key to avoid problems with code making too many assumptions
           delete message[fieldName as keyof IFieldMask]
         }

@@ -1,5 +1,5 @@
 // GENERATED CODE -- DO NOT EDIT!
-// GENERATOR VERSION: 2.3.0.efa59c2.1691588972
+// GENERATOR VERSION: 2.3.1.cbb8b0b.1728390468
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import * as joinGRPC from '@join-com/grpc'
@@ -102,6 +102,12 @@ export namespace Foo {
     requiredField: number
     customRequiredField: number
     optionalField?: number
+    repeatedOptionalField?: number[]
+    requiredEnumField: EnumType
+  }
+
+  export interface IOneRequiredFieldTest {
+    singleRequiredField: number
   }
 
   @protobufjs.Type.d('foo_CustomOptionsTest')
@@ -200,6 +206,49 @@ export namespace Foo {
     }
   }
 
+  @protobufjs.Type.d('foo_OneRequiredFieldTest')
+  export class OneRequiredFieldTest
+    extends protobufjs.Message<OneRequiredFieldTest>
+    implements ConvertibleTo<IOneRequiredFieldTest>, IOneRequiredFieldTest
+  {
+    @protobufjs.Field.d(1, 'int32')
+    public singleRequiredField!: number
+
+    public asInterface(): IOneRequiredFieldTest {
+      const message = {
+        ...this,
+      }
+      return message
+    }
+
+    public static fromInterface(this: void, value: IOneRequiredFieldTest): OneRequiredFieldTest {
+      return OneRequiredFieldTest.fromObject(value)
+    }
+
+    public static decodePatched(this: void, reader: protobufjs.Reader | Uint8Array): IOneRequiredFieldTest {
+      const message = OneRequiredFieldTest.decode(reader).asInterface()
+      for (const fieldName of ['singleRequiredField'] as (keyof IOneRequiredFieldTest)[]) {
+        if (message[fieldName] == null) {
+          throw new Error(`Required field ${fieldName} in OneRequiredFieldTest is null or undefined`)
+        }
+      }
+      return message
+    }
+
+    public static encodePatched(
+      this: void,
+      message: IOneRequiredFieldTest,
+      writer?: protobufjs.Writer,
+    ): protobufjs.Writer {
+      for (const fieldName of ['singleRequiredField'] as (keyof IOneRequiredFieldTest)[]) {
+        if (message[fieldName] == null) {
+          throw new Error(`Required field ${fieldName} in OneRequiredFieldTest is null or undefined`)
+        }
+      }
+      return OneRequiredFieldTest.encode(message, writer)
+    }
+  }
+
   @protobufjs.Type.d('foo_Request')
   export class Request extends protobufjs.Message<Request> implements ConvertibleTo<IRequest>, IRequest {
     @protobufjs.Field.d(1, 'int32', 'optional')
@@ -234,7 +283,7 @@ export namespace Foo {
   @protobufjs.Type.d('foo_RequiredPropertiesTest')
   export class RequiredPropertiesTest
     extends protobufjs.Message<RequiredPropertiesTest>
-    implements ConvertibleTo<IRequiredPropertiesTest>, IRequiredPropertiesTest
+    implements ConvertibleTo<IRequiredPropertiesTest>
   {
     @protobufjs.Field.d(1, 'int32')
     public requiredField!: number
@@ -245,12 +294,20 @@ export namespace Foo {
     @protobufjs.Field.d(3, 'int32', 'optional')
     public optionalField?: number
 
+    @protobufjs.Field.d(4, 'int32', 'repeated')
+    public repeatedOptionalField?: number[]
+
+    @protobufjs.Field.d(5, EnumType_Enum)
+    public requiredEnumField!: EnumType_Enum
+
     public asInterface(): IRequiredPropertiesTest {
       const message = {
         ...this,
+        requiredEnumField: EnumType_Enum[this.requiredEnumField]! as EnumType,
       }
       for (const fieldName of Object.keys(message)) {
-        if (message[fieldName as keyof IRequiredPropertiesTest] == null) {
+        const field = message[fieldName as keyof IRequiredPropertiesTest]
+        if (field == null || (Array.isArray(field) && (field as any[]).length === 0)) {
           // We remove the key to avoid problems with code making too many assumptions
           delete message[fieldName as keyof IRequiredPropertiesTest]
         }
@@ -259,13 +316,23 @@ export namespace Foo {
     }
 
     public static fromInterface(this: void, value: IRequiredPropertiesTest): RequiredPropertiesTest {
-      return RequiredPropertiesTest.fromObject(value)
+      const patchedValue = {
+        ...value,
+        requiredEnumField: EnumType_Enum[value.requiredEnumField]!,
+      }
+
+      return RequiredPropertiesTest.fromObject(patchedValue)
     }
 
     public static decodePatched(this: void, reader: protobufjs.Reader | Uint8Array): IRequiredPropertiesTest {
       const message = RequiredPropertiesTest.decode(reader).asInterface()
-      for (const fieldName of ['requiredField', 'customRequiredField'] as (keyof IRequiredPropertiesTest)[]) {
-        if (message[fieldName] == null) {
+      for (const fieldName of [
+        'requiredField',
+        'customRequiredField',
+        'requiredEnumField',
+      ] as (keyof IRequiredPropertiesTest)[]) {
+        const field = message[fieldName]
+        if (field == null || (Array.isArray(field) && (field as any[]).length === 0)) {
           throw new Error(`Required field ${fieldName} in RequiredPropertiesTest is null or undefined`)
         }
       }
@@ -277,12 +344,18 @@ export namespace Foo {
       message: IRequiredPropertiesTest,
       writer?: protobufjs.Writer,
     ): protobufjs.Writer {
-      for (const fieldName of ['requiredField', 'customRequiredField'] as (keyof IRequiredPropertiesTest)[]) {
-        if (message[fieldName] == null) {
+      for (const fieldName of [
+        'requiredField',
+        'customRequiredField',
+        'requiredEnumField',
+      ] as (keyof IRequiredPropertiesTest)[]) {
+        const field = message[fieldName]
+        if (field == null || (Array.isArray(field) && (field as any[]).length === 0)) {
           throw new Error(`Required field ${fieldName} in RequiredPropertiesTest is null or undefined`)
         }
       }
-      return RequiredPropertiesTest.encode(message, writer)
+      const transformedMessage = RequiredPropertiesTest.fromInterface(message)
+      return RequiredPropertiesTest.encode(transformedMessage, writer)
     }
   }
 
@@ -424,7 +497,7 @@ export namespace Foo {
       }
       for (const fieldName of Object.keys(message)) {
         const field = message[fieldName as keyof ITest]
-        if (field == null || (Array.isArray(field) && field.length === 0)) {
+        if (field == null || (Array.isArray(field) && (field as any[]).length === 0)) {
           // We remove the key to avoid problems with code making too many assumptions
           delete message[fieldName as keyof ITest]
         }
